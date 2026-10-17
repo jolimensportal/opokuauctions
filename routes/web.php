@@ -13,16 +13,7 @@ use Illuminate\Support\Facades\Route;
 | behind /admin and shares none of this chrome.
 */
 
-// THROWAWAY DESIGN PREVIEW — local only, so it cannot reach production.
-// Delete this block and resources/views/shop/preview-kinds.blade.php once the
-// multi-kind lot design is signed off.
-if (app()->environment('local')) {
-    Route::view('/_preview/kinds', 'shop.preview-kinds')->name('preview.kinds');
-}
-
 Route::get('/', [ShopController::class, 'home'])->name('home');
-
-
 
 Route::get('/lots', [ShopController::class, 'lots'])->name('lots.index');
 Route::get('/lots/{lot}', [ShopController::class, 'lot'])->name('lots.show');

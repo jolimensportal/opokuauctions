@@ -1,6 +1,6 @@
 @extends('layouts.shop')
 
-@section('title', $lot->year.' '.$lot->make.' '.$lot->model.' — Opoku Auctions')
+@section('title', $lot->title.' — Opoku Auctions')
 
 @section('content')
 <section class="mx-auto max-w-6xl px-4 sm:px-6 pt-10 pb-20">
@@ -11,25 +11,54 @@
 
         <div class="lg:col-span-7">
             <img src="{{ $lot->primaryPhoto() ?? 'https://picsum.photos/seed/opoku-lot-'.$lot->id.'/1200/900' }}"
-                 alt="{{ $lot->year }} {{ $lot->make }} {{ $lot->model }} in {{ $lot->city }}"
+                 alt="{{ $lot->title }} in {{ $lot->city }}"
                  width="1200" height="900" fetchpriority="high" decoding="async"
                  class="w-full h-72 sm:h-[28rem] object-cover rounded-[10px] border border-ink-200">
 
+            {{-- The facts a buyer weighs this lot by, which differ by kind: a
+                 pallet has no mileage or VIN, and a bed frame has neither. The
+                 shared facts sit at the end so both kinds answer location and
+                 condition the same way. --}}
+            @php
+                $facts = [];
+
+                if ($lot->vehicleDetail) {
+                    $facts[] = ['VIN', $lot->vehicleDetail->vin ?: 'Not recorded'];
+                    $facts[] = ['Year', $lot->vehicleDetail->year];
+                    $facts[] = ['Mileage', $lot->vehicleDetail->odometer
+                        ? number_format($lot->vehicleDetail->odometer).' mi'
+                        : 'Not recorded'];
+                    $facts[] = ['Primary damage', $lot->vehicleDetail->damage_primary ?: 'Not recorded'];
+                } else {
+                    $goods = $lot->goodsDetail;
+
+                    $facts[] = ['Unit', $goods?->unit_label ?: str_replace('_', ' ', $lot->kind)];
+
+                    if ($goods?->manifest_count) {
+                        $facts[] = ['Pieces', number_format($goods->manifest_count)];
+                    }
+                }
+
+                if ($lot->weight_kg) {
+                    $facts[] = ['Weight', number_format((float) $lot->weight_kg).' kg'];
+                }
+
+                $facts[] = ['Location', $lot->city];
+                $facts[] = ['Condition', str_replace('_', ' ', $lot->condition)];
+            @endphp
+
             <div class="mt-6 grid gap-4 sm:grid-cols-2">
-                @foreach ([
-                    ['VIN', $lot->vin],
-                    ['Year', $lot->year],
-                    ['Mileage', $lot->odometer ? number_format($lot->odometer).' mi' : 'Not recorded'],
-                    ['Location', $lot->city],
-                    ['Condition', str_replace('_', ' ', $lot->condition)],
-                    ['Primary damage', $lot->damage_primary ?: 'Not recorded'],
-                ] as [$label, $value])
+                @foreach ($facts as [$label, $value])
                     <div class="flex items-baseline justify-between gap-4 border-b border-ink-200 pb-2.5">
                         <span class="text-sm text-ink-500">{{ $label }}</span>
                         <span class="text-sm font-medium text-ink-900 tnum">{{ $value }}</span>
                     </div>
                 @endforeach
             </div>
+
+            @if ($lot->description)
+                <p class="mt-6 text-sm text-ink-700 leading-relaxed">{{ $lot->description }}</p>
+            @endif
         </div>
 
         {{-- The buying column. Sticky on desktop because it is the thing being
@@ -46,13 +75,19 @@
                 </div>
 
                 <h1 class="mt-4 text-3xl font-extrabold tracking-tight text-ink-900">
-                    {{ $lot->year }} {{ $lot->make }} {{ $lot->model }}
+                    {{ $lot->title }}
                 </h1>
 
                 {{-- No invented lot number. Nothing in the schema names one, and
                      slicing the primary key produced "Lot _DEMO_02" on demo
-                     rows. The VIN below is the identifier a buyer can quote. --}}
-                <p class="mt-1 text-sm text-ink-500">{{ $lot->city }} &middot; VIN <span class="tnum">{{ $lot->vin }}</span></p>
+                     rows. The VIN is the identifier a buyer can quote — and only
+                     a vehicle has one. --}}
+                <p class="mt-1 text-sm text-ink-500">
+                    {{ $lot->city }}
+                    @if ($lot->vehicleDetail?->vin)
+                        &middot; VIN <span class="tnum">{{ $lot->vehicleDetail->vin }}</span>
+                    @endif
+                </p>
 
                 <div class="mt-6 pt-6 border-t border-ink-200">
                     <div class="text-xs uppercase tracking-[0.14em] text-ink-500">Current bid</div>

@@ -41,8 +41,8 @@
             @php $lot = $shipmentLot->lot; @endphp
             @if ($lot)
                 <a href="{{ route('lots.show', $lot) }}" class="flex items-center justify-between gap-4 py-3 border-b border-ink-200">
-                    <span class="font-medium text-ink-900">{{ $lot->year }} {{ $lot->make }} {{ $lot->model }}</span>
-                    <span class="text-xs tnum text-ink-500">{{ $lot->vin }}</span>
+                    <span class="font-medium text-ink-900">{{ $lot->title }}</span>
+                    <span class="text-xs tnum text-ink-500">{{ $lot->vehicleDetail?->vin }}</span>
                 </a>
             @endif
         @endforeach

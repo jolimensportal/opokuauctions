@@ -9,7 +9,7 @@
     <a href="{{ route('lots.show', $lot) }}" class="flex flex-col flex-1 group">
         <div class="relative">
             <img src="{{ $lot->primaryPhoto() ?? 'https://picsum.photos/seed/opoku-lot-'.$lot->id.'/600/400' }}"
-                 alt="{{ $lot->year }} {{ $lot->make }} {{ $lot->model }}"
+                 alt="{{ $lot->title }}"
                  width="600" height="400" loading="lazy" decoding="async"
                  class="w-full aspect-[3/2] object-cover">
 
@@ -28,10 +28,14 @@
 
         <div class="p-4 flex flex-col flex-1">
             <h3 class="font-semibold leading-snug text-ink-900 group-hover:text-brick-600 transition-colors">
-                {{ $lot->year }} {{ $lot->make }} {{ $lot->model }}
+                {{ $lot->title }}
             </h3>
             <p class="mt-1 text-xs text-ink-500 tnum">
-                {{ $lot->city }} &middot; {{ number_format(($lot->odometer ?? 0) / 1) }} mi
+                @if ($lot->vehicleDetail?->odometer)
+                    {{ $lot->city }} &middot; {{ number_format($lot->vehicleDetail->odometer) }} mi
+                @else
+                    {{ $lot->city }} &middot; {{ $lot->weight_kg ? number_format((float) $lot->weight_kg).' kg' : 'Weight on request' }}
+                @endif
             </p>
 
             <div class="mt-auto pt-4 flex items-end justify-between gap-3">

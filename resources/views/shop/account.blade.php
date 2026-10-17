@@ -23,7 +23,7 @@
                 <div class="min-w-0">
                     <a href="{{ route('lots.show', $lot) }}"
                        class="font-semibold text-ink-900 hover:text-brick-600">
-                        {{ $lot->year }} {{ $lot->make }} {{ $lot->model }}
+                        {{ $lot->title }}
                     </a>
                     <p class="text-xs text-ink-500 tnum">
                         {{ str_replace('_', ' ', $lot->status) }}

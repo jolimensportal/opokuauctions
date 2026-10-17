@@ -12,14 +12,14 @@
          information. --}}
     <div class="col-span-4 sm:col-span-2">
         <img src="{{ $lot->primaryPhoto() ?? 'https://picsum.photos/seed/opoku-lot-'.$lot->id.'/400/260' }}"
-             alt="{{ $lot->year }} {{ $lot->make }} {{ $lot->model }}"
+             alt="{{ $lot->title }}"
              width="400" height="260" loading="lazy" decoding="async"
              class="w-full aspect-[3/2] object-cover rounded-[8px] border border-ink-200">
     </div>
 
     <div class="col-span-8 sm:col-span-4 min-w-0">
-        <div class="font-semibold text-ink-900 truncate">{{ $lot->year }} {{ $lot->make }} {{ $lot->model }}</div>
-        <div class="text-xs text-ink-500 tnum truncate">{{ $lot->vin }}</div>
+        <div class="font-semibold text-ink-900 truncate">{{ $lot->title }}</div>
+        <div class="text-xs text-ink-500 tnum truncate">{{ $lot->vehicleDetail?->vin }}</div>
     </div>
 
     <div class="hidden sm:block col-span-2 text-sm text-ink-600 truncate">{{ $lot->city }}</div>
