@@ -208,15 +208,19 @@ class ShipmentService
      */
     private function assertFullyPaid(string $shipmentId): void
     {
+        // The lot's name comes from its own title column now. It used to be
+        // assembled from year, make and model, but those moved to
+        // vehicle_detail — which a pallet has no row in, and which this query
+        // would have needed an inner join to reach anyway.
         $unpaid = DB::table('shipment_lots')
             ->join('lot', 'lot.id', '=', 'shipment_lots.lot_id')
             ->where('shipment_lots.shipment_id', $shipmentId)
             ->whereNull('lot.balance_settled_at')
-            ->select('lot.id', 'lot.make', 'lot.model', 'lot.year')
+            ->select('lot.id', 'lot.title')
             ->get();
 
         if ($unpaid->isNotEmpty()) {
-            $names = $unpaid->map(fn ($l) => "{$l->year} {$l->make} {$l->model}")->implode(', ');
+            $names = $unpaid->pluck('title')->implode(', ');
 
             throw new RuntimeException(
                 "Cannot load: {$unpaid->count()} lot(s) still owe their balance — {$names}."

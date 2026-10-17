@@ -3,6 +3,8 @@
 namespace App\Filament\Resources\Lots\Schemas;
 
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
 
@@ -12,28 +14,47 @@ class LotForm
     {
         return $schema
             ->components([
-                TextInput::make('vin'),
-                TextInput::make('year')
+                // The vehicle-only inputs moved to vehicle_detail. This form is
+                // temporarily reduced to the shared columns so admin keeps
+                // working; it is rebuilt kind-aware later in this branch.
+                Select::make('kind')
                     ->required()
-                    ->numeric(),
-                TextInput::make('make')
-                    ->required(),
-                TextInput::make('model')
-                    ->required(),
-                TextInput::make('trim'),
+                    ->default('vehicle')
+                    ->options([
+                        'vehicle' => 'Vehicle',
+                        'goods' => 'Goods (pallet, bundle or single item)',
+                    ]),
+                Select::make('provenance')
+                    ->required()
+                    ->default('salvage_auction')
+                    ->options([
+                        'salvage_auction' => 'Salvage auction',
+                        'garage_sale' => 'Garage sale',
+                        'repo' => 'Foreclosure',
+                        'liquidation' => 'Liquidation',
+                        'overstock' => 'Overstock / returns',
+                        'estate' => 'Estate',
+                        'trade_in' => 'Trade-in',
+                    ]),
+                TextInput::make('title')
+                    ->required()
+                    ->maxLength(255)
+                    ->helperText('What the buyer sees on the board.'),
+                Textarea::make('description')
+                    ->rows(3),
 
                 // Freight is priced per kilo, so an unweighed lot is a lot
                 // nobody can be quoted and a page with an empty freight card.
-                // Left blank, the lot picks its weight up from the vehicle
+                // Left blank, a vehicle picks its weight up from the vehicle
                 // lookup on creation; type over it when the car in front of you
-                // is not the standard one.
-                TextInput::make('curb_weight_kg')
-                    ->label('Curb weight (kg)')
+                // is not the standard one. A goods lot must be weighed.
+                TextInput::make('weight_kg')
+                    ->label('Weight (kg)')
                     ->numeric()
                     ->step('0.1')
                     ->minValue(1)
                     ->suffix('kg')
-                    ->helperText('Leave blank to use the weight for this make and model. Type a number to override it.'),
+                    ->helperText('Leave blank on a vehicle to use the weight for this make and model. A goods lot must be weighed.'),
                 TextInput::make('city')
                     ->required(),
                 TextInput::make('photos')
@@ -42,9 +63,6 @@ class LotForm
                 TextInput::make('condition')
                     ->required()
                     ->default('unknown'),
-                TextInput::make('odometer')
-                    ->numeric(),
-                TextInput::make('damage_primary'),
                 TextInput::make('currency_code')
                     ->required()
                     ->default('usd'),

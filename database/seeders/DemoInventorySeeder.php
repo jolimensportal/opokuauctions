@@ -3,6 +3,8 @@
 namespace Database\Seeders;
 
 use App\Models\Lot;
+use App\Models\VehicleDetail;
+use App\Services\CurbWeightLookup;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
@@ -94,6 +96,7 @@ class DemoInventorySeeder extends Seeder
 
         $now = Carbon::now();
         $rows = [];
+        $details = [];
 
         for ($i = 1; $i <= $count; $i++) {
             $make = $this->weighted(self::MAKES);
@@ -128,17 +131,28 @@ class DemoInventorySeeder extends Seeder
 
             $vin = $this->vin($year, $make);
 
-            $rows[] = [
-                'id' => 'lot_fx'.str_pad((string) $i, 4, '0', STR_PAD_LEFT),
+            $id = 'lot_fx'.str_pad((string) $i, 4, '0', STR_PAD_LEFT);
+
+            // Vehicle facts live in vehicle_detail now; the lot keeps the title
+            // a buyer reads. Both rows are written below.
+            $details[] = [
+                'lot_id' => $id,
                 'vin' => $vin,
                 'year' => $year,
                 'make' => $make,
                 'model' => $model,
                 'trim' => Str::random(1).strtoupper(Str::random(5)),
-                'city' => $city,
-                'condition' => $condition,
                 'odometer' => random_int(4_000, 245_000),
                 'damage_primary' => collect(self::DAMAGE)->random(),
+            ];
+
+            $rows[] = [
+                'id' => $id,
+                'kind' => 'vehicle',
+                'provenance' => 'salvage_auction',
+                'title' => $year.' '.$make.' '.$model,
+                'city' => $city,
+                'condition' => $condition,
                 'currency_code' => 'usd',
                 'starting_bid' => $starting,
                 'reserve_price' => random_int(1, 5) === 1 ? 0 : (int) round($current * 1.08 / 500) * 500,
@@ -163,6 +177,14 @@ class DemoInventorySeeder extends Seeder
         foreach (array_chunk($rows, 50) as $chunk) {
             Lot::insert($chunk);
         }
+
+        foreach (array_chunk($details, 50) as $chunk) {
+            VehicleDetail::insert($chunk);
+        }
+
+        // Weigh anything the lookup table can answer for. A generated lot is
+        // otherwise unquotable, and an unquotable lot shows an empty freight card.
+        app(CurbWeightLookup::class)->backfill();
 
         $this->command?->info(sprintf('Seeded %d generated demo lots.', $count));
     }

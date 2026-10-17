@@ -55,7 +55,7 @@
             <p class="text-xs text-gray-500 mb-3">Sold lots whose balance is unpaid. Blocks loading.</p>
             @forelse ($needsMoney['rows'] as $lot)
                 <div class="flex justify-between py-1 text-sm border-b border-gray-100 dark:border-gray-800">
-                    <span>{{ $lot->year }} {{ $lot->make }} {{ $lot->model }}</span>
+                    <span>{{ $lot->title }}</span>
                     <span class="font-mono">{{ $money($lot->current_bid) }}</span>
                 </div>
             @empty
@@ -69,7 +69,7 @@
             <p class="text-xs text-gray-500 mb-3">Paid, no container. The most expensive idle state.</p>
             @forelse ($unallocated['rows'] as $lot)
                 <div class="flex justify-between py-1 text-sm border-b border-gray-100 dark:border-gray-800">
-                    <span>{{ $lot->year }} {{ $lot->make }} {{ $lot->model }} <span class="text-gray-400">· {{ $lot->city }}</span></span>
+                    <span>{{ $lot->title }} <span class="text-gray-400">· {{ $lot->city }}</span></span>
                     <span class="font-mono">{{ $money($lot->current_bid) }}</span>
                 </div>
             @empty

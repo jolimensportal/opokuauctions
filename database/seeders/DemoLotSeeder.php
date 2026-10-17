@@ -4,7 +4,10 @@ namespace Database\Seeders;
 
 use App\Models\Bid;
 use App\Models\Lot;
+use App\Models\VehicleDetail;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Carbon;
 
 /**
@@ -23,13 +26,22 @@ class DemoLotSeeder extends Seeder
     {
         $now = Carbon::now();
 
-        // Earlier development sessions filled `lot` with synthetic factory rows
-        // whose VINs carry a "VIN-" prefix. Left in place they make the storefront
-        // report 84 lots while showing six, which reads as a broken page rather
-        // than as seed data. Only that exact prefix is removed, so this seeder
-        // can never delete inventory that was imported for real.
-        $stale = Lot::where('vin', 'like', 'VIN-%')->delete();
-        Bid::whereIn('lot_id', fn ($q) => $q->select('id')->from('lot')->where('vin', 'like', 'VIN-%'))->delete();
+        // Earlier development sessions filled the tables with synthetic factory
+        // rows whose VINs carry a "VIN-" prefix. Left in place they make the
+        // storefront report a hundred lots while showing six, which reads as a
+        // broken page rather than as seed data. Only that exact prefix is
+        // removed, so this seeder can never delete inventory imported for real.
+        //
+        // The VIN lives in vehicle_detail now, so the search for synthetic rows
+        // goes through there and the matching lot ids are collected once.
+        $syntheticLotIds = DB::table('vehicle_detail')
+            ->where('vin', 'like', 'VIN-%')
+            ->pluck('lot_id');
+
+        Bid::whereIn('lot_id', $syntheticLotIds)->delete();
+        DB::table('shipment_lots')->whereIn('lot_id', $syntheticLotIds)->delete();
+        DB::table('vehicle_detail')->whereIn('lot_id', $syntheticLotIds)->delete();
+        $stale = Lot::whereIn('id', $syntheticLotIds)->delete();
 
         $lots = [
             [
@@ -158,13 +170,32 @@ class DemoLotSeeder extends Seeder
             // Keyed on an explicit, stable id rather than the VIN: editing a
             // seeded lot's year or make is an ordinary edit, and keying on the
             // VIN would insert a duplicate row instead of updating in place.
+            $id = 'lot_demo_'.str_pad((string) ($i + 1), 2, '0', STR_PAD_LEFT);
+
+            // Everything except the vehicle facts, which now live in
+            // vehicle_detail. A pallet has no VIN, and these are all vehicles.
+            // partition() returns [matching, non-matching] and the callback
+            // receives the VALUE, not the key.
+            [$shared, $vehicle] = Arr::partition(
+                $lot,
+                fn ($value, $key) => ! in_array($key, ['vin', 'year', 'make', 'model', 'trim', 'odometer', 'damage_primary'], true),
+            );
+
             Lot::updateOrCreate(
-                ['id' => 'lot_demo_'.str_pad((string) ($i + 1), 2, '0', STR_PAD_LEFT)],
-                $lot + [
+                ['id' => $id],
+                $shared + [
+                    'kind' => 'vehicle',
+                    'provenance' => 'salvage_auction',
+                    'title' => $vehicle['year'].' '.$vehicle['make'].' '.$vehicle['model'],
                     'starts_at' => $now->copy()->subDay(),
                     'extensions' => 0,
                     'highest_bidder_id' => null,
                 ],
+            );
+
+            VehicleDetail::updateOrCreate(
+                ['lot_id' => $id],
+                $vehicle,
             );
         }
 

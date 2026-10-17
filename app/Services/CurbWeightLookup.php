@@ -60,17 +60,30 @@ final class CurbWeightLookup
     {
         // A weight already on the lot is either measured or was typed by
         // someone who knows the car. Either way it outranks this table.
-        if ($lot->curb_weight_kg !== null) {
+        if ($lot->weight_kg !== null) {
             return $lot;
         }
 
-        $weight = $this->forVehicle((string) $lot->make, (string) $lot->model);
+        // Only a vehicle has a make and model to look up. A pallet is weighed
+        // at intake, and a stored guess would be indistinguishable from a
+        // measured weight to everything downstream.
+        if (! $lot->isVehicle()) {
+            return $lot;
+        }
+
+        $detail = $lot->vehicleDetail;
+
+        if (! $detail) {
+            return $lot;
+        }
+
+        $weight = $this->forVehicle((string) $detail->make, (string) $detail->model);
 
         if ($weight === null) {
             return $lot;
         }
 
-        $lot->curb_weight_kg = $weight;
+        $lot->weight_kg = $weight;
         $lot->save();
 
         return $lot;
@@ -93,11 +106,20 @@ final class CurbWeightLookup
         $filled = 0;
         $unweighable = 0;
 
-        Lot::whereNull('curb_weight_kg')
-            ->orWhere('curb_weight_kg', '<=', 0)
+        // Vehicles only: the lookup table is keyed on make and model, and a
+        // pallet is weighed at intake rather than looked up.
+        Lot::where('kind', 'vehicle')
+            ->where(function ($query) {
+                $query->whereNull('weight_kg')->orWhere('weight_kg', '<=', 0);
+            })
+            ->with('vehicleDetail')
             ->chunkById(200, function ($lots) use (&$filled, &$unweighable) {
                 foreach ($lots as $lot) {
-                    $weight = $this->forVehicle((string) $lot->make, (string) $lot->model);
+                    $detail = $lot->vehicleDetail;
+
+                    $weight = $detail
+                        ? $this->forVehicle((string) $detail->make, (string) $detail->model)
+                        : null;
 
                     if ($weight === null) {
                         $unweighable++;
@@ -105,7 +127,7 @@ final class CurbWeightLookup
                         continue;
                     }
 
-                    $lot->curb_weight_kg = $weight;
+                    $lot->weight_kg = $weight;
                     $lot->save();
                     $filled++;
                 }

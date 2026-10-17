@@ -56,7 +56,7 @@ final class QuoteService
      */
     public function forLot(Lot $lot, bool $pickup = false): ?Quote
     {
-        $weight = $lot->curb_weight_kg === null ? null : (float) $lot->curb_weight_kg;
+        $weight = $lot->weight_kg === null ? null : (float) $lot->weight_kg;
 
         // A zero weight is a weight nobody has measured yet, not a vehicle that
         // weighs nothing. Both states mean the same thing: we cannot price it.

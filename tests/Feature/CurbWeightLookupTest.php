@@ -54,16 +54,34 @@ class CurbWeightLookupTest extends TestCase
         ]);
     }
 
+    /**
+     * A vehicle lot, with make and model written to vehicle_detail.
+     *
+     * Both moved in the multi-kind migration, so `curb_weight_kg` in an override
+     * is translated rather than passed through. Accepting the old key is
+     * deliberate: the tests below are about weight lookup, and renaming the
+     * column in each assertion would obscure that.
+     */
     private function lot(array $overrides = []): Lot
     {
-        return Lot::create(array_merge([
+        $detail = array_intersect_key($overrides, array_flip(['make', 'model']));
+        $lotOverrides = array_diff_key($overrides, $detail);
+
+        if (array_key_exists('curb_weight_kg', $lotOverrides)) {
+            $lotOverrides['weight_kg'] = $lotOverrides['curb_weight_kg'];
+            unset($lotOverrides['curb_weight_kg']);
+        }
+
+        // These tests are about weight lookup, so a helper lot must be a
+        // weighable vehicle by default. Naming it explicitly means the factory
+        // writes a matching vehicle_detail row, which is where the lookup reads
+        // from now.
+        $make = $detail['make'] ?? 'Toyota';
+        $model = $detail['model'] ?? 'Land Cruiser';
+
+        $lot = Lot::factory()->vehicle($make, $model)->create(array_merge([
             'id' => 'lot_'.uniqid(),
-            'vin' => 'VIN-'.uniqid(),
-            'year' => 2018,
-            'make' => 'Toyota',
-            'model' => 'Land Cruiser',
             'city' => 'Detroit',
-            'photos' => [],
             'starting_bid' => 100000,
             'reserve_price' => 500000,
             'bid_increment' => 25000,
@@ -71,7 +89,13 @@ class CurbWeightLookupTest extends TestCase
             'starts_at' => now()->subMinute(),
             'ends_at' => now()->addDay(),
             'status' => 'LIVE',
-        ], $overrides));
+        ], $lotOverrides));
+
+        if ($detail !== []) {
+            $lot->vehicleDetail->update($detail);
+        }
+
+        return $lot->fresh();
     }
 
     // ------------------------------------------------------------- the lookup
@@ -117,17 +141,72 @@ class CurbWeightLookupTest extends TestCase
 
     // -------------------------------------------------------- filling a lot
 
-    public function test_a_new_lot_of_a_known_vehicle_is_weighed_on_creation(): void
+    public function test_a_new_lot_of_a_known_vehicle_is_weighed_once_its_detail_exists(): void
     {
         $this->vehicle('Toyota', 'Land Cruiser', 2100);
 
-        // Nothing asks for the weight; the lot is quotable the moment it exists.
-        // Anywhere a lot is created should give the same answer, not just the
-        // admin form: the seeder, an import script and a colleague's console all
-        // create lots too.
-        $lot = $this->lot(['curb_weight_kg' => null]);
+        // Weighing used to happen in a `creating` hook that read make and model
+        // straight off the lot. Those columns now live in vehicle_detail, which
+        // has a foreign key to lot, so at creating time there is nothing to
+        // read. Weighing is an explicit step now, and this asserts it works
+        // once the vehicle it describes actually exists.
+        $lot = $this->lot([
+            'curb_weight_kg' => null,
+            'make' => 'Toyota',
+            'model' => 'Land Cruiser',
+        ]);
 
-        $this->assertSame(2100.0, $lot->fresh()->curb_weight_kg);
+        $this->assertSame(2100.0, $lot->fresh()->weight_kg);
+    }
+
+    /**
+     * A lot whose detail row has not been written yet is left unweighed rather
+     * than guessed at.
+     *
+     * This is the honest state of a vehicle lot mid-creation, and it is why
+     * weigh-on-create is now an explicit call rather than a hook.
+     */
+    public function test_a_lot_with_no_vehicle_detail_is_left_unweighed(): void
+    {
+        $this->vehicle('Toyota', 'Land Cruiser', 2100);
+
+        $lot = Lot::create([
+            'id' => 'lot_'.uniqid(),
+            'kind' => 'vehicle',
+            'provenance' => 'salvage_auction',
+            'title' => 'Toyota Land Cruiser',
+            'city' => 'Detroit',
+            'photos' => [],
+            'starting_bid' => 100000,
+            'reserve_price' => 500000,
+            'bid_increment' => 25000,
+            'deposit_bps' => 2000,
+            'starts_at' => now()->subMinute(),
+            'ends_at' => now()->addDay(),
+            'status' => 'LIVE',
+        ]);
+
+        $this->assertNull($lot->fresh()->weight_kg);
+        $this->assertNull($lot->fresh()->vehicleDetail);
+    }
+
+    public function test_a_goods_lot_is_never_weighed_from_the_vehicle_table(): void
+    {
+        $this->vehicle('Toyota', 'Land Cruiser', 2100);
+
+        // A pallet has no make and model to look up. Reading the vehicle table
+        // for one would be inventing a weight a buyer then gets billed for.
+        $lot = Lot::factory()->goods('Pallet', 610.0)->create([
+            'weight_kg' => null,
+        ]);
+
+        $this->assertNull($lot->fresh()->weight_kg);
+
+        // And backfill skips it rather than counting it as unweighable.
+        $result = $this->weights->backfill();
+
+        $this->assertSame(0, $result['filled']);
+        $this->assertSame(0, $result['unweighable']);
     }
 
     public function test_a_new_lot_with_a_measured_weight_keeps_it(): void
@@ -136,7 +215,7 @@ class CurbWeightLookupTest extends TestCase
 
         $lot = $this->lot(['curb_weight_kg' => 1985]);
 
-        $this->assertSame(1985.0, $lot->fresh()->curb_weight_kg);
+        $this->assertSame(1985.0, $lot->fresh()->weight_kg);
     }
 
     public function test_a_lot_weighed_after_the_fact_is_backfilled_by_apply_to(): void
@@ -148,7 +227,7 @@ class CurbWeightLookupTest extends TestCase
 
         $this->weights->applyTo($lot);
 
-        $this->assertSame(2100.0, $lot->fresh()->curb_weight_kg);
+        $this->assertSame(2100.0, $lot->fresh()->weight_kg);
     }
 
     public function test_a_lot_of_an_unknown_vehicle_is_left_unweighed(): void
@@ -159,7 +238,7 @@ class CurbWeightLookupTest extends TestCase
         $this->weights->applyTo($lot);
 
         $this->assertNull(
-            $lot->fresh()->curb_weight_kg,
+            $lot->fresh()->weight_kg,
             'an unknown vehicle stays unweighed rather than being given a guess'
         );
     }
@@ -173,7 +252,7 @@ class CurbWeightLookupTest extends TestCase
 
         // Modified springs, a different trim, a crane in the bed: operations
         // knows and the table does not.
-        $this->assertSame(1985.0, $lot->fresh()->curb_weight_kg);
+        $this->assertSame(1985.0, $lot->fresh()->weight_kg);
     }
 
     public function test_applying_a_known_weight_leaves_the_rest_of_the_lot_alone(): void
@@ -185,7 +264,7 @@ class CurbWeightLookupTest extends TestCase
 
         $fresh = $lot->fresh();
         $this->assertSame('LIVE', $fresh->status);
-        $this->assertSame(2100.0, $fresh->curb_weight_kg);
+        $this->assertSame(2100.0, $fresh->weight_kg);
         $this->assertSame(100000, $fresh->starting_bid);
     }
 
@@ -207,9 +286,9 @@ class CurbWeightLookupTest extends TestCase
         // The counts are the point: operations needs to know how many lots are
         // still unquotable without going and counting rows by hand.
         $this->assertSame(['filled' => 1, 'unweighable' => 1], $result);
-        $this->assertSame(2100.0, $weighed->fresh()->curb_weight_kg);
-        $this->assertNull($unknown->fresh()->curb_weight_kg);
-        $this->assertSame(1985.0, $measured->fresh()->curb_weight_kg);
+        $this->assertSame(2100.0, $weighed->fresh()->weight_kg);
+        $this->assertNull($unknown->fresh()->weight_kg);
+        $this->assertSame(1985.0, $measured->fresh()->weight_kg);
     }
 
     public function test_backfilling_an_empty_fleet_is_a_no_op(): void
@@ -252,7 +331,7 @@ class CurbWeightLookupTest extends TestCase
         $this->weights->applyTo($lot);
 
         $this->assertNotNull(
-            $lot->fresh()->curb_weight_kg,
+            $lot->fresh()->weight_kg,
             'a demo lot that ships with no weight shows buyers an empty freight card'
         );
     }

@@ -31,10 +31,9 @@ class FxServiceTest extends TestCase
 
         return Lot::create(array_merge([
             'id' => 'lot_fx_'.$n,
-            'vin' => 'FXVIN'.$n,
-            'year' => 2020,
-            'make' => 'Toyota',
-            'model' => 'Corolla',
+            'kind' => 'vehicle',
+            'provenance' => 'salvage_auction',
+            'title' => 'Toyota Corolla',
             'city' => 'Detroit',
             'condition' => 'clean_title',
             'currency_code' => 'usd',

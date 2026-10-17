@@ -20,28 +20,34 @@ class FacetServiceTest extends TestCase
 
     private function lot(array $overrides = []): Lot
     {
-        $n = substr(md5(json_encode($overrides).microtime()), 0, 10);
+        // Make, model, year and odometer live in vehicle_detail now, so this
+        // pulls them out of the overrides and writes them there. Passing them
+        // to lot would be silently ignored and the facets would count nothing.
+        $detail = array_intersect_key($overrides, array_flip([
+            'make', 'model', 'year', 'odometer', 'trim', 'vin', 'damage_primary',
+        ]));
 
-        return Lot::create(array_merge([
-            'id' => 'lot_facet_'.$n,
-            'vin' => 'FVIN'.$n,
-            'year' => 2020,
-            'make' => 'Toyota',
-            'model' => 'Corolla',
-            'city' => 'Detroit',
+        $lotOverrides = array_diff_key($overrides, $detail);
+
+        $lot = Lot::factory()->create([
+            'id' => 'lot_facet_'.substr(md5(json_encode($overrides).microtime()), 0, 10),
+            'title' => ($detail['make'] ?? 'Toyota').' '.($detail['model'] ?? 'Corolla'),
             'condition' => 'clean_title',
-            'currency_code' => 'usd',
-            'starting_bid' => 100_000,
-            'reserve_price' => 0,
-            'bid_increment' => 5_000,
-            'status' => 'LIVE',
+            'city' => 'Detroit',
             'current_bid' => 100_000,
-            'bid_count' => 0,
-            'extensions' => 0,
-            'starts_at' => now()->subDay(),
-            'photos' => [],
+            'reserve_price' => 0,
             'ends_at' => now()->addDays(3),
-        ], $overrides));
+            ...$lotOverrides,
+        ]);
+
+        $lot->vehicleDetail->update([
+            'make' => $detail['make'] ?? 'Toyota',
+            'model' => $detail['model'] ?? 'Corolla',
+            'year' => $detail['year'] ?? 2020,
+            'odometer' => $detail['odometer'] ?? null,
+        ]);
+
+        return $lot->fresh();
     }
 
     public function test_only_open_lots_are_counted(): void

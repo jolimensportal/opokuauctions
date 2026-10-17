@@ -24,10 +24,9 @@ class DisplayCurrencyTest extends TestCase
 
         return Lot::create(array_merge([
             'id' => 'lot_cur_'.$n,
-            'vin' => 'CVIN'.$n,
-            'year' => 2020,
-            'make' => 'Ford',
-            'model' => 'F-150',
+            'kind' => 'vehicle',
+            'provenance' => 'salvage_auction',
+            'title' => 'Toyota Corolla',
             'city' => 'Detroit',
             'condition' => 'clean_title',
             'currency_code' => 'usd',

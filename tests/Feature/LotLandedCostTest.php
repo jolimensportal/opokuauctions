@@ -29,10 +29,9 @@ class LotLandedCostTest extends TestCase
 
         return Lot::create(array_merge([
             'id' => 'lot_test_'.$n,
-            'vin' => 'TESTVIN'.$n,
-            'year' => 2018,
-            'make' => 'Toyota',
-            'model' => 'Corolla',
+            'kind' => 'vehicle',
+            'provenance' => 'salvage_auction',
+            'title' => 'Toyota Corolla',
             'city' => 'Detroit',
             'condition' => 'clean_title',
             'currency_code' => 'usd',

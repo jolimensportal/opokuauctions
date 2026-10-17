@@ -20,13 +20,31 @@ use Illuminate\Support\Facades\DB;
 final class FacetService
 {
     /**
-     * Count open lots grouped by make, richest first.
+     * Count open vehicle lots grouped by make, richest first.
+     *
+     * Joined through vehicle_detail because a pallet has no make. A make facet
+     * on a mixed board must count cars and only cars: offering "Toyota (3)" over
+     * a board that also holds pallets would tell a buyer their filter does
+     * something it does not.
      *
      * @return \Illuminate\Support\Collection<int, object{value:string, count:int}>
      */
     public function byMake(int $limit = 12)
     {
-        return $this->countBy('make', $limit);
+        return $this->openScope()
+            ->join('vehicle_detail', 'vehicle_detail.lot_id', '=', 'lot.id')
+            ->select('vehicle_detail.make as value', DB::raw('COUNT(*) as aggregate'))
+            ->whereNotNull('vehicle_detail.make')
+            ->where('vehicle_detail.make', '<>', '')
+            ->groupBy('vehicle_detail.make')
+            ->orderByDesc('aggregate')
+            ->orderBy('vehicle_detail.make')
+            ->limit($limit)
+            ->get()
+            ->map(fn ($row) => (object) [
+                'value' => $row->value,
+                'count' => (int) $row->aggregate,
+            ]);
     }
 
     /** @return \Illuminate\Support\Collection<int, object{value:string, count:int}> */
@@ -90,17 +108,20 @@ final class FacetService
             ['Before 2005', null, 2004],
         ];
 
-        $open = $this->openScope();
+        // Vehicle lots only. A pallet has no year, and a year band that counted
+        // pallets would not sum to the open total.
+        $open = $this->openScope()
+            ->join('vehicle_detail', 'vehicle_detail.lot_id', '=', 'lot.id');
 
         return collect($ranges)->map(function (array $range) use ($open) {
             $query = $open->clone();
 
             if ($range[1] !== null) {
-                $query->where('year', '>=', $range[1]);
+                $query->where('vehicle_detail.year', '>=', $range[1]);
             }
 
             if ($range[2] !== null) {
-                $query->where('year', '<=', $range[2]);
+                $query->where('vehicle_detail.year', '<=', $range[2]);
             }
 
             return (object) [
@@ -124,17 +145,23 @@ final class FacetService
             ['Above 150,000 mi', 150_000, null],
         ];
 
-        $open = $this->openScope();
+        // Vehicle lots only. A pallet has no odometer, and a mileage band that
+        // counted pallets would not sum to the open total.
+        $open = $this->openScope()
+            ->join('vehicle_detail', 'vehicle_detail.lot_id', '=', 'lot.id');
 
         return collect($ranges)->map(function (array $range) use ($open) {
-            $query = $open->clone()->whereNotNull('odometer');
+            // A lot with no recorded odometer is deliberately excluded: a car
+            // landing in "Under 50,000" because nobody wrote down its mileage
+            // would be a band that lies.
+            $query = $open->clone()->whereNotNull('vehicle_detail.odometer');
 
             if ($range[1] !== null) {
-                $query->where('odometer', '>=', $range[1]);
+                $query->where('vehicle_detail.odometer', '>=', $range[1]);
             }
 
             if ($range[2] !== null) {
-                $query->where('odometer', '<', $range[2]);
+                $query->where('vehicle_detail.odometer', '<', $range[2]);
             }
 
             return (object) [
@@ -190,10 +217,25 @@ final class FacetService
         return (clone $this->openScope())->distinct()->count('city');
     }
 
-    /** Distinct makes available. */
+    /** Distinct makes available, across vehicle lots only. */
     public function makeCount(): int
     {
-        return (clone $this->openScope())->distinct()->count('make');
+        return $this->openScope()
+            ->join('vehicle_detail', 'vehicle_detail.lot_id', '=', 'lot.id')
+            ->distinct()
+            ->count('vehicle_detail.make');
+    }
+
+    /** Open lots of one kind, for the category tiles on the homepage. */
+    public function countOfKind(string $kind): int
+    {
+        return $this->openScope()->where('kind', $kind)->count();
+    }
+
+    /** @return \Illuminate\Support\Collection<int, object{value:string, count:int}> */
+    public function byProvenance()
+    {
+        return $this->countBy('provenance');
     }
 
     /**

@@ -51,10 +51,9 @@ class WhatsAppNotificationTest extends TestCase
 
         $lot = Lot::create([
             'id' => 'lot_'.uniqid(),
-            'vin' => 'VIN-'.uniqid(),
-            'year' => 2019,
-            'make' => 'Toyota',
-            'model' => 'Camry',
+            'kind' => 'vehicle',
+            'provenance' => 'salvage_auction',
+            'title' => 'Toyota Corolla',
             'city' => 'Detroit',
             'photos' => [],
             'starting_bid' => 100000,

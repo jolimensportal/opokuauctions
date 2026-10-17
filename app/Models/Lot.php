@@ -3,15 +3,25 @@
 namespace App\Models;
 
 use App\Services\CurbWeightLookup;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * A vehicle offered at auction on the OpokuAuctions corridor.
+ * One thing offered at auction on the OpokuAuctions corridor.
+ *
+ * A lot can be a vehicle, a pallet, a liquidation bundle or a single garage
+ * item — a headlamp at 13 cents is a lot with its own bid, not decoration
+ * inside a bigger one. `kind` says which shape it is; `provenance` says where
+ * it came from. The shape-specific facts live in `vehicle_detail` or
+ * `goods_detail`, so this table holds only what a bid needs and therefore only
+ * what the money and auction paths ever touch.
  *
  * Money is stored in integer minor units (cents) throughout. Never floats.
  */
 class Lot extends Model
 {
+    use HasFactory;
+
     /** Singular on purpose: matches the Medusa spike schema exactly. */
     protected $table = 'lot';
 
@@ -20,8 +30,8 @@ class Lot extends Model
     protected $keyType = 'string';
 
     protected $fillable = [
-        'id', 'vin', 'year', 'make', 'model', 'trim', 'city', 'photos',
-        'condition', 'odometer', 'damage_primary', 'curb_weight_kg', 'currency_code',
+        'id', 'kind', 'provenance', 'title', 'description', 'city', 'photos',
+        'condition', 'weight_kg', 'currency_code',
         'starting_bid', 'reserve_price', 'bid_increment', 'deposit_bps',
         'balance_settled_at', 'balance_due_usd', 'fx_quote_id', 'starts_at', 'ends_at',
         'status', 'current_bid', 'highest_bidder_id', 'bid_count', 'extensions',
@@ -29,7 +39,6 @@ class Lot extends Model
 
     protected $casts = [
         'photos' => 'array',
-        'year' => 'integer',
         'starting_bid' => 'integer',
         'reserve_price' => 'integer',
         'bid_increment' => 'integer',
@@ -37,40 +46,42 @@ class Lot extends Model
         'bid_count' => 'integer',
         'extensions' => 'integer',
         'deposit_bps' => 'integer',
-        'curb_weight_kg' => 'float',
+        'weight_kg' => 'float',
         'balance_settled_at' => 'immutable_datetime',
         'balance_due_usd' => 'integer',
         'starts_at' => 'immutable_datetime',
         'ends_at' => 'immutable_datetime',
     ];
 
-    protected static function booted(): void
+    // NOTE: the automatic weigh-on-create that used to live in a `creating`
+    // hook cannot work any more, and its absence is not an oversight.
+    //
+    // The hook read the lot's own `make` and `model`. Those columns now live in
+    // `vehicle_detail`, which carries a foreign key to `lot` — so at `creating`
+    // time the detail row does not exist yet and the hook would read nothing.
+    //
+    // Weighing is now an explicit step: `CurbWeightLookup::applyTo($lot)`. The
+    // LotFactory calls it after the detail row is written, and anything else
+    // that creates a vehicle lot must do the same. An unweighed lot is a lot
+    // with no freight quote, which is a state the system already handles
+    // honestly rather than a crash.
+
+    /** Whether this lot is a car. One place, so a view never has to guess. */
+    public function isVehicle(): bool
     {
-        // A lot with a known make and model but no weight is a lot nobody can be
-        // quoted freight for, so the weight is filled in on creation from the
-        // vehicle lookup.
-        //
-        // This lives here rather than in the admin form because lots are also
-        // created by the demo seeder, by imports and from a console. A default
-        // that only the admin form applies is a default that half the fleet
-        // quietly does without.
-        //
-        // A weight that is already set is never touched: someone measured that
-        // car, or typed a number they know to be right.
-        static::creating(function (self $lot) {
-            if ($lot->curb_weight_kg !== null) {
-                return;
-            }
+        return $this->kind === 'vehicle';
+    }
 
-            $weight = app(CurbWeightLookup::class)->forVehicle(
-                (string) $lot->make,
-                (string) $lot->model,
-            );
+    /** The vehicle facts, for a car. Null on anything else. */
+    public function vehicleDetail()
+    {
+        return $this->hasOne(VehicleDetail::class);
+    }
 
-            if ($weight !== null) {
-                $lot->curb_weight_kg = $weight;
-            }
-        });
+    /** The goods facts, for a pallet, a bundle or a single item. */
+    public function goodsDetail()
+    {
+        return $this->hasOne(GoodsDetail::class);
     }
 
     /** The rate this lot's buyer was quoted, frozen at deposit time. */

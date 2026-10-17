@@ -31,8 +31,11 @@ class CorridorDashboardTest extends TestCase
         $this->actingAs(User::factory()->create(['role' => Role::Ops]));
 
         Lot::create([
-            'id' => 'lot_unpaid_1', 'vin' => 'VIN-UNPAID', 'year' => 2020,
-            'make' => 'Kia', 'model' => 'Sorento', 'city' => 'Milwaukee', 'photos' => [],
+            'id' => 'lot_unpaid_1', 'kind' => 'vehicle', 'provenance' => 'salvage_auction',
+            'title' => 'Kia Sportage',
+            'city' => 'Detroit',
+            'condition' => 'clean_title',
+            'currency_code' => 'usd',
             'starting_bid' => 100000, 'reserve_price' => 500000, 'bid_increment' => 25000,
             'deposit_bps' => 2000,
             'starts_at' => now()->subMinute(), 'ends_at' => now()->addDay(),
@@ -50,8 +53,11 @@ class CorridorDashboardTest extends TestCase
         $this->actingAs(User::factory()->create(['role' => Role::Ops]));
 
         Lot::create([
-            'id' => 'lot_paid_1', 'vin' => 'VIN-PAID', 'year' => 2021,
-            'make' => 'Mazda', 'model' => 'CX5', 'city' => 'New York', 'photos' => [],
+            'id' => 'lot_paid_1', 'kind' => 'vehicle', 'provenance' => 'salvage_auction',
+            'title' => 'Mazda CX-5',
+            'city' => 'Detroit',
+            'condition' => 'clean_title',
+            'currency_code' => 'usd',
             'starting_bid' => 100000, 'reserve_price' => 500000, 'bid_increment' => 25000,
             'deposit_bps' => 2000, 'balance_settled_at' => now(),
             'starts_at' => now()->subMinute(), 'ends_at' => now()->addDay(),

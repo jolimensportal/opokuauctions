@@ -33,10 +33,9 @@ class ShipmentCorridorTest extends TestCase
     {
         return Lot::create(array_merge([
             'id' => 'lot_'.uniqid(),
-            'vin' => 'VIN-'.uniqid(),
-            'year' => 2018,
-            'make' => 'Honda',
-            'model' => 'Accord',
+            'kind' => 'vehicle',
+            'provenance' => 'salvage_auction',
+            'title' => 'Toyota Corolla',
             'city' => 'Detroit',
             'photos' => [],
             'starting_bid' => 100000,

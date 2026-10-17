@@ -46,10 +46,9 @@ class ClearanceTest extends TestCase
         for ($i = 0; $i < $count; $i++) {
             $lot = Lot::create([
                 'id' => 'lot_'.uniqid(),
-                'vin' => 'VIN-'.uniqid(),
-                'year' => 2019,
-                'make' => 'Toyota',
-                'model' => 'Camry',
+                'kind' => 'vehicle',
+                'provenance' => 'salvage_auction',
+                'title' => 'Toyota Camry',
                 'city' => 'Detroit',
                 'photos' => [],
                 'starting_bid' => 100000,

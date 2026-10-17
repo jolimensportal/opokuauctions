@@ -132,20 +132,34 @@ class ShopController extends Controller
             $query->where('condition', $condition);
         }
 
+        // Make, kind and provenance are how a buyer narrows a board that now
+        // holds cars and goods alike. Make is filtered through a subquery
+        // rather than a join because the column now lives in vehicle_detail,
+        // and joining would multiply rows against the paginator.
         if ($make = $request->string('make')->toString()) {
-            $query->where('make', $make);
+            $query->whereIn('id', function ($sub) use ($make) {
+                $sub->select('lot_id')->from('vehicle_detail')->where('make', $make);
+            });
+        }
+
+        if ($kind = $request->string('kind')->toString()) {
+            $query->where('kind', $kind);
+        }
+
+        if ($provenance = $request->string('provenance')->toString()) {
+            $query->where('provenance', $provenance);
         }
 
         $lots = $query->paginate(24)->withQueryString();
 
         $cities = Lot::distinct()->orderBy('city')->pluck('city');
-        $makes = Lot::distinct()->orderBy('make')->pluck('make');
+        $makes = $facets->byMake(50)->pluck('value');
 
         return view('shop.lots.index', [
             'lots' => $lots,
             'cities' => $cities,
             'makes' => $makes,
-            'filters' => $request->only(['city', 'condition', 'make']),
+            'filters' => $request->only(['city', 'condition', 'make', 'kind', 'provenance']),
         ]);
     }
 
