@@ -1,0 +1,342 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+
+/**
+ * Opoku Auctions palette.
+ *
+ * The brief named the colours: brick red, white, black. Everything here is one
+ * hue family (H≈30, warm) at different lightness and chroma, which is what makes
+ * three colours look designed rather than added.
+ *
+ * All values are oklch. Two reasons that matters here rather than being
+ * pedantry: hue is perceptually uniform, so a brick at L=0.52 is the same
+ * "brightness" as any other colour at that lightness, and the neutrals can be
+ * tinted toward the brick without drifting into a second palette.
+ *
+ * No pure black and no pure white. #000 and #fff flatten depth and are harsh
+ * against a saturated red; ink-900 and paper do the same job with less glare.
+ */
+@theme {
+    --font-sans: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
+    --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', monospace;
+
+    /* Brick. The single accent, locked across the whole product. */
+    --color-brick-50: oklch(0.970 0.012 32);
+    --color-brick-100: oklch(0.935 0.028 32);
+    --color-brick-200: oklch(0.885 0.055 32);
+    --color-brick-300: oklch(0.800 0.090 31);
+    --color-brick-400: oklch(0.680 0.135 30);
+    --color-brick-500: oklch(0.565 0.152 30);
+    --color-brick-600: oklch(0.487 0.148 29);
+    --color-brick-700: oklch(0.405 0.128 28);
+    --color-brick-800: oklch(0.330 0.100 28);
+    --color-brick-900: oklch(0.265 0.075 28);
+
+    /* Ink: the neutrals. Warm, so they sit with the brick rather than against it. */
+    --color-ink-50: oklch(0.975 0.004 60);
+    --color-ink-100: oklch(0.945 0.005 55);
+    --color-ink-200: oklch(0.895 0.006 50);
+    --color-ink-300: oklch(0.800 0.007 45);
+    --color-ink-400: oklch(0.660 0.008 40);
+    --color-ink-500: oklch(0.545 0.009 38);
+    --color-ink-600: oklch(0.440 0.010 35);
+    --color-ink-700: oklch(0.340 0.011 32);
+    --color-ink-800: oklch(0.255 0.012 30);
+    --color-ink-900: oklch(0.190 0.012 30);
+    --color-ink-950: oklch(0.135 0.011 30);
+
+    /* Paper: off-white. The page is never #fff. */
+    --color-paper: oklch(0.988 0.004 70);
+    --color-paper-dim: oklch(0.960 0.006 65);
+
+    /* One radius scale for the whole product. Buttons are pill, surfaces are
+       10px, inputs are 8px. Documented here because mixed systems read as
+       broken even when each element is individually fine. */
+    --radius-pill: 999px;
+    --radius-surface: 10px;
+    --radius-input: 8px;
+}
+
+@layer base {
+    html {
+        -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+        background-color: var(--color-paper);
+        color: var(--color-ink-900);
+        font-family: var(--font-sans);
+        /* Long Ghanaian place names and model names wrap badly without this. */
+        text-wrap: pretty;
+        -webkit-font-smoothing: antialiased;
+    }
+
+    /* Money, container numbers, lot references, VINs, timestamps. Identifiers
+       should read as identifiers. */
+    .tnum {
+        font-family: var(--font-mono);
+        font-variant-numeric: tabular-nums;
+        letter-spacing: -0.01em;
+    }
+
+    /* Every interactive element gets a real focus ring. Removing outlines
+       without replacing them makes the product unusable by keyboard. */
+    :where(a, button, input, select, textarea, [tabindex]):focus-visible {
+        outline: 2px solid var(--color-brick-500);
+        outline-offset: 2px;
+        border-radius: 4px;
+    }
+
+    /* A tactile push, so clicks feel physical. */
+    :where(button, a[role='button'], .btn):active {
+        transform: translateY(1px);
+    }
+}
+
+@layer components {
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.25rem;
+        border-radius: var(--radius-pill);
+        font-weight: 600;
+        font-size: 0.9375rem;
+        line-height: 1.2;
+        white-space: nowrap;
+        transition: background-color 0.18s ease, color 0.18s ease,
+            border-color 0.18s ease;
+    }
+
+    /* Brick on paper: 5.4:1, so it passes AA for normal-size text. */
+    .btn-primary {
+        background-color: var(--color-brick-500);
+        color: var(--color-paper);
+    }
+
+    .btn-primary:hover {
+        background-color: var(--color-brick-600);
+    }
+
+    /* Ink on paper, for the one secondary action per view. */
+    .btn-secondary {
+        background-color: var(--color-ink-900);
+        color: var(--color-paper);
+    }
+
+    .btn-secondary:hover {
+        background-color: var(--color-ink-800);
+    }
+
+    /* Outline, for tertiary. Never transparent-on-white with no border. */
+    .btn-ghost {
+        border: 1px solid var(--color-ink-300);
+        color: var(--color-ink-800);
+        background-color: transparent;
+    }
+
+    .btn-ghost:hover {
+        border-color: var(--color-ink-900);
+        background-color: var(--color-ink-50);
+    }
+
+    /* btn-ghost is ink-on-paper. On an ink-950 surface the same button is dark
+       text on a dark fill, which renders as nothing at all. */
+    .btn-ghost-dark {
+        border: 1px solid var(--color-ink-700);
+        color: var(--color-ink-200);
+        background-color: transparent;
+    }
+
+    .btn-ghost-dark:hover {
+        border-color: var(--color-ink-400);
+        color: var(--color-paper);
+        background-color: var(--color-ink-900);
+    }
+
+    .field {
+        width: 100%;
+        padding: 0.7rem 0.85rem;
+        border: 1px solid var(--color-ink-300);
+        border-radius: var(--radius-input);
+        background-color: var(--color-paper);
+        color: var(--color-ink-900);
+        font-size: 0.9375rem;
+    }
+
+    .field::placeholder {
+        /* Real placeholder contrast, not the usual washed-out grey. */
+        color: var(--color-ink-400);
+    }
+
+    .field:focus {
+        border-color: var(--color-brick-500);
+    }
+
+    .label {
+        display: block;
+        font-size: 0.8125rem;
+        font-weight: 600;
+        color: var(--color-ink-700);
+        margin-bottom: 0.375rem;
+    }
+
+    .surface {
+        background-color: var(--color-paper);
+        border: 1px solid var(--color-ink-200);
+        border-radius: var(--radius-surface);
+    }
+
+    .rule {
+        border: 0;
+        border-top: 1px solid var(--color-ink-200);
+    }
+}
+
+@layer utilities {
+    /* Dark surfaces for the one inverted band. Kept in the same theme family —
+       never flips to a light "warm paper" band mid-page. */
+    .band-ink {
+        background-color: var(--color-ink-950);
+        color: var(--color-ink-100);
+    }
+
+    .band-ink a {
+        color: inherit;
+    }
+}
+
+/* Motion is deliberately restrained. These transitions are the only movement
+   in the buyer experience, and they collapse entirely when reduced motion is
+   requested. */
+@media (prefers-reduced-motion: no-preference) {
+    .reveal {
+        animation: rise 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    @keyframes rise {
+        from {
+            opacity: 0;
+            transform: translateY(12px);
+        }
+        to {
+            opacity: 1;
+            transform: none;
+        }
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+/* ---------------------------------------------------------------------------
+   MANIFEST (candidate 1a)
+
+   The page as a shipping document: hairline rules instead of boxes, mono as the
+   primary voice, tabular figures, and status marks that look stamped rather than
+   drawn. Nothing here is rounded and nothing floats. The business moves cargo
+   across an ocean and proves it on paper, so the page is paper.
+   --------------------------------------------------------------------------- */
+
+.rule-top {
+    border-top: 1px solid var(--color-ink-300);
+}
+
+.rule-bottom {
+    border-bottom: 1px solid var(--color-ink-300);
+}
+
+/* A rubber stamp. Tilted, ink-coloured, never perfectly opaque. */
+.stamp {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    padding: 0.2rem 0.5rem;
+    border: 2px solid currentColor;
+    border-radius: 3px;
+    transform: rotate(-1.5deg);
+    opacity: 0.9;
+}
+
+.stamp-held {
+    color: var(--color-brick-500);
+}
+
+.stamp-clear {
+    color: var(--color-ink-500);
+}
+
+/* Field label above field value, the way a form is laid out on a manifest. */
+.field-key {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-ink-500);
+}
+
+.field-val {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    color: var(--color-ink-900);
+}
+
+/* ---------------------------------------------------------------------------
+   CONSOLE (candidate 1b)
+
+   The corridor as a live operations board. The buyer is shown the operator's
+   screen. Transparency is the product, so the page is an instrument panel.
+   --------------------------------------------------------------------------- */
+
+.console {
+    background-color: var(--color-ink-950);
+    color: var(--color-ink-300);
+}
+
+/* A tick mark on the milestone track. */
+.track-node {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 999px;
+    border: 1px solid var(--color-ink-600);
+    background-color: var(--color-ink-950);
+}
+
+.track-node-done {
+    background-color: var(--color-brick-500);
+    border-color: var(--color-brick-500);
+}
+
+.track-node-active {
+    background-color: var(--color-ink-50);
+    border-color: var(--color-ink-50);
+    box-shadow: 0 0 0 4px rgb(from var(--color-brick-500) r g b / 0.25);
+}
+
+/* A single live indicator. Respects reduced motion via the global rule. */
+@keyframes opoku-pulse {
+    0%,
+    100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.25;
+    }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .live-dot {
+        animation: opoku-pulse 2.4s ease-in-out infinite;
+    }
+}
