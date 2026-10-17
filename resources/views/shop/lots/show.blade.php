@@ -124,6 +124,49 @@
                     </p>
                 </div>
 
+                {{-- What this lot costs all-in. Every figure is booked money
+                     from the clearance ledger, never a typed template. A lot
+                     not yet on a container has no landed cost, and the section
+                     stays silent rather than guessing. --}}
+                @if ($landed)
+                    @php $row = $landed['row']; @endphp
+                    <div class="mt-6 pt-6 border-t border-ink-200">
+                        <div class="text-xs uppercase tracking-[0.14em] text-ink-500">Landed cost</div>
+                        <dl class="mt-3 space-y-1.5">
+                            <div class="flex items-baseline justify-between gap-4">
+                                <dt class="text-sm text-ink-600">Freight to Tema</dt>
+                                <dd class="text-sm text-ink-900 tnum">{{ number_format($row['freight'] / 100, 2) }}</dd>
+                            </div>
+                            <div class="flex items-baseline justify-between gap-4">
+                                <dt class="text-sm text-ink-600">Insurance</dt>
+                                <dd class="text-sm text-ink-900 tnum">{{ number_format($row['insurance'] / 100, 2) }}</dd>
+                            </div>
+                            <div class="flex items-baseline justify-between gap-4">
+                                <dt class="text-sm text-ink-600">Clearance, duty and port</dt>
+                                <dd class="text-sm text-ink-900 tnum">{{ number_format($row['clearance'] / 100, 2) }}</dd>
+                            </div>
+                            <div class="flex items-baseline justify-between gap-4">
+                                <dt class="text-sm text-ink-600">
+                                    This lot&rsquo;s share of freight, insurance and clearance
+                                    @if (($landed['vehicleCount'] ?? 0) > 1)
+                                        <span class="block text-xs text-ink-500">
+                                            Container costs divided across {{ $landed['vehicleCount'] }} vehicles.
+                                        </span>
+                                    @endif
+                                </dt>
+                                <dd class="text-sm font-medium text-ink-900 tnum">{{ number_format($row['freight_and_clearance_share'] / 100, 2) }}</dd>
+                            </div>
+                        </dl>
+
+                        <div class="mt-3 pt-3 border-t border-ink-200 flex items-baseline justify-between gap-4">
+                            <span class="text-sm font-semibold text-ink-900">
+                                Landed cost if won at {{ number_format($row['purchase_price'] / 100, 2) }}
+                            </span>
+                            <span class="text-lg font-bold text-ink-900 tnum">{{ number_format($row['landed_cost'] / 100, 2) }}</span>
+                        </div>
+                    </div>
+                @endif
+
                 @auth
                     @if ($lot->isAcceptingBids())
                         <form method="POST" action="{{ route('lots.bid', $lot) }}" class="mt-6 pt-6 border-t border-ink-200">

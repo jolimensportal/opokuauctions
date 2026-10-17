@@ -240,14 +240,28 @@ class ClearanceService
         $share = $this->landedCostPerLot($shipmentId);
         $breakdown = [];
 
+        // The three inputs are carried on every row so the view can itemise
+        // them without a second query. They are container-wide figures, not
+        // this lot's — which is exactly why the share is shown next to them.
+        $components = [
+            'freight' => (int) $shipment->freight_cost,
+            'insurance' => (int) $shipment->insurance_cost,
+            'clearance' => (int) ClearanceTask::where('shipment_id', $shipmentId)
+                ->whereNotNull('cost')
+                ->sum('cost'),
+        ];
+
         foreach ($links as $link) {
             $purchase = (int) $link->lot->current_bid;
-            $breakdown[] = [
+            $breakdown[] = $components + [
                 'lot_id' => $link->lot_id,
-                'description' => $link->lot->year.' '.$link->lot->make.' '.$link->lot->model,
+                // title, not year/make/model: a pallet or a bed frame has no
+                // year, and those columns no longer exist on lot.
+                'description' => $link->lot->title,
                 'purchase_price' => $purchase,
                 'freight_and_clearance_share' => $share,
                 'landed_cost' => $purchase + $share,
+                'shipment_lot_count' => (int) ShipmentLot::where('shipment_id', $shipmentId)->sum('quantity'),
             ];
         }
 
