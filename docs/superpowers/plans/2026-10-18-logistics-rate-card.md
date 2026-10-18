@@ -66,10 +66,17 @@ class PostcodeTest extends TestCase
         $this->assertSame('07030', Postcode::normalise('07030-1234', 'us'));
     }
 
-    public function test_a_four_digit_us_zip_is_left_padded(): void
+    public function test_a_short_us_zip_is_refused_rather_than_padded(): void
     {
-        $this->assertSame('00703', Postcode::normalise('703', 'us'));
-        $this->assertSame('00703', Postcode::normalise(' 703 ', 'us'));
+        // CORRECTED DURING EXECUTION. This test originally asserted that "703"
+        // padded to "00703" while the next test asserted "0703" was invalid.
+        // Both are four-or-fewer digit strings, so padding one and refusing
+        // the other was a rule nobody could explain. Refusing both matches the
+        // principle the normaliser is built on: padding invents a digit the
+        // sender never typed, and an invented digit picks the rate band.
+        $this->assertNull(Postcode::normalise('703', 'us'));
+        $this->assertNull(Postcode::normalise(' 703 ', 'us'));
+        $this->assertNull(Postcode::normalise('0703', 'us'));
     }
 
     public function test_an_invalid_us_postcode_is_not_guessed_at(): void
