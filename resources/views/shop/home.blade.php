@@ -337,18 +337,32 @@
     <h2 class="text-2xl font-bold tracking-[-0.02em] text-ink-900">We buy more than cars</h2>
 
     <div class="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        {{--
+            Every tile below opens a genuinely different board, and every claim
+            is one the product actually makes.
+
+            This used to be four links that mostly pointed at /lots with no
+            filter at all, so three of them opened the same board, one pointed
+            at an article rather than a board, and the Pallets tile promised "no
+            bidding and no waiting for a lot to close" when a pallet is a lot
+            and does bid. A tile that leads somewhere empty is a dead end on the
+            front page; copy that lies is worse than no tile.
+
+            There is no Pallets tile yet because pallets are not a category that
+            can be filtered — a pallet and a bed frame are both kind=goods, and
+            nothing on a lot records that it is a pallet. It returns when pallet
+            inventory actually exists, rather than as a link to a board that
+            would show bed frames.
+        --}}
         @foreach ([
-            ['Vehicles', 'Cars, SUVs and pickups out of North American garage sales and salvage auctions.', 'lots.index', []],
-            ['Pallets', 'Whole pallets at a fixed price. No bidding and no waiting for a lot to close.', 'lots.index', []],
-            ['Garage lots', 'A whole garage bought as one lot and resold piece by piece at a margin.', 'how-it-works', []],
-            ['Foreclosure', 'Vehicles repossessed in North America and sold to recover a lender\'s loss.', 'lots.index', []],
-        ] as $i => [$title, $blurb, $routeName, $params])
+            ['Vehicles', 'Cars, SUVs and pickups from North American salvage auctions and garage sales.', 'lots.index', ['kind' => 'vehicle'], 'photo-1533473359331-0135ef1b58bf'],
+            ['Garage goods', 'Individual items out of whole-garage cleanouts. One item, one lot, one price.', 'lots.index', ['kind' => 'goods'], 'photo-1586528116311-ad8dd3c8310d'],
+            ['Salvage write-offs', 'Accident-damaged and insurance write-off vehicles, graded and photographed.', 'lots.index', ['provenance' => 'salvage_auction'], 'photo-1625047509248-ec889cbff17f'],
+            ['Garage-sale lots', 'A whole garage bought as one lot, then resold piece by piece.', 'lots.index', ['provenance' => 'garage_sale'], 'photo-1449965408869-eaa3f722e40d'],
+        ] as [$title, $blurb, $routeName, $params, $photo])
             <a href="{{ route($routeName, $params) }}" class="surface overflow-hidden group">
                 <div class="aspect-[3/2] overflow-hidden bg-ink-100">
-                    <img src="{{ ['https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=600&q=80',
-                                  'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&q=80',
-                                  'https://images.unsplash.com/photo-1625047509248-ec889cbff17f?w=600&q=80',
-                                  'https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?w=600&q=80'][$i] }}"
+                    <img src="https://images.unsplash.com/{{ $photo }}?w=600&q=80"
                          alt="" width="600" height="400" loading="lazy" decoding="async"
                          class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500">
                 </div>

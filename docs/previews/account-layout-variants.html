@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Opoku — one account, two businesses</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#16193A; --ink-soft:#33365C; --body:#6E7280; --muted:#9AA0AC;
+  --rose:#E1537A; --rose-deep:#D1436B; --rose-soft:#FCEAEF; --rose-line:#F6C9D6;
+  --surface:#FFFFFF; --line:#E8EAEF; --field:#F3F4F6; --canvas:#F6F7F9;
+  --r-card:14px; --r-pill:999px; --rail:64px;
+  --ok-bg:#E4F5EC; --ok-fg:#127A4A; --warn-bg:#FDF1DD; --warn-fg:#9A6206;
+  --info-bg:#E7EFFB; --info-fg:#2C5FC7;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Poppins",system-ui,sans-serif;background:var(--canvas);color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(1200px 640px at 4% -14%,#E9E5F8 0,rgba(233,229,248,0) 58%),
+                   radial-gradient(900px 520px at 94% -8%,#F7E6EF 0,rgba(247,230,239,0) 55%);
+  padding:40px 32px 80px}
+.label{max-width:1180px;margin:0 auto 10px}
+.label .id{display:inline-block;background:var(--rose);color:#fff;font-size:11px;font-weight:700;
+  padding:3px 9px;border-radius:5px;letter-spacing:.06em}
+.label h2{font-size:22px;font-weight:800;letter-spacing:-.02em;margin-top:8px}
+.label p{font-size:13.5px;color:var(--body);margin-top:5px;line-height:1.6;max-width:78ch}
+.label .verdict{display:inline-block;margin-top:8px;font-size:12px;font-weight:700;color:var(--ok-fg);
+  background:var(--ok-bg);padding:3px 10px;border-radius:var(--r-pill)}
+.label .verdict.no{color:var(--warn-fg);background:var(--warn-bg)}
+
+/* ---------- shell ---------- */
+.shell{max-width:1180px;margin:0 auto 56px;background:var(--surface);border-radius:18px;
+  border:1px solid var(--line);overflow:hidden;box-shadow:0 2px 10px rgba(22,25,58,.05)}
+.top{height:58px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:24px;padding:0 20px}
+.wm{font-size:19px;font-weight:800;letter-spacing:-.035em}
+.wm i{font-style:normal;color:var(--rose)}
+.nav{display:flex;gap:22px;align-items:center}
+.nav a{font-size:13px;font-weight:600;color:var(--ink-soft);text-decoration:none}
+.nav a.on{color:var(--rose)}
+.tools{margin-left:auto;display:flex;align-items:center;gap:12px}
+.av{width:28px;height:28px;border-radius:50%;background:linear-gradient(140deg,#C9B8E8,#E7B6C8);
+  display:grid;place-items:center;font-size:10px;font-weight:700;color:#fff}
+.body{display:flex}
+.rail{width:var(--rail);flex:0 0 var(--rail);border-right:1px solid var(--line);
+  display:flex;flex-direction:column;align-items:center;gap:4px;padding:14px 0}
+.rail a{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;color:#1B1E3D}
+.rail a.on{color:var(--rose);background:var(--rose-soft)}
+.rail svg{width:18px;height:18px;stroke:currentColor;stroke-width:1.9;fill:none;
+  stroke-linecap:round;stroke-linejoin:round}
+.main{flex:1;min-width:0;padding:20px 24px 26px;background:#FCFCFD}
+h1{font-size:23px;font-weight:800;letter-spacing:-.025em}
+.sub{font-size:12px;color:var(--muted);margin-top:3px}
+
+/* ---------- components ---------- */
+.hero{margin-top:16px;background:var(--rose-soft);border:1px solid var(--rose-line);
+  border-radius:var(--r-card);padding:16px 20px}
+.hero b{font-size:15px;font-weight:700;color:var(--rose-deep)}
+.hero p{font-size:12.5px;color:#B0416A;margin-top:5px;line-height:1.6}
+.hero u{color:var(--rose-deep);font-weight:600;text-decoration-thickness:1px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+.grid3{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);
+  border:1px solid var(--line);border-radius:var(--r-card);overflow:hidden;margin-top:14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-card)}
+.card h3{font-size:13px;font-weight:700;padding:12px 16px;border-bottom:1px solid var(--line);
+  display:flex;align-items:center;gap:8px}
+.card h3 em{font-style:normal;font-size:10px;font-weight:700;padding:2px 7px;border-radius:var(--r-pill)}
+.tag-buy{background:var(--info-bg);color:var(--info-fg)}
+.tag-ship{background:#F3ECFB;color:#6D3FB5}
+.card h3 .more{margin-left:auto;font-size:11px;font-weight:600;color:var(--rose)}
+.tile{background:var(--surface);padding:12px 14px}
+.tile .k{font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.tile .v{font-size:21px;font-weight:800;letter-spacing:-.03em;margin-top:5px;font-variant-numeric:tabular-nums}
+.tile .d{font-size:10.5px;font-weight:600;margin-top:3px}
+.d.up{color:var(--ok-fg)} .d.mut{color:var(--muted)}
+.row{display:flex;align-items:center;gap:11px;padding:10px 16px;border-bottom:1px solid #F4F5F7}
+.row:last-child{border-bottom:0}
+.thumb{width:42px;height:42px;border-radius:9px;background:linear-gradient(140deg,#E7E4F2,#F3DDE6);
+  flex:0 0 auto;display:grid;place-items:center;color:#6D3FB5;font-size:9px;font-weight:700}
+.thumb.car{background:linear-gradient(140deg,#DEE7F7,#E7EEF9);color:#2C5FC7}
+.tx{min-width:0;flex:1}
+.tx b{display:block;font-size:12.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tx small{display:block;font-size:10.5px;color:var(--muted);margin-top:2px}
+.amt{font-size:13px;font-weight:700;font-variant-numeric:tabular-nums;flex:0 0 auto}
+.st{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:3px 8px;
+  border-radius:var(--r-pill);flex:0 0 auto}
+.st::before{content:"";width:4px;height:4px;border-radius:50%;background:currentColor}
+.s-live{background:var(--ok-bg);color:var(--ok-fg)}
+.s-move{background:var(--info-bg);color:var(--info-fg)}
+.s-wait{background:var(--warn-bg);color:var(--warn-fg)}
+.s-done{background:var(--field);color:var(--body)}
+
+/* tabs */
+.tabs{display:flex;gap:4px;padding:4px;background:var(--field);border-radius:var(--r-pill);
+  width:max-content;margin-top:14px}
+.tabs b{font-size:12.5px;font-weight:600;color:var(--body);padding:7px 18px;border-radius:var(--r-pill)}
+.tabs b.on{background:var(--surface);color:var(--rose);box-shadow:0 1px 3px rgba(22,25,58,.08)}
+
+/* feed */
+.feed{padding:4px 0}
+.feed .row{gap:13px}
+.when{font-size:10px;font-weight:700;color:var(--muted);padding:12px 16px 5px;
+  text-transform:uppercase;letter-spacing:.06em;background:#FCFCFD}
+.note{font-size:11.5px;color:var(--body);padding:9px 16px;background:var(--rose-soft);
+  border-radius:var(--r-card);margin:12px 16px;border:1px solid var(--rose-line);
+  color:#B0416A;line-height:1.55}
+</style>
+</head>
+<body>
+
+<!-- ============================ VARIANT A ============================ -->
+<div class="label">
+  <span class="id">A</span>
+  <h2>One dashboard, both businesses side by side</h2>
+  <p>No tabs. Buying and shipping sit as two equal columns under one welcome
+     banner. The customer sees everything they are involved in at a glance, and
+     neither business looks secondary to the other.</p>
+  <span class="verdict">Strongest first impression — recommended</span>
+</div>
+<div class="shell">
+  <div class="top">
+    <div class="wm">Opoku<i>.</i></div>
+    <div class="nav"><a class="on">Dashboard</a><a>Buying</a><a>Shipping</a><a>How it works</a></div>
+    <div class="tools"><span class="av">AM</span></div>
+  </div>
+  <div class="body">
+    <div class="rail">
+      <a class="on"><svg viewBox="0 0 24 24"><path d="M3 10.5L12 3l9 7.5"/><path d="M5.5 9.5V20h13V9.5"/></svg></a>
+      <a><svg viewBox="0 0 24 24"><path d="M4 7h16l-1.5 13H5.5z"/><path d="M9 7V5a3 3 0 016 0v2"/></svg></a>
+      <a><svg viewBox="0 0 24 24"><path d="M3 7l9-4 9 4v10l-9 4-9-4z"/><path d="M3 7l9 4 9-4M12 11v10"/></svg></a>
+      <a><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2.5"/><path d="M3 10.5h18"/></svg></a>
+      <a><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.2"/><path d="M5 20c0-3.6 3.1-5.5 7-5.5s7 1.9 7 5.5"/></svg></a>
+    </div>
+    <div class="main">
+      <h1>Dashboard</h1>
+      <div class="sub">Welcome back, Ama</div>
+
+      <div class="hero"><b>Good afternoon, Ama.</b>
+        <p>You have <u>2 auctions closing today</u> and <u>1 parcel waiting on a quote</u>.
+           Your next container sails in 6 days.</p></div>
+
+      <div class="grid3">
+        <div class="tile"><div class="k">Won this month</div><div class="v">3</div><div class="d up">+$4,120</div></div>
+        <div class="tile"><div class="k">In transit</div><div class="v">2</div><div class="d mut">to Tema</div></div>
+        <div class="tile"><div class="k">Parcels sent</div><div class="v">7</div><div class="d mut">this year</div></div>
+        <div class="tile"><div class="k">Balance</div><div class="v">$0.00</div><div class="d mut">settled</div></div>
+      </div>
+
+      <div class="grid2">
+        <div class="card">
+          <h3><em class="tag-buy">Buying</em> Your auctions <span class="more">See all</span></h3>
+          <div class="row"><div class="thumb car">F150</div><div class="tx"><b>2021 Ford F-150</b><small>Closes in 2h 14m · highest bid $4,850</small></div><span class="st s-live">Leading</span></div>
+          <div class="row"><div class="thumb car">CRV</div><div class="tx"><b>2019 Honda CR-V</b><small>Closes today · reserve met</small></div><span class="st s-move">Outbid</span></div>
+          <div class="row"><div class="thumb car">TL</div><div class="tx"><b>2016 Toyota Tacoma</b><small>Sold · awaiting payment</small></div><span class="st s-wait">Pay</span></div>
+        </div>
+        <div class="card">
+          <h3><em class="tag-ship">Shipping</em> Your parcels <span class="more">See all</span></h3>
+          <div class="row"><div class="thumb">BED</div><div class="tx"><b>Oak bed frame</b><small>M5V 2T6 · 35 kg · quoted $58.40</small></div><span class="st s-wait">Quote</span></div>
+          <div class="row"><div class="thumb">BOX</div><div class="tx"><b>Books, 3 cartons</b><small>07030 · in container shp_0042</small></div><span class="st s-move">Sailing</span></div>
+          <div class="row"><div class="thumb">LAM</div><div class="tx"><b>2 table lamps</b><small>Delivered 12 Oct</small></div><span class="st s-done">Delivered</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================ VARIANT B ============================ -->
+<div class="label">
+  <span class="id">B</span>
+  <h2>One account, two modes behind tabs</h2>
+  <p>Buying and Shipping are separate modes. Each tab shows one thing properly,
+     with room for a full checkout flow or a rate calculator. Clearer to navigate,
+     but you only ever see half your account at a time.</p>
+  <span class="verdict no">Best when shipping becomes the bigger business</span>
+</div>
+<div class="shell">
+  <div class="top">
+    <div class="wm">Opoku<i>.</i></div>
+    <div class="nav"><a class="on">Dashboard</a><a>Account</a><a>Help</a></div>
+    <div class="tools"><span class="av">AM</span></div>
+  </div>
+  <div class="body">
+    <div class="rail">
+      <a class="on"><svg viewBox="0 0 24 24"><path d="M4 7h16l-1.5 13H5.5z"/><path d="M9 7V5a3 3 0 016 0v2"/></svg></a>
+      <a><svg viewBox="0 0 24 24"><path d="M3 7l9-4 9 4v10l-9 4-9-4z"/><path d="M3 7l9 4 9-4M12 11v10"/></svg></a>
+      <a><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2.5"/><path d="M3 10.5h18"/></svg></a>
+      <a><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.2"/><path d="M5 20c0-3.6 3.1-5.5 7-5.5s7 1.9 7 5.5"/></svg></a>
+    </div>
+    <div class="main">
+      <h1>Dashboard</h1>
+      <div class="sub">Welcome back, Ama</div>
+      <div class="tabs"><b class="on">Buying</b><b>Shipping</b></div>
+
+      <div class="grid3" style="margin-top:16px">
+        <div class="tile"><div class="k">Active bids</div><div class="v">2</div><div class="d mut">1 leading</div></div>
+        <div class="tile"><div class="k">Won this year</div><div class="v">11</div><div class="d up">+$18,400</div></div>
+        <div class="tile"><div class="k">Awaiting payment</div><div class="v">1</div><div class="d mut">$3,200</div></div>
+        <div class="tile"><div class="k">Saved searches</div><div class="v">4</div><div class="d mut">2 new matches</div></div>
+      </div>
+
+      <div class="grid2" style="grid-template-columns:1.35fr 1fr">
+        <div class="card">
+          <h3>Closing soon <span class="more">Browse all lots</span></h3>
+          <div class="row"><div class="thumb car">F150</div><div class="tx"><b>2021 Ford F-150</b><small>Detroit · clean title · 2h 14m left</small></div><span class="amt">$4,850</span></div>
+          <div class="row"><div class="thumb car">CRV</div><div class="tx"><b>2019 Honda CR-V</b><small>Newark · salvage · closes today</small></div><span class="amt">$2,910</span></div>
+          <div class="row"><div class="thumb car">TL</div><div class="tx"><b>2016 Toyota Tacoma</b><small>Detroit · clean title · tomorrow</small></div><span class="amt">$3,640</span></div>
+          <div class="row"><div class="thumb">PAL</div><div class="tx"><b>Pallet — 40 mixed cartons</b><small>Fixed price · Tema, 3 weeks</small></div><span class="amt">$480</span></div>
+        </div>
+        <div class="card">
+          <h3>Your recent activity</h3>
+          <div class="row"><div class="thumb car">TL</div><div class="tx"><b>Won Toyota Tacoma</b><small>Payment due in 2 days</small></div></div>
+          <div class="row"><div class="thumb">BOX</div><div class="tx"><b>3 cartons booked</b><small>Arrived Newark warehouse</small></div></div>
+          <div class="row"><div class="thumb car">CIV</div><div class="tx"><b>Won Honda Civic</b><small>Delivered 2 Oct</small></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================ VARIANT C ============================ -->
+<div class="label">
+  <span class="id">C</span>
+  <h2>One chronological stream of everything</h2>
+  <p>A single activity feed mixing bids, wins, parcels and collections. Nothing
+     to navigate and the customer never hunts for anything — but it cannot answer
+     "what did I win?" or "where is my parcel?" without scrolling.</p>
+  <span class="verdict no">Elegant, weak for anything with structure</span>
+</div>
+<div class="shell">
+  <div class="top">
+    <div class="wm">Opoku<i>.</i></div>
+    <div class="nav"><a class="on">Dashboard</a><a>Browse</a><a>Send</a></div>
+    <div class="tools"><span class="av">AM</span></div>
+  </div>
+  <div class="body">
+    <div class="rail">
+      <a class="on"><svg viewBox="0 0 24 24"><path d="M3 10.5L12 3l9 7.5"/><path d="M5.5 9.5V20h13V9.5"/></svg></a>
+      <a><svg viewBox="0 0 24 24"><path d="M4 7h16l-1.5 13H5.5z"/><path d="M9 7V5a3 3 0 016 0v2"/></svg></a>
+      <a><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2.5"/><path d="M3 10.5h18"/></svg></a>
+      <a><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.2"/><path d="M5 20c0-3.6 3.1-5.5 7-5.5s7 1.9 7 5.5"/></svg></a>
+    </div>
+    <div class="main">
+      <h1>Dashboard</h1>
+      <div class="sub">Everything that has happened, newest first</div>
+
+      <div class="hero"><b>Two things need you today.</b>
+        <p>Your <u>Tacoma won at $3,640</u> and is unpaid, and the <u>bed frame quote</u>
+           expires tomorrow.</p></div>
+
+      <div class="card" style="margin-top:14px">
+        <h3>Activity</h3>
+        <div class="feed">
+          <div class="when">Today</div>
+          <div class="row"><div class="thumb car">TL</div><div class="tx"><b>You won the 2016 Toyota Tacoma for $3,640</b><small>Payment due in 2 days or the lot is released</small></div><span class="st s-wait">Pay now</span></div>
+          <div class="row"><div class="thumb car">F150</div><div class="tx"><b>Your bid of $4,850 is leading</b><small>2021 Ford F-150 · closes in 2h 14m</small></div><span class="st s-live">Leading</span></div>
+          <div class="row"><div class="thumb">BED</div><div class="tx"><b>Quote ready for your bed frame</b><small>M5V 2T6 → Tema · $58.40 · valid 24 hours</small></div><span class="st s-wait">Book</span></div>
+          <div class="when">This week</div>
+          <div class="row"><div class="thumb">BOX</div><div class="tx"><b>Your 3 cartons were received at Newark</b><small>Allocated to container MSKU-7741</small></div><span class="st s-move">Sailing</span></div>
+          <div class="row"><div class="thumb car">CRV</div><div class="tx"><b>Someone outbid you on the Honda CR-V</b><small>Now $2,910 · you would need $3,000</small></div><span class="st s-wait">Bid again</span></div>
+          <div class="row"><div class="thumb">LAM</div><div class="tx"><b>Your 2 table lamps were delivered</b><small>Signed for by your brother in Tema</small></div><span class="st s-done">Done</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="note" style="max-width:1180px;margin:0 auto">
+  All three share one account, one login and one wallet. The rail icon that opens
+  the operations console is a different surface entirely — staff see everyone's
+  data, customers see only their own, and mixing those on one screen would be a
+  data-scope mistake, not just a crowded layout.
+</div>
+
+</body>
+</html>
