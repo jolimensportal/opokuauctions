@@ -98,7 +98,7 @@
             <header class="flex items-center gap-2.5 border-b border-ink-200 px-4 py-3">
                 <h2 class="text-[0.9375rem] font-bold tracking-tight text-ink-900">Shipping</h2>
                 <span class="rounded-full bg-ink-100 px-2 py-0.5 text-[10px] font-bold text-ink-700">Your parcels</span>
-                <a href="{{ route('how-it-works') }}" class="ml-auto text-xs font-semibold text-brick-600 hover:underline">How it works</a>
+                <a href="{{ route('send.create') }}" class="ml-auto text-xs font-semibold text-brick-600 hover:underline">Get a price</a>
             </header>
 
             @forelse ($shipments as $shipment)
@@ -127,9 +127,9 @@
                         not you bought it from us. Priced by weight and size, and you see the
                         all-in figure before you pay.
                     </p>
-                    <a href="{{ route('how-it-works') }}"
+                    <a href="{{ route('send.create') }}"
                        class="mt-4 inline-flex items-center rounded-full bg-brick-500 px-4 py-2 text-xs font-bold text-paper transition-colors hover:bg-brick-600">
-                        Send something
+                        Get my price
                     </a>
                 </div>
             @endforelse

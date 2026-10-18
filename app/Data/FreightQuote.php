@@ -19,6 +19,7 @@ final readonly class FreightQuote
         public int $totalCents,
         public string $currencyCode,
         public ?string $rateCardRowId,
+        public ?BillableExplanation $explanation,
     ) {}
 
     /**
@@ -27,13 +28,18 @@ final readonly class FreightQuote
      *
      * @param  array<int, array{label: string, cents: int}>  $lines
      */
-    public static function of(array $lines, string $currencyCode, ?string $rateCardRowId): self
-    {
+    public static function of(
+        array $lines,
+        string $currencyCode,
+        ?string $rateCardRowId,
+        ?BillableExplanation $explanation = null,
+    ): self {
         return new self(
             $lines,
             array_sum(array_column($lines, 'cents')),
             $currencyCode,
             $rateCardRowId,
+            $explanation,
         );
     }
 }

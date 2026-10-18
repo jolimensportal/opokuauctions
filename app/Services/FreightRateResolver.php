@@ -6,6 +6,7 @@ use App\Data\ResolvedRate;
 use App\Enums\IntakeMethod;
 use App\Enums\QuoteUnavailableReason;
 use App\Enums\ShipmentUnit;
+use App\Models\OriginZone;
 use App\Models\PostcodeBand;
 use App\Models\RateCardRow;
 use Carbon\CarbonImmutable;
@@ -55,7 +56,13 @@ class FreightRateResolver
         );
 
         if ($candidates->isEmpty()) {
-            return ResolvedRate::refused(QuoteUnavailableReason::UnpricedLane);
+            // The postcode resolved, so we know exactly where the parcel starts.
+            // Saying "that lane" when we hold the answer is a shrug dressed up
+            // as an explanation.
+            return ResolvedRate::refused(
+                QuoteUnavailableReason::UnpricedLane,
+                ['origin' => OriginZone::find($band->zone_id)?->name],
+            );
         }
 
         // Sorted by id and filtered by window, so a closed row never shadows

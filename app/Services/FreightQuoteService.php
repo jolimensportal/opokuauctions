@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Data\BillableExplanation;
 use App\Data\FreightQuote;
 use App\Data\QuoteResult;
 use App\Enums\IntakeMethod;
@@ -111,8 +112,15 @@ class FreightQuoteService
             $lines[] = ['label' => 'Courier collection', 'cents' => $pickupCents];
         }
 
+        $explanation = BillableExplanation::of(
+            actualGrams: (int) round($weightKg * 1000),
+            volumetricGrams: (int) floor($l * $w * $h / $row->divisor * 1000),
+            billableGrams: $billable,
+            divisor: $row->divisor,
+        );
+
         return QuoteResult::quoted(
-            FreightQuote::of($lines, $row->currency(), $row->id),
+            FreightQuote::of($lines, $row->currency(), $row->id, $explanation),
         );
     }
 

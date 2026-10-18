@@ -55,6 +55,10 @@ class SenderQuoteController extends Controller
             'pickup' => ['nullable', 'boolean'],
         ]);
 
+        // Kept so a reservation can be priced again server-side. The figure the
+        // customer sees is never the figure we record.
+        $request->session()->put('send.quote_input', $data);
+
         $result = $this->quotes->quote(
             postcode: $data['postcode'],
             country: $data['country'],
@@ -89,16 +93,37 @@ class SenderQuoteController extends Controller
             'country' => ['required', Rule::in(['us', 'ca'])],
             'postcode' => ['required', 'string', 'max:16'],
             'unit' => ['nullable', Rule::in(['parcel', 'pallet'])],
-            'quoted_total_cents' => ['required', 'integer', 'min:0'],
         ]);
+
+        // Priced again here, from the quote we held server-side, rather than
+        // taken from the form. A hidden field is a number anyone can edit, and
+        // a demand table full of invented totals is worse than no table at all:
+        // it would tell us we have demand for lanes we have not priced.
+        $held = $request->session()->get('send.quote_input');
+
+        $priced = $held ? $this->quotes->quote(
+            postcode: $held['postcode'],
+            country: $held['country'],
+            destination: 'Tema',
+            mode: 'air',
+            unit: ShipmentUnit::from($held['unit']),
+            intakeMethod: IntakeMethod::Dropoff,
+            weightKg: (float) $held['weight_kg'],
+            lengthCm: $held['length_cm'] ?? null,
+            widthCm: $held['width_cm'] ?? null,
+            heightCm: $held['height_cm'] ?? null,
+            pickup: (bool) ($held['pickup'] ?? false),
+        ) : null;
 
         RateReservation::create([
             'email' => $data['email'],
             'country' => $data['country'],
             'postcode' => $data['postcode'],
             'unit' => $data['unit'] ?? 'parcel',
-            'quoted_total_cents' => $data['quoted_total_cents'],
+            'quoted_total_cents' => $priced?->isAvailable() ? $priced->quote->totalCents : null,
         ]);
+
+        $request->session()->forget('send.quote_input');
 
         return redirect()
             ->route('send.create')

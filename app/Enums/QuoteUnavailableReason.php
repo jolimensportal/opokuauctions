@@ -33,7 +33,9 @@ enum QuoteUnavailableReason: string
             self::MissingDimensions => 'We need the length, width and height to price this, because air freight is charged on the space it takes.',
             self::UnpricedLane => $context['service'] ?? null
                 ? 'We do not have a price for that service on that lane yet.'
-                : 'We do not have a price for that lane yet.',
+                : ($context['origin'] ?? null
+                    ? sprintf('We do not ship from %s yet.', $context['origin'])
+                    : 'We do not have a price for that lane yet.'),
             self::ExpiredRate => 'Our price for that lane has expired and is being reviewed.',
         };
     }

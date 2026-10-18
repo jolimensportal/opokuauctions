@@ -29,6 +29,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             CurbWeightSeeder::class,
             FreightRateSeeder::class,
+            LogisticsRateSeeder::class,
         ]);
 
         $this->call([

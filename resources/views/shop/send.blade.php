@@ -157,19 +157,22 @@
 
                         {{-- Explaining the charge is the whole point. "USD 25 to
                              move a USD 12 box" is an objection; "USD 25 because
-                             your box is 48 kg of air freight" is an answer. --}}
-                        @php
-                            $vol = ($input['length_cm'] ?? 0) * ($input['width_cm'] ?? 0) * ($input['height_cm'] ?? 0) / 2000;
-                            $actual = (float) ($input['weight_kg'] ?? 0);
-                        @endphp
-                        @if (($input['unit'] ?? 'parcel') === 'parcel' && $vol > $actual && $vol > 0)
+                             your box is 48 kg of air freight" is an answer.
+
+                             These numbers come from the quote, not from a second
+                             calculation here. The page used to divide by 2000
+                             while the rate row said 5000, which meant the
+                             explanation could contradict the invoice. --}}
+                        @php $why = $quote->explanation; @endphp
+                        @if ($why && ($input['unit'] ?? 'parcel') === 'parcel' && $why->isVolumetric())
                             <p class="mt-4 rounded-[10px] border border-brick-200 bg-brick-50 px-3.5 py-3 text-xs leading-relaxed text-brick-700">
                                 <strong>Why ${{ number_format($quote->totalCents / 100, 2) }}?</strong>
                                 Your box bills at
                                 {{ $input['length_cm'] }} &times; {{ $input['width_cm'] }} &times; {{ $input['height_cm'] }} cm,
-                                which is {{ number_format($vol, 0) }} kg of air freight &mdash; more than
-                                the {{ number_format($actual, 1) }} kg on the scale. We charge on whichever is
-                                greater, and the container minimum of $25.00 applies.
+                                which is {{ number_format($why->volumetricGrams / 1000, 1) }} kg of air freight &mdash; more than
+                                the {{ number_format($why->actualKg(), 1) }} kg on the scale. We charge on whichever is
+                                greater, so this box is billed at
+                                {{ number_format($why->billableKg(), 1) }} kg.
                             </p>
                         @endif
 
@@ -185,7 +188,6 @@
                             <input type="hidden" name="country" value="{{ $input['country'] ?? 'us' }}">
                             <input type="hidden" name="postcode" value="{{ $input['postcode'] ?? '' }}">
                             <input type="hidden" name="unit" value="{{ $input['unit'] ?? 'parcel' }}">
-                            <input type="hidden" name="quoted_total_cents" value="{{ $quote->totalCents }}">
 
                             <label for="email" class="mb-1.5 block text-[11.5px] font-semibold text-ink-900">
                                 Hold this price
@@ -224,7 +226,6 @@
                             <input type="hidden" name="country" value="{{ $input['country'] ?? 'us' }}">
                             <input type="hidden" name="postcode" value="{{ $input['postcode'] ?? '' }}">
                             <input type="hidden" name="unit" value="{{ $input['unit'] ?? 'parcel' }}">
-                            <input type="hidden" name="quoted_total_cents" value="0">
 
                             <label for="email-refuse" class="mb-1.5 block text-[11.5px] font-semibold text-ink-900">
                                 Price my postcode when you can
