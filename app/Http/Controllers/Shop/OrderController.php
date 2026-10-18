@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Shop;
 use App\Http\Controllers\Controller;
 use App\Models\Lot;
 use App\Models\Shipment;
+use App\Models\Wallet;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -31,7 +32,35 @@ class OrderController extends Controller
         return view('shop.account', [
             'wonLots' => $wonLots,
             'shipments' => $this->shipmentsFor($userId),
+            'tiles' => $this->tiles($userId, $wonLots),
         ]);
+    }
+
+    /**
+     * The four figures across the top of the dashboard.
+     *
+     * Parcels sent is always zero until sender identity exists. It is shown as
+     * a real zero rather than omitted: a tile that is silently missing reads as
+     * "not applicable", and a real zero reads as "you have sent none", which
+     * is a different and truthful message.
+     */
+    private function tiles(string $userId, $wonLots): array
+    {
+        $shipments = $this->shipmentsFor($userId);
+
+        return [
+            'wonThisMonth' => $wonLots->filter(
+                fn (Lot $lot) => $lot->ends_at?->isCurrentMonth() ?? false,
+            )->count(),
+            'inTransit' => $shipments->filter(
+                fn (Shipment $s) => in_array($s->status, ['BOOKING', 'SAILING'], true),
+            )->count(),
+            // Zero until the logistics portal can book a parcel.
+            'parcelsSent' => 0,
+            'balanceCents' => (int) Wallet::where('user_id', $userId)
+                ->where('currency_code', 'USD')
+                ->value('balance_available'),
+        ];
     }
 
     public function purchases(Request $request): View

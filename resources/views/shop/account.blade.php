@@ -3,10 +3,22 @@
 @section('title', 'My account — Opoku Auctions')
 
 @section('content')
-<section class="mx-auto max-w-4xl px-4 sm:px-6 pt-12 pb-20">
+{{--
+    One account, both businesses.
+
+    Buying and shipping sit side by side rather than behind tabs. A tab makes
+    the larger of the two look like an afterthought, and shipping is the larger
+    of the two — so it gets equal weight on the first screen rather than one
+    click away.
+
+    The shipping column ships an empty state because there is no sender concept
+    yet. It reads as an invitation, not as a panel that failed to load: a fake
+    parcel on someone's real dashboard would be worse than no column at all.
+--}}
+<section class="mx-auto max-w-6xl px-4 sm:px-6 pt-10 pb-20">
 
     @if (session('status'))
-        <div class="mb-8 bg-brick-50 border border-brick-200 text-brick-900 text-sm px-4 py-3 rounded-[8px]" role="status">
+        <div class="mb-6 bg-brick-50 border border-brick-200 text-brick-900 text-sm px-4 py-3 rounded-[8px]" role="status">
             {{ session('status') }}
         </div>
     @endif
@@ -15,46 +27,113 @@
         Hello, {{ Str::before(auth()->user()->name, ' ') }}
     </h1>
 
-    <div class="mt-10">
-        <h2 class="text-xl font-extrabold tracking-tight text-ink-900">Your lots</h2>
-
-        @forelse ($wonLots as $lot)
-            <div class="flex items-center justify-between gap-4 py-4 border-b border-ink-200">
-                <div class="min-w-0">
-                    <a href="{{ route('lots.show', $lot) }}"
-                       class="font-semibold text-ink-900 hover:text-brick-600">
-                        {{ $lot->title }}
-                    </a>
-                    <p class="text-xs text-ink-500 tnum">
-                        {{ str_replace('_', ' ', $lot->status) }}
-                        @if ($lot->ends_at) &middot; closed {{ $lot->ends_at->format('j M Y') }} @endif
-                    </p>
-                </div>
-                <span class="tnum font-bold text-ink-900 shrink-0">{{ number_format($lot->current_bid / 100, 0) }}</span>
-            </div>
-        @empty
-            <p class="mt-4 text-ink-600">
-                You have not won a lot yet.
-                <a href="{{ route('lots.index') }}" class="font-semibold text-brick-600 hover:text-brick-700">See what is live</a>.
-            </p>
-        @endforelse
+    {{-- The one thing worth acting on today, stated plainly. --}}
+    <div class="mt-6 rounded-[14px] border border-brick-200 bg-brick-50 px-5 py-4">
+        <p class="text-[0.9375rem] font-bold text-brick-600">Everything you have with us, in one place.</p>
+        <p class="mt-1 text-sm text-brick-700">
+            You are winning
+            <a href="#auctions" class="font-semibold underline underline-offset-2">{{ count($wonLots) }} {{ Str::plural('lot', count($wonLots)) }}</a>
+            and have
+            <a href="#shipping" class="font-semibold underline underline-offset-2">{{ count($shipments) }} {{ Str::plural('shipment', count($shipments)) }}</a>
+            on the water.
+        </p>
     </div>
 
-    @if ($shipments->isNotEmpty())
-        <div class="mt-14">
-            <h2 class="text-xl font-extrabold tracking-tight text-ink-900">In transit</h2>
+    {{-- Icon-free tiles. At this density the number is the content. --}}
+    <div class="mt-6 grid grid-cols-2 gap-px overflow-hidden rounded-[14px] border border-ink-200 bg-ink-200 sm:grid-cols-4">
+        @foreach ([
+            ['Won this month', $tiles['wonThisMonth'], null],
+            ['In transit', $tiles['inTransit'], 'to Tema'],
+            ['Parcels sent', $tiles['parcelsSent'], 'this year'],
+            ['Balance', '$'.number_format($tiles['balanceCents'] / 100, 2), 'settled'],
+        ] as [$label, $value, $hint])
+            <div class="bg-white px-4 py-3">
+                <p class="text-[11px] font-semibold uppercase tracking-wider text-ink-500">{{ $label }}</p>
+                <p class="tnum mt-1 text-2xl font-extrabold tracking-tight text-ink-900">{{ $value }}</p>
+                @if ($hint)
+                    <p class="mt-0.5 text-[11px] font-medium text-ink-500">{{ $hint }}</p>
+                @endif
+            </div>
+        @endforeach
+    </div>
 
-            @foreach ($shipments as $shipment)
-                <a href="{{ route('orders.show', $shipment) }}"
-                   class="mt-4 flex items-center justify-between gap-4 surface p-5 hover:border-ink-400 transition-colors">
-                    <div>
-                        <div class="tnum font-semibold text-ink-900">{{ $shipment->container_no ?? 'Container pending' }}</div>
-                        <p class="text-sm text-ink-600">{{ ucfirst(str_replace('_', ' ', $shipment->status)) }}</p>
-                    </div>
-                    <span class="text-sm font-semibold text-brick-600">Track</span>
+    <div class="mt-6 grid gap-5 lg:grid-cols-2">
+
+        {{-- ------------------------------------------------------ Buying --}}
+        <section id="auctions" class="overflow-hidden rounded-[14px] border border-ink-200 bg-white">
+            <header class="flex items-center gap-2.5 border-b border-ink-200 px-4 py-3">
+                <h2 class="text-[0.9375rem] font-bold tracking-tight text-ink-900">Buying</h2>
+                <span class="rounded-full bg-brick-50 px-2 py-0.5 text-[10px] font-bold text-brick-600">Your auctions</span>
+                <a href="{{ route('lots.index') }}" class="ml-auto text-xs font-semibold text-brick-600 hover:underline">Browse lots</a>
+            </header>
+
+            @forelse ($wonLots as $lot)
+                <a href="{{ route('lots.show', $lot) }}" class="flex items-center gap-3 border-b border-ink-100 px-4 py-3 transition-colors last:border-0 hover:bg-ink-50">
+                    <span class="grid h-10 w-10 flex-none place-items-center rounded-[9px] bg-brick-50 text-[10px] font-bold text-brick-600">
+                        {{ Str::upper(Str::substr($lot->title, 0, 3)) }}
+                    </span>
+                    <span class="min-w-0 flex-1">
+                        <span class="block truncate text-sm font-semibold text-ink-900">{{ $lot->title }}</span>
+                        <span class="tnum mt-0.5 block text-[11px] text-ink-500">
+                            {{ $lot->city }} &middot; closes {{ $lot->ends_at?->format('j M, H:i') }}
+                        </span>
+                    </span>
+                    <span class="tnum flex-none text-sm font-bold text-ink-900">
+                        {{ number_format($lot->current_bid / 100, 2) }}
+                    </span>
                 </a>
-            @endforeach
-        </div>
-    @endif
+            @empty
+                <div class="px-4 py-10 text-center">
+                    <p class="text-sm font-semibold text-ink-900">No lots yet</p>
+                    <p class="mt-1 text-[13px] text-ink-600">
+                        You are not the highest bidder on anything right now.
+                        <a href="{{ route('lots.index') }}" class="font-semibold text-brick-600 hover:underline">See what is closing</a>.
+                    </p>
+                </div>
+            @endforelse
+        </section>
+
+        {{-- ---------------------------------------------------- Shipping --}}
+        <section id="shipping" class="overflow-hidden rounded-[14px] border border-ink-200 bg-white">
+            <header class="flex items-center gap-2.5 border-b border-ink-200 px-4 py-3">
+                <h2 class="text-[0.9375rem] font-bold tracking-tight text-ink-900">Shipping</h2>
+                <span class="rounded-full bg-ink-100 px-2 py-0.5 text-[10px] font-bold text-ink-700">Your parcels</span>
+                <a href="{{ route('how-it-works') }}" class="ml-auto text-xs font-semibold text-brick-600 hover:underline">How it works</a>
+            </header>
+
+            @forelse ($shipments as $shipment)
+                <div class="flex items-center gap-3 border-b border-ink-100 px-4 py-3 last:border-0">
+                    <span class="grid h-10 w-10 flex-none place-items-center rounded-[9px] bg-ink-100 text-[10px] font-bold text-ink-700">
+                        {{ Str::upper(Str::substr($shipment->container_no ?? $shipment->id, 0, 3)) }}
+                    </span>
+                    <span class="min-w-0 flex-1">
+                        <span class="block truncate text-sm font-semibold text-ink-900">
+                            Container {{ $shipment->container_no ?? $shipment->id }}
+                        </span>
+                        <span class="tnum mt-0.5 block text-[11px] text-ink-500">
+                            {{ str_replace('_', ' ', $shipment->status) }} &middot; to {{ $shipment->seaport_destination }}
+                        </span>
+                    </span>
+                    <a href="{{ route('orders.show', $shipment) }}" class="text-xs font-semibold text-brick-600 hover:underline">Track</a>
+                </div>
+            @empty
+                {{-- Honest empty state. There is no sender concept yet, so
+                     every customer sees this. It reads as an invitation because
+                     it is one — the rate card behind it is already built. --}}
+                <div class="px-4 py-10 text-center">
+                    <p class="text-sm font-semibold text-ink-900">Nothing in transit</p>
+                    <p class="mx-auto mt-1 max-w-[34ch] text-[13px] text-ink-600">
+                        Send something to Tema from anywhere in the USA or Canada, whether or
+                        not you bought it from us. Priced by weight and size, and you see the
+                        all-in figure before you pay.
+                    </p>
+                    <a href="{{ route('how-it-works') }}"
+                       class="mt-4 inline-flex items-center rounded-full bg-brick-500 px-4 py-2 text-xs font-bold text-paper transition-colors hover:bg-brick-600">
+                        Send something
+                    </a>
+                </div>
+            @endforelse
+        </section>
+    </div>
 </section>
 @endsection
