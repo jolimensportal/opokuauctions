@@ -29,7 +29,7 @@ final readonly class AttentionItem
         /** When the underlying condition first became true, as best known. */
         public CarbonImmutable $raisedAt,
         /** Assigned staff member, or null when nobody is available. */
-        public ?string $ownerId,
+        public ?int $ownerId,
         /** Where the operator goes to fix it. */
         public string $actionUrl,
     ) {}

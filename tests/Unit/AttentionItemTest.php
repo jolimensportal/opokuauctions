@@ -56,7 +56,7 @@ class AttentionItemTest extends TestCase
 
     public function test_an_assigned_item_is_not_unassigned(): void
     {
-        $this->assertFalse($this->item(['ownerId' => 'usr_kofi'])->isUnassigned());
+        $this->assertFalse($this->item(['ownerId' => 42])->isUnassigned());
     }
 
     public function test_age_is_measured_from_when_it_was_raised(): void
