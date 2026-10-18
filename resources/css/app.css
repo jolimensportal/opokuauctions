@@ -1,5 +1,84 @@
 @import 'tailwindcss';
 
+/* ---------------------------------------------------------------------------
+   FONTS, SELF-HOSTED
+
+   Both faces were named as tokens for the whole project's life and never
+   actually loaded, so every page has been rendering in the system font. They are
+   served from this origin rather than a CDN for three reasons: the site does not
+   render at all until a third party answers, a Ghanaian mobile customer on a
+   slow connection waits on someone else's uptime, and font-display:swap only
+   means something when the font is one step away.
+
+   Latin subsets only. The site is English; shipping the other 22 subsets is
+   dead weight on a page a customer opens on a phone.
+   --------------------------------------------------------------------------- */
+
+@font-face {
+    font-family: 'Poppins';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url('/fonts/Poppins-400.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Poppins';
+    font-style: normal;
+    font-weight: 500;
+    font-display: swap;
+    src: url('/fonts/Poppins-500.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Poppins';
+    font-style: normal;
+    font-weight: 600;
+    font-display: swap;
+    src: url('/fonts/Poppins-600.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Poppins';
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url('/fonts/Poppins-700.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Poppins';
+    font-style: normal;
+    font-weight: 800;
+    font-display: swap;
+    src: url('/fonts/Poppins-800.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'IBM Plex Mono';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url('/fonts/IBMPlexMono-400.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'IBM Plex Mono';
+    font-style: normal;
+    font-weight: 500;
+    font-display: swap;
+    src: url('/fonts/IBMPlexMono-500.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'IBM Plex Mono';
+    font-style: normal;
+    font-weight: 600;
+    font-display: swap;
+    src: url('/fonts/IBMPlexMono-600.woff2') format('woff2');
+}
+
+
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 
@@ -19,43 +98,55 @@
  * against a saturated red; ink-900 and paper do the same job with less glare.
  */
 @theme {
-    --font-sans: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
+    --font-sans: 'Poppins', ui-sans-serif, system-ui, sans-serif;
     --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', monospace;
 
-    /* Brick. The single accent, locked across the whole product. */
-    --color-brick-50: oklch(0.970 0.012 32);
-    --color-brick-100: oklch(0.935 0.028 32);
-    --color-brick-200: oklch(0.885 0.055 32);
-    --color-brick-300: oklch(0.800 0.090 31);
-    --color-brick-400: oklch(0.680 0.135 30);
-    --color-brick-500: oklch(0.565 0.152 30);
-    --color-brick-600: oklch(0.487 0.148 29);
-    --color-brick-700: oklch(0.405 0.128 28);
-    --color-brick-800: oklch(0.330 0.100 28);
-    --color-brick-900: oklch(0.265 0.075 28);
+    /* Rose. The single accent, locked across the whole product.
+       Hue 5-8 throughout: Brikk's rose is a pink-red, not the orange-red
+       this token family used to be. Only the hue and chroma moved — every
+       lightness is unchanged, so contrast relationships are preserved. */
+    --color-brick-50: oklch(0.970 0.012 8);
+    --color-brick-100: oklch(0.940 0.030 8);
+    --color-brick-200: oklch(0.895 0.062 7);
+    --color-brick-300: oklch(0.820 0.105 6);
+    /* 0.670 rather than the reference's 0.700: at 0.700 this step is 4.23:1
+       on paper, under AA for body text, and the layout uses it on a small
+       label. 0.670 is 5.06:1. */
+    --color-brick-400: oklch(0.670 0.160 5);
+    --color-brick-500: oklch(0.600 0.190 5);
+    --color-brick-600: oklch(0.520 0.180 5);
+    --color-brick-700: oklch(0.435 0.150 6);
+    --color-brick-800: oklch(0.350 0.115 7);
+    --color-brick-900: oklch(0.275 0.085 8);
 
-    /* Ink: the neutrals. Warm, so they sit with the brick rather than against it. */
-    --color-ink-50: oklch(0.975 0.004 60);
-    --color-ink-100: oklch(0.945 0.005 55);
-    --color-ink-200: oklch(0.895 0.006 50);
-    --color-ink-300: oklch(0.800 0.007 45);
-    --color-ink-400: oklch(0.660 0.008 40);
-    --color-ink-500: oklch(0.545 0.009 38);
-    --color-ink-600: oklch(0.440 0.010 35);
-    --color-ink-700: oklch(0.340 0.011 32);
-    --color-ink-800: oklch(0.255 0.012 30);
-    --color-ink-900: oklch(0.190 0.012 30);
-    --color-ink-950: oklch(0.135 0.011 30);
+    /* Ink: the neutrals. Cool navy rather than warm near-black, so headings
+       read as Brikk's do. Hue 285 throughout. */
+    --color-ink-50: oklch(0.975 0.006 285);
+    --color-ink-100: oklch(0.945 0.009 285);
+    --color-ink-200: oklch(0.895 0.014 285);
+    --color-ink-300: oklch(0.800 0.020 285);
+    --color-ink-400: oklch(0.660 0.028 285);
+    --color-ink-500: oklch(0.545 0.036 285);
+    --color-ink-600: oklch(0.440 0.044 285);
+    --color-ink-700: oklch(0.345 0.052 285);
+    --color-ink-800: oklch(0.290 0.058 285);
+    --color-ink-900: oklch(0.240 0.060 285);
+    --color-ink-950: oklch(0.175 0.055 285);
 
-    /* Paper: off-white. The page is never #fff. */
-    --color-paper: oklch(0.988 0.004 70);
-    --color-paper-dim: oklch(0.960 0.006 65);
+    /* Paper: the surface colour. Cool-tinted, and never #fff on the page —
+       cards sit white on canvas, which is how Brikk separates them. */
+    --color-paper: oklch(0.985 0.004 285);
+
+    /* Canvas: the page behind the cards. Slightly cooler and darker than
+       paper, so a white card reads as a card without needing a shadow. */
+    --color-canvas: oklch(0.965 0.006 285);
+    --color-canvas-dim: oklch(0.940 0.008 285);
 
     /* One radius scale for the whole product. Buttons are pill, surfaces are
-       10px, inputs are 8px. Documented here because mixed systems read as
+       14px, inputs are 8px. Documented here because mixed systems read as
        broken even when each element is individually fine. */
     --radius-pill: 999px;
-    --radius-surface: 10px;
+    --radius-surface: 14px;
     --radius-input: 8px;
 }
 
@@ -65,7 +156,7 @@
     }
 
     body {
-        background-color: var(--color-paper);
+        background-color: var(--color-canvas);
         color: var(--color-ink-900);
         font-family: var(--font-sans);
         /* Long Ghanaian place names and model names wrap badly without this. */
@@ -185,7 +276,9 @@
     }
 
     .surface {
-        background-color: var(--color-paper);
+        /* White on canvas. Brikk separates a card from the page with value,
+           not with a shadow, and a shadow would be the wrong instinct here. */
+        background-color: #fff;
         border: 1px solid var(--color-ink-200);
         border-radius: var(--radius-surface);
     }
