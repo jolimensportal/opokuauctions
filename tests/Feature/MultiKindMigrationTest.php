@@ -30,7 +30,16 @@ class MultiKindMigrationTest extends TestCase
      */
     private function acrossMigration(callable $callback): void
     {
-        $this->artisan('migrate:rollback', ['--step' => 1])->assertSuccessful();
+        // Roll back *this* migration by path, not by --step=1.
+        //
+        // Stepping back one migration only worked while this was the newest
+        // file in the directory, so adding any later migration silently
+        // turned every test in this file into a no-op that still passed its
+        // assertions. Naming the path keeps this test testing this migration
+        // no matter what lands after it.
+        $this->artisan('migrate:rollback', [
+            '--path' => 'database/migrations/2026_10_17_300000_multi_kind_lots.php',
+        ])->assertSuccessful();
 
         // The old shape has to exist for the rollback to have been real.
         $this->assertTrue(
