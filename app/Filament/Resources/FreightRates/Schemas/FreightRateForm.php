@@ -36,11 +36,18 @@ class FreightRateForm
                 // 25000 reads as "$25000" and gets typed as 250, which stores
                 // USD 2.50. The unit belongs in the label instead.
                 TextInput::make('min_charge_cents')
-                    ->label('Min charge (cents)')
+                    ->label('Container minimum (cents)')
                     ->required()
                     ->numeric()
                     ->suffix('cents')
-                    ->helperText('Forwarder minimum consignment charge. USD 250.00 is 25000. Floors freight only.'),
+                    // This used to be a per-lot floor, which meant a 200 g
+                    // headlamp shipped beside a car was billed the full USD
+                    // 250 for itself. The freight for a container is computed
+                    // once, floored once, then split by weight — so this number
+                    // is paid once per container, no matter how many lots are
+                    // aboard. Leaving the old wording here would have an
+                    // operator "fixing" a rate that is behaving correctly.
+                    ->helperText('Forwarder minimum consignment charge, charged once per container. USD 250.00 is 25000. Split across the lots aboard by weight, so a light item beside a car pays cents.'),
 
                 // Flat per car. Cover is priced on the vehicle, not the kilos.
                 TextInput::make('insurance_cents')

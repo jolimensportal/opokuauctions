@@ -22,7 +22,8 @@ class FreightRatesTable
                     ->formatStateUsing(fn ($state) => '$'.number_format((float) $state, 4))
                     ->sortable(),
                 TextColumn::make('min_charge_cents')
-                    ->label('Min charge')
+                    ->label('Container min')
+                    ->tooltip('The forwarder minimum consignment charge. Paid once per container, then split across the lots aboard by weight.')
                     ->formatStateUsing(fn ($state) => '$'.number_format((int) $state / 100, 2))
                     ->sortable(),
                 TextColumn::make('insurance_cents')
