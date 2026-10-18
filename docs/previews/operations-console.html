@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Operations — dense console study</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* SAME TOKENS AS THE BUYER DASHBOARD. Different structure. That is the test. */
+:root{
+  --ink:#16193A; --ink-soft:#33365C; --body:#6E7280; --muted:#9AA0AC;
+  --rose:#E1537A; --rose-deep:#D1436B; --rose-soft:#FCEAEF; --rose-line:#F6C9D6;
+  --surface:#FFFFFF; --line:#E8EAEF; --line-soft:#F1F2F5; --field:#F3F4F6;
+  --canvas:#F6F7F9;
+  --r-card:14px; --r-field:8px; --r-pill:999px; --rail:64px;
+
+  /* functional status colours — only colour with meaning */
+  --ok-bg:#E4F5EC;   --ok-fg:#127A4A;
+  --warn-bg:#FDF1DD; --warn-fg:#9A6206;
+  --bad-bg:#FCE3E8;  --bad-fg:#B32C46;
+  --info-bg:#E7EFFB; --info-fg:#2C5FC7;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-font-smoothing:antialiased}
+body{
+  font-family:"Poppins","Futura","Century Gothic",-apple-system,system-ui,sans-serif;
+  background:var(--canvas);color:var(--ink);min-height:100vh;font-size:14px;
+  background-image:
+    radial-gradient(1200px 640px at 2% -18%, #E9E5F8 0%, rgba(233,229,248,0) 58%),
+    linear-gradient(180deg,#F4F3FA 0%,var(--canvas) 38%);
+}
+
+/* ---------------------------------------------------------------- topbar --- */
+.topbar{height:60px;background:var(--surface);border-bottom:1px solid var(--line);
+  display:flex;align-items:center;gap:20px;padding:0 18px;position:sticky;top:0;z-index:20}
+.wordmark{font-size:20px;font-weight:800;letter-spacing:-.035em}
+.env{font-size:10px;font-weight:700;letter-spacing:.09em;color:var(--bad-fg);
+  background:var(--bad-bg);padding:3px 7px;border-radius:4px}
+.crumb{font-size:13px;font-weight:600;color:var(--body)}
+.tools{margin-left:auto;display:flex;align-items:center;gap:12px;white-space:nowrap}
+.srch{display:flex;align-items:center;gap:8px;background:var(--field);
+  border:1px solid var(--line);border-radius:var(--r-pill);padding:7px 14px;width:250px}
+.srch input{border:0;background:transparent;outline:0;font:inherit;font-size:12.5px;
+  color:var(--ink);width:100%}
+.srch input::placeholder{color:var(--muted)}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:var(--r-pill);
+  padding:7px 14px;font:inherit;font-size:12.5px;font-weight:600;color:var(--ink-soft);cursor:pointer}
+.btn-primary{background:linear-gradient(135deg,#EC6A8C,#DE4E77);color:#fff;border:0;
+  box-shadow:0 1px 4px rgba(225,83,122,.3)}
+.avatar{width:28px;height:28px;border-radius:50%;background:#1B1E3D;color:#fff;
+  display:grid;place-items:center;font-size:11px;font-weight:700}
+
+/* ------------------------------------------------------------------ rail --- */
+.shell{display:flex;align-items:flex-start}
+.rail{width:var(--rail);flex:0 0 var(--rail);background:var(--surface);
+  border-right:1px solid var(--line);display:flex;flex-direction:column;align-items:center;
+  gap:4px;padding:14px 0;position:sticky;top:60px;min-height:calc(100vh - 60px)}
+.rail a{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;
+  color:#1B1E3D;position:relative}
+.rail a:hover{background:var(--field)}
+.rail a.on{color:var(--rose);background:var(--rose-soft)}
+.rail svg{width:19px;height:19px;stroke:currentColor;stroke-width:1.9;fill:none;
+  stroke-linecap:round;stroke-linejoin:round}
+.rail .count{position:absolute;top:3px;right:3px;min-width:15px;height:15px;padding:0 3px;
+  border-radius:var(--r-pill);background:var(--rose);color:#fff;font-size:9px;font-weight:700;
+  display:grid;place-items:center;border:1.5px solid #fff}
+
+.main{flex:1;min-width:0;padding:20px 24px 48px}
+
+/* ------------------------------------------------------------------ head --- */
+.head{display:flex;align-items:flex-end;gap:16px;margin-bottom:16px}
+h1{font-size:23px;font-weight:800;letter-spacing:-.025em;line-height:1.15}
+.sub{font-size:12.5px;color:var(--muted);margin-top:3px}
+.head .right{margin-left:auto;display:flex;gap:8px}
+
+/* ----------------------------------------------------------- stat strip --- */
+/* Dense and wide-format. No icons — the number is the content, a 42px tile of
+   coloured glyph beside every figure is what makes buyer dashboards unreadable
+   at this density. */
+.strip{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:1px;
+  background:var(--line);border:1px solid var(--line);border-radius:var(--r-card);
+  overflow:hidden;margin-bottom:16px}
+.tile{background:var(--surface);padding:12px 14px}
+.tile .k{font-size:10.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;
+  color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tile .v{font-size:21px;font-weight:800;letter-spacing:-.03em;margin-top:5px;
+  font-variant-numeric:tabular-nums;line-height:1}
+.tile .d{font-size:10.5px;font-weight:600;margin-top:4px}
+.d.up{color:var(--ok-fg)} .d.down{color:var(--bad-fg)} .d.flat{color:var(--muted)}
+
+/* ----------------------------------------------------------------- cards --- */
+.grid{display:grid;gap:16px;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);margin-bottom:16px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-card);
+  box-shadow:0 1px 2px rgba(22,25,58,.04);overflow:hidden}
+.card-h{display:flex;align-items:center;gap:10px;padding:13px 16px;border-bottom:1px solid var(--line-soft)}
+.card-h h3{font-size:13.5px;font-weight:700;letter-spacing:-.01em}
+.count-pill{font-size:10.5px;font-weight:700;background:var(--rose-soft);color:var(--rose-deep);
+  padding:2px 7px;border-radius:var(--r-pill);font-variant-numeric:tabular-nums}
+.card-h .right{margin-left:auto;display:flex;gap:6px;align-items:center}
+.linkbtn{font-size:11.5px;font-weight:600;color:var(--rose);background:none;border:0;
+  cursor:pointer;font-family:inherit}
+
+/* ----------------------------------------------------------------- table --- */
+.filters{display:flex;gap:8px;align-items:center;padding:10px 16px;border-bottom:1px solid var(--line-soft);
+  background:#FBFBFC}
+.f{display:flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;color:var(--body)}
+select{font:inherit;font-size:11.5px;font-weight:600;color:var(--ink-soft);background:var(--field);
+  border:1px solid var(--line);border-radius:6px;padding:5px 26px 5px 9px;cursor:pointer;
+  appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'><path d='M2 4l3 3 3-3' stroke='%236E7280' stroke-width='2' fill='none'/></svg>");
+  background-repeat:no-repeat;background-position:right 8px center;background-size:10px 10px}
+
+.table-scroll{overflow-x:auto}
+.table-scroll table{table-layout:auto}
+table{width:100%;border-collapse:collapse}
+th{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);
+  text-align:left;padding:9px 12px;border-bottom:1px solid var(--line-soft);white-space:nowrap;
+  background:#FBFBFC}
+td{padding:0 12px;height:42px;border-bottom:1px solid var(--line-soft);font-size:12.5px;
+  white-space:nowrap;color:var(--ink-soft)}
+tbody tr:hover td{background:#FCFCFE}
+tbody tr:last-child td{border-bottom:0}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11.5px;
+  color:var(--ink);font-weight:600;letter-spacing:-.01em}
+.num{text-align:right;font-variant-numeric:tabular-nums}
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:700;
+  padding:3px 9px;border-radius:var(--r-pill);letter-spacing:.01em}
+.pill::before{content:"";width:5px;height:5px;border-radius:50%;background:currentColor}
+.p-ok{background:var(--ok-bg);color:var(--ok-fg)}
+.p-warn{background:var(--warn-bg);color:var(--warn-fg)}
+.p-bad{background:var(--bad-bg);color:var(--bad-fg)}
+.p-info{background:var(--info-bg);color:var(--info-fg)}
+.p-mute{background:var(--field);color:var(--body)}
+.owner{display:flex;align-items:center;gap:8px}
+.av{width:22px;height:22px;border-radius:50%;background:#EDEAF7;color:#4A3F86;font-size:9.5px;
+  font-weight:700;display:grid;place-items:center}
+.rowbtn{font-size:11px;font-weight:600;color:var(--rose);background:none;border:1px solid var(--rose-line);
+  border-radius:6px;padding:3px 9px;cursor:pointer;font-family:inherit}
+
+/* --------------------------------------------------------------- sidebar --- */
+.side.pad{padding:14px 16px}
+.meter{margin-bottom:14px}
+.meter:last-child{margin-bottom:0}
+.meter .top{display:flex;justify-content:space-between;font-size:11.5px;font-weight:600;margin-bottom:6px}
+.meter .top span:last-child{color:var(--muted);font-variant-numeric:tabular-nums}
+.bar{height:6px;border-radius:var(--r-pill);background:var(--field);overflow:hidden}
+.bar i{display:block;height:100%;border-radius:var(--r-pill)}
+.qa{display:flex;flex-direction:column}
+.qa a{display:flex;align-items:center;gap:11px;padding:11px 16px;border-bottom:1px solid var(--line-soft);
+  text-decoration:none;color:inherit}
+.qa a:last-child{border-bottom:0}
+.qa a:hover{background:#FCFCFE}
+.qa .tx{min-width:0}
+.qa .tx b{display:block;font-size:12.5px;font-weight:600;color:var(--ink)}
+.qa .tx small{display:block;font-size:11px;color:var(--muted);margin-top:1px}
+.qa .chev{margin-left:auto;color:var(--muted);font-size:14px;flex:0 0 auto}
+.qa .tag{margin-left:auto;font-size:10.5px;font-weight:700;color:var(--bad-fg);background:var(--bad-bg);
+  padding:2px 7px;border-radius:var(--r-pill);flex:0 0 auto}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wordmark">Opoku<i style="font-style:normal;color:var(--rose)">.</i></div>
+  <span class="env">LIVE</span>
+  <span class="crumb">Operations</span>
+
+  <div class="tools">
+    <div class="srch">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9AA0AC" stroke-width="2.2">
+        <circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5" stroke-linecap="round"/></svg>
+      <input placeholder="Search container, parcel, sender…">
+    </div>
+    <button class="btn">Export</button>
+    <button class="btn btn-primary">New shipment</button>
+    <div class="avatar">KO</div>
+  </div>
+</header>
+
+<div class="shell">
+  <aside class="rail">
+    <a href="#" class="on"><svg viewBox="0 0 24 24"><path d="M4 13h6V4H4zM14 20h6v-9h-6zM4 20h6v-3H4zM14 8h6V4h-6z"/></svg></a>
+    <a href="#"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/></svg><span class="count">7</span></a>
+    <a href="#"><svg viewBox="0 0 24 24"><path d="M4 8.5l8-4.5 8 4.5v7l-8 4.5-8-4.5z"/><path d="M4 8.5l8 4.5 8-4.5M12 13v7"/></svg><span class="count">23</span></a>
+    <a href="#"><svg viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6z"/><path d="M9 12h7M9 16h5"/></svg></a>
+    <a href="#"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2.5"/><path d="M3 10.5h18"/></svg></a>
+    <a href="#"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.2"/><path d="M5 20c0-3.6 3.1-5.5 7-5.5s7 1.9 7 5.5"/></svg></a>
+    <a href="#"><svg viewBox="0 0 24 24"><path d="M3 20h18M6 16V9M11 16V5M16 16v-4M21 16v-7"/></svg></a>
+    <a href="#"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/></svg></a>
+  </aside>
+
+  <main class="main">
+    <div class="head">
+      <div>
+        <h1>Operations</h1>
+        <div class="sub">Sunday 18 October · 03:40 UTC · all corridors</div>
+      </div>
+      <div class="right">
+        <button class="btn">Last 7 days</button>
+        <button class="btn">Export</button>
+      </div>
+    </div>
+
+    <!-- dense, icon-free stat strip -->
+    <section class="strip">
+      <div class="tile"><div class="k">Containers in transit</div><div class="v">7</div><div class="d flat">no change</div></div>
+      <div class="tile"><div class="k">Parcels received</div><div class="v">1,284</div><div class="d up">+18.2%</div></div>
+      <div class="tile"><div class="k">Awaiting clearance</div><div class="v">3</div><div class="d down">needs action</div></div>
+      <div class="tile"><div class="k">Unpaid senders</div><div class="v">23</div><div class="d down">$18,406</div></div>
+      <div class="tile"><div class="k">Delivered this week</div><div class="v">412</div><div class="d up">+6.4%</div></div>
+      <div class="tile"><div class="k">Margin · corridor</div><div class="v">31.4%</div><div class="d down">−1.2pt</div></div>
+    </section>
+
+    <div class="grid">
+      <!-- the hero: a work queue, not a card -->
+      <section class="card">
+        <div class="card-h">
+          <h3>Needs attention</h3>
+          <span class="count-pill">9</span>
+          <div class="right"><button class="linkbtn">Open full queue</button></div>
+        </div>
+
+        <div class="filters">
+          <select><option>All types</option><option>Customs</option><option>Payment</option><option>Intake</option></select>
+          <select><option>Any urgency</option><option>Overdue</option><option>Today</option></select>
+          <select><option>Newark → Tema</option><option>Toronto → Tema</option></select>
+        </div>
+
+        <div class="table-scroll"><table>
+          <thead>
+            <tr>
+              <th>Reference</th><th>Issue</th><th>Corridor</th><th class="num">Value</th><th>Waiting</th><th>Owner</th><th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="mono">SHP-0042</td>
+              <td><span class="pill p-bad">Duty not paid</span></td>
+              <td>NWK→TMH</td>
+              <td class="num">$4,820</td>
+              <td><span class="pill p-bad">6 days</span></td>
+              <td><span class="owner"><span class="av">KA</span>Kofi</span></td>
+              <td class="num"><button class="rowbtn">Resolve</button></td>
+            </tr>
+            <tr>
+              <td class="mono">SHP-0039</td>
+              <td><span class="pill p-warn">Sender unpaid</span></td>
+              <td>NWK→TMH</td>
+              <td class="num">$1,265</td>
+              <td><span class="pill p-warn">4 days</span></td>
+              <td><span class="owner"><span class="av">AM</span>Adwoa</span></td>
+              <td class="num"><button class="rowbtn">Chase</button></td>
+            </tr>
+            <tr>
+              <td class="mono">PC-11904</td>
+              <td><span class="pill p-warn">Weigh-in mismatch</span></td>
+              <td>YYZ→TMH</td>
+              <td class="num">$310</td>
+              <td><span class="pill p-mute">1 day</span></td>
+              <td><span class="owner"><span class="av">SN</span>Selina</span></td>
+              <td class="num"><button class="rowbtn">Review</button></td>
+            </tr>
+            <tr>
+              <td class="mono">SHP-0044</td>
+              <td><span class="pill p-bad">Held by Customs</span></td>
+              <td>NWK→TMH</td>
+              <td class="num">$2,190</td>
+              <td><span class="pill p-bad">2 days</span></td>
+              <td><span class="owner"><span class="av">KA</span>Kofi</span></td>
+              <td class="num"><button class="rowbtn">Resolve</button></td>
+            </tr>
+            <tr>
+              <td class="mono">PC-11877</td>
+              <td><span class="pill p-warn">Pickup failed</span></td>
+              <td>NWK→TMH</td>
+              <td class="num">$88</td>
+              <td><span class="pill p-mute">9 hours</span></td>
+              <td><span class="owner"><span class="av">—</span>Unassigned</span></td>
+              <td class="num"><button class="rowbtn">Assign</button></td>
+            </tr>
+            <tr>
+              <td class="mono">SHP-0040</td>
+              <td><span class="pill p-info">Awaiting release</span></td>
+              <td>YYZ→TMH</td>
+              <td class="num">$6,740</td>
+              <td><span class="pill p-mute">3 hours</span></td>
+              <td><span class="owner"><span class="av">AM</span>Adwoa</span></td>
+              <td class="num"><button class="rowbtn">Release</button></td>
+            </tr>
+          </tbody>
+        </table></div>
+      </section>
+
+      <!-- sidebar: clearance health + shortcuts -->
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <section class="card">
+          <div class="card-h"><h3>Clearance health</h3></div>
+          <div class="side pad">
+            <div class="meter">
+              <div class="top"><span>Fully cleared</span><span>4 of 7</span></div>
+              <div class="bar"><i style="width:57%;background:#127A4A"></i></div>
+            </div>
+            <div class="meter">
+              <div class="top"><span>Payments pending</span><span>2</span></div>
+              <div class="bar"><i style="width:29%;background:#9A6206"></i></div>
+            </div>
+            <div class="meter">
+              <div class="top"><span>Blocked</span><span>1</span></div>
+              <div class="bar"><i style="width:14%;background:#B32C46"></i></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-h"><h3>Today</h3></div>
+          <div class="qa">
+            <a href="#"><span class="tx"><b>Weigh-in 38 inbound parcels</b><small>Newark warehouse queue</small></span><span class="chev">›</span></a>
+            <a href="#"><span class="tx"><b>Release 1 cleared container</b><small>SHP-0040 · Tema</small></span><span class="chev">›</span></a>
+            <a href="#"><span class="tx"><b>23 unpaid senders</b><small>$18,406 outstanding</small></span><span class="tag">CHASE</span></a>
+            <a href="#"><span class="tx"><b>Reconcile Oct FX</b><small>GHS/USD · scheduled nightly</small></span><span class="chev">›</span></a>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>
