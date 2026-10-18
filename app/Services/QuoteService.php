@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\FreightRate;
 use App\Models\Lot;
+use App\Models\ShipmentLot;
 
 /**
  * What it costs to move one car along the corridor.
@@ -52,7 +53,17 @@ final class QuoteService
     /**
      * The quote for a lot, or null when there is nothing honest to quote.
      *
-     * @param  bool  $pickup  whether we are collecting the car for the buyer
+     * Freight and insurance are **per-shipment** costs divided among the lots
+     * aboard. They are not per-lot constants: the forwarder charges for the
+     * container, so a lot's share has to be its share of the container, not a
+     * fresh $250 floor and a flat $107 of insurance. On a car that comes out
+     * the same. On a single garage item it comes out sane.
+     *
+     * A lot that is not aboard a container yet gets no quote. There is no
+     * container cost to take a share of, and inventing one — the old flat
+     * $250 — is exactly the number that made a headlamp look expensive.
+     *
+     * @param  bool  $pickup  whether we are collecting for the buyer
      */
     public function forLot(Lot $lot, bool $pickup = false): ?Quote
     {
@@ -70,12 +81,13 @@ final class QuoteService
             return null;
         }
 
-        $freight = max(
-            $this->freightCents($weight, (float) $rate->usd_per_kg),
-            (int) $rate->min_charge_cents
-        );
+        $allocation = $this->shipmentAllocation($lot, $rate);
 
-        $insurance = (int) $rate->insurance_cents;
+        if ($allocation === null) {
+            return null;
+        }
+
+        [$freight, $insurance] = $allocation;
 
         // Collect-it-yourself is the default and costs nothing. The surcharge is
         // for the convenience we were asked for, never a default the buyer has
@@ -91,6 +103,54 @@ final class QuoteService
             currencyCode: 'usd',
             available: true,
         );
+    }
+
+    /**
+     * This lot's share of its container's freight and insurance.
+     *
+     * The container's own freight is the total weight aboard at the lane rate,
+     * floored once at the forwarder's minimum consignment charge, and that one
+     * figure is divided by weight across everything in the container. The floor
+     * is therefore paid once per container rather than once per lot, which is
+     * the entire point of the change.
+     *
+     * @return array{0: int, 1: int}|null  [freight share, insurance share]
+     */
+    private function shipmentAllocation(Lot $lot, FreightRate $rate): ?array
+    {
+        $link = ShipmentLot::where('lot_id', $lot->id)->first();
+
+        if (! $link) {
+            return null;
+        }
+
+        $siblings = ShipmentLot::where('shipment_id', $link->shipment_id)->with('lot')->get();
+
+        $weights = [];
+        $selfIndex = null;
+
+        foreach ($siblings as $sibling) {
+            $weights[] = (float) ($sibling->lot?->weight_kg ?? 0.0);
+
+            if ($sibling->lot_id === $lot->id) {
+                $selfIndex = array_key_last($weights);
+            }
+        }
+
+        if ($selfIndex === null || $weights === []) {
+            return null;
+        }
+
+        $freight = max(
+            $this->freightCents(array_sum($weights), (float) $rate->usd_per_kg),
+            (int) $rate->min_charge_cents,
+        );
+
+        // Largest-remainder, so the shares reconcile to the container total.
+        $freightShares = Allocation::split($freight, $weights);
+        $insuranceShares = Allocation::split((int) $rate->insurance_cents, $weights);
+
+        return [$freightShares[$selfIndex], $insuranceShares[$selfIndex]];
     }
 
     /**

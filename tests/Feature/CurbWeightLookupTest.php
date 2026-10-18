@@ -315,6 +315,21 @@ class CurbWeightLookupTest extends TestCase
         $lot = $this->lot(['curb_weight_kg' => null]);
         $this->weights->applyTo($lot);
 
+        // Weighing only earns the lot a share once there is a container to take
+        // it from. Before the freight rule changed, any weighed lot could be
+        // quoted on its own; now it has to be aboard something.
+        $shipment = \App\Models\Shipment::create([
+            'id' => 'shp_'.uniqid(),
+            'status' => 'PLANNED',
+            'freight_cost' => 0,
+            'insurance_cost' => 0,
+        ]);
+        \App\Models\ShipmentLot::create([
+            'shipment_id' => $shipment->id,
+            'lot_id' => $lot->id,
+            'quantity' => 1,
+        ]);
+
         $quote = app(QuoteService::class)->forLot($lot->fresh(), false);
 
         $this->assertNotNull($quote);

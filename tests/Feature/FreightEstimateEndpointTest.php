@@ -4,6 +4,8 @@ namespace Tests\Feature;
 
 use App\Models\FreightRate;
 use App\Models\Lot;
+use App\Models\Shipment;
+use App\Models\ShipmentLot;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
@@ -65,12 +67,42 @@ class FreightEstimateEndpointTest extends TestCase
 
     // ------------------------------------------------------------- the contract
 
+    /**
+     * Put lots aboard one container.
+     *
+     * Freight is a container cost now, so a lot that is not aboard one has no
+     * share of anything and the endpoint reports it unavailable. Fixtures that
+     * want a figure have to be in a container.
+     */
+    private function container(array $lots): Shipment
+    {
+        $shipment = Shipment::create([
+            'id' => 'shp_'.uniqid(),
+            'status' => 'PLANNED',
+            'freight_cost' => 0,
+            'insurance_cost' => 0,
+        ]);
+
+        foreach ($lots as $lot) {
+            ShipmentLot::create([
+                'shipment_id' => $shipment->id,
+                'lot_id' => $lot->id,
+                'quantity' => 1,
+            ]);
+        }
+
+        return $shipment;
+    }
+
     public function test_a_signed_out_buyer_can_ask_for_an_estimate(): void
     {
         $this->rate();
 
+        $lot = $this->lot(1800);
+        $this->container([$lot]);
+
         // No actingAs(): the estimate sits on a public listing page.
-        $this->getJson('/lots/'.$this->lot(1800)->id.'/freight-estimate?pickup=0')
+        $this->getJson('/lots/'.$lot->id.'/freight-estimate?pickup=0')
             ->assertOk();
     }
 
@@ -78,7 +110,10 @@ class FreightEstimateEndpointTest extends TestCase
     {
         $this->rate();
 
-        $response = $this->getJson('/lots/'.$this->lot(1800)->id.'/freight-estimate?pickup=0')
+        $lot = $this->lot(1800);
+        $this->container([$lot]);
+
+        $response = $this->getJson('/lots/'.$lot->id.'/freight-estimate?pickup=0')
             ->assertOk()
             ->json();
 
@@ -110,7 +145,10 @@ class FreightEstimateEndpointTest extends TestCase
     {
         $this->rate();
 
-        $this->getJson('/lots/'.$this->lot(1800)->id.'/freight-estimate?pickup=0')
+        $lot = $this->lot(1800);
+        $this->container([$lot]);
+
+        $this->getJson('/lots/'.$lot->id.'/freight-estimate?pickup=0')
             ->assertOk()
             ->assertJson([
                 'pickupCents' => 0,
@@ -123,7 +161,10 @@ class FreightEstimateEndpointTest extends TestCase
     {
         $this->rate();
 
-        $this->getJson('/lots/'.$this->lot(1800)->id.'/freight-estimate?pickup=1')
+        $lot = $this->lot(1800);
+        $this->container([$lot]);
+
+        $this->getJson('/lots/'.$lot->id.'/freight-estimate?pickup=1')
             ->assertOk()
             ->assertJson([
                 'pickupCents' => 15000,
