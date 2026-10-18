@@ -88,7 +88,43 @@ class LotFactory extends Factory
             $states['weight_kg'] = $weightKg;
         }
 
-        return $this->state($states);
+        // Registered HERE rather than in configure(), because configure() binds
+        // its afterCreating callback to a different factory instance than the
+        // one vehicle() mutates — so $this->vehicle was always null in there and
+        // every vehicle detail row got its make guessed from the title instead.
+        // Seventeen tests used ->vehicle() and none of them read make back, so
+        // a Corolla came out with make "Toyota" and nobody noticed.
+        // Registered HERE rather than only in configure(), because callbacks
+        // registered in configure() are bound to a different factory instance
+        // and could never see this state.
+        //
+        // Updates rather than skips: configure()'s fallback callback runs first
+        // and may already have written a row with a make guessed from the
+        // title. Seventeen tests use ->vehicle() and none of them read make
+        // back, so a Ford F-150 was quietly being filed as make "2004".
+        return $this->state($states)->afterCreating(function (Lot $lot) use ($make, $model) {
+            $detail = $lot->vehicleDetail()->first();
+
+            $attributes = [
+                'vin' => $detail?->vin ?? 'VIN'.strtoupper(fake()->lexify('??????')),
+                'year' => $detail?->year ?? fake()->numberBetween(2005, 2024),
+                'make' => $make,
+                'model' => $model,
+                'trim' => $detail?->trim ?? fake()->randomElement(['LE', 'SE', 'XLE']),
+                'odometer' => $detail->odometer ?? fake()->randomElement([null, 44_000, 88_000, 132_000]),
+                'damage_primary' => $detail->damage_primary ?? fake()->randomElement([null, 'front', 'rear', 'side']),
+            ];
+
+            $detail
+                ? $lot->vehicleDetail()->update($attributes)
+                : VehicleDetail::create(['lot_id' => $lot->id] + $attributes);
+
+            // Weigh it now the detail row exists. This used to be a `creating`
+            // hook on Lot, which read the make and model straight off the lot.
+            // It cannot work any more: those columns moved to a table with a
+            // foreign key to lot, so at creating time the row is not there yet.
+            app(CurbWeightLookup::class)->applyTo($lot);
+        });
     }
 
     /**
@@ -129,6 +165,14 @@ class LotFactory extends Factory
      *
      * After creation rather than in the definition, because the detail row
      * carries a foreign key and `lot` has to exist first.
+     *
+     * Tests and seeders that only care about facets, prices or counts build
+     * lots with a plain create() and never name a make. They still get a row,
+     * guessed from the title, because a vehicle lot with no vehicle_detail row
+     * is a vehicle lot nothing can read.
+     *
+     * ->vehicle() overwrites what this writes, so the guess is only ever a
+     * last resort.
      */
     public function configure(): static
     {
@@ -157,10 +201,6 @@ class LotFactory extends Factory
                 'damage_primary' => fake()->randomElement([null, 'front', 'rear', 'side']),
             ]);
 
-            // Weigh it now the detail row exists. This used to be a `creating`
-            // hook on Lot, which read the make and model straight off the lot.
-            // It cannot work any more: those columns moved to a table with a
-            // foreign key to lot, so at creating time the row is not there yet.
             app(CurbWeightLookup::class)->applyTo($lot);
         });
     }

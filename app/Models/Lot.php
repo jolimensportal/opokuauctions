@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Services\CurbWeightLookup;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -52,6 +53,22 @@ class Lot extends Model
         'starts_at' => 'immutable_datetime',
         'ends_at' => 'immutable_datetime',
     ];
+
+    protected static function booted(): void
+    {
+        // A lot's primary key is a string, not a sequence, and nothing has ever
+        // generated one for a new record — the seeders hand-write lot_demo_01.
+        //
+        // Which means the admin create form could not create a lot at all: an
+        // operator filling it in got a NOT NULL violation on lot.id. The id is
+        // not something a person should be asked for, so it is minted here in
+        // the house style rather than exposed as a field.
+        static::creating(function (self $lot) {
+            if (blank($lot->getKey())) {
+                $lot->setAttribute($lot->getKeyName(), 'lot_'.Str::lower(Str::ulid()));
+            }
+        });
+    }
 
     // NOTE: the automatic weigh-on-create that used to live in a `creating`
     // hook cannot work any more, and its absence is not an oversight.
