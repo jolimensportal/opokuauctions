@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Send something — flow study</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#16193A; --body:#6E7280; --muted:#9AA0AC;
+  --rose:#E1537A; --rose-deep:#D1436B; --rose-soft:#FCEAEF; --rose-line:#F6C9D6;
+  --surface:#fff; --line:#E8EAEF; --field:#F3F4F6; --canvas:#F6F7F9;
+  --r:14px; --pill:999px;
+  --ok-bg:#E4F5EC; --ok-fg:#127A4A; --warn-bg:#FDF1DD; --warn-fg:#9A6206;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Poppins",system-ui,sans-serif;background:var(--canvas);color:var(--ink);
+  -webkit-font-smoothing:antialiased;padding:34px 28px 70px;
+  background-image:radial-gradient(1100px 600px at 4% -14%,#E9E5F8 0,rgba(233,229,248,0) 58%),
+                   radial-gradient(900px 500px at 94% -8%,#F7E6EF 0,rgba(247,230,239,0) 55%)}
+.wrap{max-width:1080px;margin:0 auto}
+.id{display:inline-block;background:var(--rose);color:#fff;font-size:11px;font-weight:700;
+  padding:3px 9px;border-radius:5px;letter-spacing:.06em}
+h1.t{font-size:26px;font-weight:800;letter-spacing:-.02em;margin:9px 0 5px}
+p.t{font-size:13.5px;color:var(--body);line-height:1.65;max-width:82ch;margin-bottom:26px}
+.grid{display:grid;grid-template-columns:1.05fr .95fr;gap:22px;align-items:start}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
+  box-shadow:0 1px 2px rgba(22,25,58,.04)}
+.card h3{font-size:14px;font-weight:700;padding:14px 18px;border-bottom:1px solid var(--line)}
+.pad{padding:18px}
+label{display:block;font-size:11.5px;font-weight:600;color:var(--ink);margin-bottom:6px}
+input,select{width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:8px;
+  background:var(--surface);font:inherit;font-size:13.5px;color:var(--ink)}
+input:focus,select:focus{outline:2px solid var(--rose);outline-offset:1px}
+.hint{font-size:11px;color:var(--muted);margin-top:5px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.seg{display:flex;gap:4px;padding:4px;background:var(--field);border-radius:var(--pill);width:max-content}
+.seg b{font-size:12.5px;font-weight:600;color:var(--body);padding:7px 16px;border-radius:var(--pill);cursor:pointer}
+.seg b.on{background:var(--surface);color:var(--rose);box-shadow:0 1px 3px rgba(22,25,58,.08)}
+.btn{background:linear-gradient(135deg,#EC6A8C,#DE4E77);color:#fff;border:0;border-radius:var(--pill);
+  padding:11px 20px;font:inherit;font-size:13px;font-weight:700;cursor:pointer}
+.btn-ghost{border:1px solid var(--line);background:var(--surface);color:var(--ink);
+  border-radius:var(--pill);padding:11px 18px;font:inherit;font-size:13px;font-weight:600;cursor:pointer}
+.wide{width:100%;margin-top:16px}
+
+/* quote panel */
+.quote{position:sticky;top:20px}
+.qline{display:flex;justify-content:space-between;gap:12px;padding:9px 0;
+  border-bottom:1px solid #F2F3F6;font-size:13px}
+.qline span:first-child{color:var(--body)}
+.qline b{font-variant-numeric:tabular-nums}
+.qtotal{display:flex;justify-content:space-between;align-items:baseline;padding-top:14px;margin-top:6px;
+  border-top:1px solid var(--line)}
+.qtotal .l{font-size:14px;font-weight:700}
+.qtotal .v{font-size:26px;font-weight:800;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.ddp{margin-top:14px;padding:12px 14px;background:var(--ok-bg);border-radius:10px;
+  font-size:12px;color:#0F5C39;line-height:1.55}
+.billable{margin-top:12px;padding:11px 14px;background:var(--rose-soft);border:1px solid var(--rose-line);
+  border-radius:10px;font-size:12px;color:#9B3A5C;line-height:1.55}
+
+/* states */
+.states{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:22px}
+.state{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px}
+.state .k{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.refuse{border-left:3px solid var(--warn-fg);padding:10px 12px;background:var(--warn-bg);
+  border-radius:8px;font-size:12.5px;color:#7A4E05;line-height:1.55}
+.okline{display:flex;align-items:center;gap:7px;font-size:12.5px;color:#0F5C39;margin-bottom:7px}
+.okline::before{content:"";width:14px;height:14px;border-radius:50%;background:var(--ok-fg);
+  flex:0 0 auto;position:relative}
+.note{background:var(--rose-soft);border:1px solid var(--rose-line);border-radius:var(--r);
+  padding:14px 16px;font-size:12.5px;color:#9B3A5C;line-height:1.65;margin-top:22px}
+ol.steps{counter-reset:s;padding-left:0;list-style:none;display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+ol.steps li{counter-increment:s;font-size:11.5px;font-weight:600;color:var(--body);
+  display:flex;align-items:center;gap:7px}
+ol.steps li::before{content:counter(s);width:19px;height:19px;border-radius:50%;background:var(--field);
+  color:var(--ink);display:grid;place-items:center;font-size:10px;font-weight:700}
+ol.steps li.on{color:var(--rose)}
+ol.steps li.on::before{background:var(--rose);color:#fff}
+.mono{font-family:"IBM Plex Mono",monospace;font-size:11.5px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<span class="id">SP-2</span>
+<h1 class="t">Send something — the customer flow, step by step</h1>
+<p class="t">One screen until there is a reason to break it up. A sender is not
+   browsing, they have a box and a postcode, and every extra click between those
+   two facts and a price is a place they give up. Every figure below is real
+   output from the rate card built yesterday.</p>
+
+<ol class="steps">
+  <li class="on">Where are you shipping from</li>
+  <li class="on">What are you sending</li>
+  <li class="on">Your price</li>
+  <li>Where it is going</li>
+  <li>Pay</li>
+</ol>
+
+<div class="grid">
+  <div class="card">
+    <h3>Tell us about the shipment</h3>
+    <div class="pad">
+      <div style="margin-bottom:16px">
+        <label>How will you get it to us?</label>
+        <div class="seg"><b class="on">Drop off at a warehouse</b><b>Courier collects</b></div>
+        <p class="hint">Courier collection is billed per stop, not per kilo — shown as its own line so you can see it.</p>
+      </div>
+
+      <div style="margin-bottom:16px">
+        <label>Shipping from</label>
+        <div class="two">
+          <select><option>United States</option><option>Canada</option></select>
+          <input value="07030" placeholder="Postcode">
+        </div>
+        <p class="hint">Accepted: 07030 and 07030-4471, or m5v 2t6 for Canada.</p>
+      </div>
+
+      <div style="margin-bottom:16px">
+        <label>What are you sending?</label>
+        <div class="seg"><b class="on">Parcel</b><b>Pallet</b></div>
+      </div>
+
+      <div class="two" style="margin-bottom:12px">
+        <div><label>Weight (kg)</label><input value="20"></div>
+        <div><label>Quantity</label><input value="1"></div>
+      </div>
+      <div class="two">
+        <div><label>Length (cm)</label><input value="60"></div>
+        <div><label>Width (cm)</label><input value="40"></div>
+        <div><label>Height (cm)</label><input value="40"></div>
+      </div>
+      <p class="hint">All three, because air freight is charged on the space it takes. A light, bulky box costs more than a heavy, small one.</p>
+
+      <button class="btn wide">Get my price</button>
+    </div>
+  </div>
+
+  <div class="card quote">
+    <h3>Your price to Tema</h3>
+    <div class="pad">
+      <div class="qline"><span>Freight to Tema</span><b>$25.00</b></div>
+      <div class="qtotal"><span class="l">Total</span><span class="v">$25.00</span></div>
+
+      <div class="ddp">
+        <strong>Duty, VAT and clearance included.</strong> Nothing to pay on
+        arrival. We act as importer of record, so the parcel opens with no bill
+        at the door.
+      </div>
+
+      <div class="billable">
+        <strong>Why $25.00 for a 20 kg box?</strong> Your box bills at
+        <strong>60 × 40 × 40 cm</strong>, which is 48 kg of air freight — more
+        than the 20 kg on the scale. Charged on whichever is greater, and the
+        container minimum of $25 applies. A 2 kg headlamp in the same box is
+        also $25.00; a full pallet is $180.00.
+      </div>
+    </div>
+  </div>
+</div>
+
+<h3 class="t" style="font-size:17px;margin:34px 0 12px">The five states this screen has to handle</h3>
+<p class="t" style="margin-bottom:14px">Most of the design work here is not the happy path. It is refusing to guess, and saying so in a way a customer can act on.</p>
+
+<div class="states">
+  <div class="state">
+    <div class="k">Price found</div>
+    <div class="okline">07030 resolves to a band, the band to a rate, the rate to a price.</div>
+    <div class="okline">Quote records the rate row id, so this price is reproducible in October.</div>
+    <div class="okline">Lines shown separately, so a courier stop is never hidden inside a total.</div>
+  </div>
+  <div class="state">
+    <div class="k">Postcode we do not ship from</div>
+    <div class="refuse">
+      <strong>We do not ship from 60601 yet.</strong><br>
+      That is Ohio, outside every corridor we have priced. Tell us your postcode
+      and we will price it — we do not quote a nearest zone, because a wrong
+      rate is a loss for one of us.
+    </div>
+  </div>
+  <div class="state">
+    <div class="k">Parcel with no dimensions</div>
+    <div class="refuse">
+      <strong>We need length, width and height.</strong><br>
+      Air freight is charged on volume. Without them we would be inventing your
+      price, and inventing a price is worse than asking.
+    </div>
+  </div>
+  <div class="state">
+    <div class="k">Rate expired since you loaded</div>
+    <div class="refuse">
+      <strong>Our price for that lane changed while you were here.</strong><br>
+      Rates are versioned and never edited, so this page cannot show a stale
+      figure. Here is the new one.
+    </div>
+  </div>
+</div>
+
+<div class="note">
+  <strong>Deliberately not here:</strong> an account wall. A first-time sender in
+  Newark should reach a price without creating an account. Identity is asked for
+  at step four, once there is a number they want. Losing them before they see
+  what it costs is losing them entirely — and they can create an account later,
+  with their address book already populated.
+</div>
+
+</div>
+</body>
+</html>

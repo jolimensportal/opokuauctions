@@ -1,0 +1,107 @@
+<?php
+
+namespace App\Http\Controllers\Shop;
+
+use App\Enums\IntakeMethod;
+use App\Http\Controllers\Controller;
+use App\Enums\ShipmentUnit;
+use App\Models\RateReservation;
+use App\Services\FreightQuoteService;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
+use Illuminate\View\View;
+
+/**
+ * The sender quote page.
+ *
+ * No account wall. A first-time sender has a box and a postcode, not an
+ * intention to register with us, and every click between those two facts and a
+ * price is somewhere they give up. Identity is asked for only once there is a
+ * number they want.
+ *
+ * The page cannot book a shipment yet, so it does not pretend to. "Reserve this
+ * rate" records that a real person wanted to ship at a real price, which is the
+ * signal that decides whether building the booking flow is worth the work.
+ */
+class SenderQuoteController extends Controller
+{
+    public function __construct(private FreightQuoteService $quotes) {}
+
+    public function create(Request $request): View
+    {
+        return view('shop.send', [
+            'result' => null,
+            'input' => $request->only([
+                'country', 'postcode', 'unit', 'weight_kg', 'quantity',
+                'length_cm', 'width_cm', 'height_cm', 'pickup',
+            ]),
+        ]);
+    }
+
+    public function store(Request $request): View
+    {
+        $data = $request->validate([
+            'country' => ['required', Rule::in(['us', 'ca'])],
+            'postcode' => ['required', 'string', 'max:16'],
+            'unit' => ['required', Rule::in(['parcel', 'pallet'])],
+            'weight_kg' => ['required', 'numeric', 'min:0'],
+            'quantity' => ['nullable', 'integer', 'min:1'],
+            // Nullable on purpose: a missing dimension is a refusal we explain,
+            // not a validation error that bounces the customer off the page.
+            'length_cm' => ['nullable', 'integer', 'min:0'],
+            'width_cm' => ['nullable', 'integer', 'min:0'],
+            'height_cm' => ['nullable', 'integer', 'min:0'],
+            'pickup' => ['nullable', 'boolean'],
+        ]);
+
+        $result = $this->quotes->quote(
+            postcode: $data['postcode'],
+            country: $data['country'],
+            destination: 'Tema',
+            mode: 'air',
+            unit: ShipmentUnit::from($data['unit']),
+            intakeMethod: IntakeMethod::Dropoff,
+            weightKg: (float) $data['weight_kg'],
+            lengthCm: $data['length_cm'] ?? null,
+            widthCm: $data['width_cm'] ?? null,
+            heightCm: $data['height_cm'] ?? null,
+            pickup: (bool) ($data['pickup'] ?? false),
+        );
+
+        return view('shop.send', [
+            'result' => $result,
+            'input' => $data,
+        ]);
+    }
+
+    /**
+     * Record interest in a quoted rate.
+     *
+     * An email and nothing else. This is a demand signal, not a customer
+     * record — there is no password and no address because at this point we
+     * have a question and nothing we have consent to hold.
+     */
+    public function reserve(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'email' => ['required', 'email:rfc', 'max:254'],
+            'country' => ['required', Rule::in(['us', 'ca'])],
+            'postcode' => ['required', 'string', 'max:16'],
+            'unit' => ['nullable', Rule::in(['parcel', 'pallet'])],
+            'quoted_total_cents' => ['required', 'integer', 'min:0'],
+        ]);
+
+        RateReservation::create([
+            'email' => $data['email'],
+            'country' => $data['country'],
+            'postcode' => $data['postcode'],
+            'unit' => $data['unit'] ?? 'parcel',
+            'quoted_total_cents' => $data['quoted_total_cents'],
+        ]);
+
+        return redirect()
+            ->route('send.create')
+            ->with('status', 'Got it. When booking opens we will write to you at that address before anything is charged.');
+    }
+}

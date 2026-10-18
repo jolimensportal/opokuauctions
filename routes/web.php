@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Shop\CurrencyController;
+use App\Http\Controllers\Shop\SenderQuoteController;
 use App\Http\Controllers\Shop\ShopController;
 use App\Http\Controllers\Shop\WalletController;
 use App\Http\Controllers\Shop\OrderController;
@@ -14,6 +15,14 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', [ShopController::class, 'home'])->name('home');
+
+/*
+| The sender quote. Deliberately public: a first-time sender must reach a price
+| without an account, or the rate card is a library nothing can reach.
+*/
+Route::get('/send', [SenderQuoteController::class, 'create'])->name('send.create');
+Route::post('/send', [SenderQuoteController::class, 'store'])->name('send.store');
+Route::post('/send/reserve', [SenderQuoteController::class, 'reserve'])->name('send.reserve');
 
 Route::get('/lots', [ShopController::class, 'lots'])->name('lots.index');
 Route::get('/lots/{lot}', [ShopController::class, 'lot'])->name('lots.show');
