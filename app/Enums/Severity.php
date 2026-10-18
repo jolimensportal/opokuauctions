@@ -33,6 +33,24 @@ enum Severity: int
         return $this->value;
     }
 
+    /**
+     * The Filament colour this severity renders as.
+     *
+     * The admin panel does not load the application's compiled Tailwind, so
+     * severity has to be expressed with Filament's own tokens. Returning the
+     * name here keeps the mapping in one place rather than in a match buried
+     * in a view.
+     */
+    public function color(): string
+    {
+        return match ($this) {
+            self::Critical => 'danger',
+            self::High => 'warning',
+            self::Medium => 'info',
+            self::Low => 'gray',
+        };
+    }
+
     public function label(): string
     {
         return match ($this) {
