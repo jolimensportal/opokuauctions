@@ -271,9 +271,11 @@ class BillableWeightTest extends TestCase
         $air = BillableWeight::grams(2.0, 30, 30, 30, 2000);
         $sea = BillableWeight::grams(2.0, 30, 30, 30, 5000);
 
-        // Sea freight is charged on more cubic volume for the same price, so
-        // the same box is worth more of the trip.
-        $this->assertGreaterThan($air, $sea);
+        // CORRECTED DURING EXECUTION. The plan had this backwards. A larger
+        // divisor means more cubic centimetres make one kilo, so the same box
+        // is worth LESS of the trip. Air is charged harder on volume than sea,
+        // which is why its divisor is the smaller number.
+        $this->assertLessThan($air, $sea);
         $this->assertSame(5_400, $sea);
     }
 
