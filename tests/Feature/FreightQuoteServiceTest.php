@@ -184,28 +184,39 @@ class FreightQuoteServiceTest extends TestCase
         $this->assertSame(QuoteUnavailableReason::MissingDimensions, $result->reason);
     }
 
-    public function test_a_pallet_carries_its_own_floor(): void
+    public function test_a_pallet_is_priced_from_its_own_price(): void
     {
         $this->seedRow([
             'id' => 'row_pallet', 'unit' => ShipmentUnit::Pallet,
-            'per_kg_cents' => 10, 'per_pallet_cents' => 18_000, 'min_charge_cents' => 0,
+            // No per-kg figure at all. A standard 120x120x150 pallet is
+            // 1,080 kg volumetric, so a per-kg rate would return the same
+            // number for a 40 kg pallet and a 900 kg one and tell the
+            // operator nothing.
+            'per_kg_cents' => null,
+            'per_pallet_cents' => 18_000,
+            'min_charge_cents' => 0,
         ]);
 
-        $result = app(FreightQuoteService::class)->quote(
-            postcode: '07030', country: 'us', destination: 'Tema', mode: 'air',
-            unit: ShipmentUnit::Pallet, intakeMethod: IntakeMethod::Dropoff,
-            weightKg: 40.0, lengthCm: 120, widthCm: 120, heightCm: 150,
-            pickup: false,
-        );
+        foreach ([40.0, 900.0] as $weight) {
+            $result = app(FreightQuoteService::class)->quote(
+                postcode: '07030', country: 'us', destination: 'Tema', mode: 'air',
+                unit: ShipmentUnit::Pallet, intakeMethod: IntakeMethod::Dropoff,
+                weightKg: $weight, lengthCm: 120, widthCm: 120, heightCm: 150,
+                pickup: false,
+            );
 
-        // 1,080 kg volumetric x 10 cents = 10,800, below the pallet floor.
-        $this->assertSame(18_000, $result->quote->totalCents);
+            $this->assertSame(
+                18_000,
+                $result->quote->totalCents,
+                "A {$weight} kg pallet is priced the same, and that is the model.",
+            );
+        }
     }
 
-    public function test_a_heavy_pallet_is_charged_above_its_floor(): void
+    public function test_a_pallet_still_uses_a_per_kg_rate_when_the_row_supplies_one(): void
     {
         $this->seedRow([
-            'id' => 'row_pallet_heavy', 'unit' => ShipmentUnit::Pallet,
+            'id' => 'row_pallet_kg', 'unit' => ShipmentUnit::Pallet,
             'per_kg_cents' => 30, 'per_pallet_cents' => 18_000, 'min_charge_cents' => 0,
         ]);
 
@@ -216,9 +227,8 @@ class FreightQuoteServiceTest extends TestCase
             pickup: false,
         );
 
-        // A 120x120x150 cm pallet is 1,080 kg volumetric, which beats the
-        // 900 kg on the scale. 1,080,000 g x 30 cents/kg = 32,400, above the
-        // 18,000 floor — so the floor must not win.
+        // 1,080,000 g x 30 cents/kg = 32,400, above the 18,000 pallet price,
+        // so the rate row wins. A pallet row can express either shape.
         $this->assertSame(32_400, $result->quote->totalCents);
     }
 

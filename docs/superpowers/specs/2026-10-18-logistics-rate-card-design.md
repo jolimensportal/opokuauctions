@@ -113,16 +113,27 @@ invented number wearing a decimal point.
 
 ### Pallet pricing
 
-`per_pallet_cents` is the floor for a pallet and is `NULL` for a parcel. A pallet
-row charges:
+**Decided after building it.** A standard 120×120×150 cm pallet is **1,080 kg
+volumetric** at the air divisor of 2000. Because billable weight is
+`max(actual, volumetric)`, every pallet below about 1,080 kg priced identically —
+a 40 kg pallet and a 900 kg pallet both quoted $345.60 — which left
+`per_kg_cents` on a pallet row doing nothing for almost every shipment.
 
-```
-max(per_pallet_cents, round_half_up(billable_g × per_kg_cents ÷ 1000))
-```
+A number that never changes is worse than no number, because an operator will
+assume it is doing something. So:
 
-which is the freight formula plus the pallet floor. A half-empty pallet costs
-what a full one costs to handle, so a customer shipping one small box on a
-pallet does not get away with $13.
+- A **pallet row is priced from `per_pallet_cents` outright.**
+- `per_kg_cents` is nullable and NULL on a pallet row.
+- A rate row that *does* supply both still works: the calculated per-kg rate
+  wins when it exceeds the pallet price. A row can express either shape.
+
+The service still applies the pallet price as a floor over the calculated rate,
+so the decision costs nothing and removes the misleading field.
+
+The alternative considered was pricing pallets at the sea divisor of 5000, which
+drops the standard footprint to 432 kg so real weight starts mattering sooner.
+Rejected: it invents a second rate shape to solve a problem that footprint
+pricing already solves, and pallet pricing is genuinely a per-pallet product.
 
 ### Rate matching
 

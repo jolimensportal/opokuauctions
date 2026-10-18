@@ -7,6 +7,7 @@ use App\Data\QuoteResult;
 use App\Enums\IntakeMethod;
 use App\Enums\QuoteUnavailableReason;
 use App\Enums\ShipmentUnit;
+use App\Models\RateCardRow;
 
 /**
  * The price a sender is shown.
@@ -79,16 +80,12 @@ class FreightQuoteService
             return QuoteResult::refused(QuoteUnavailableReason::MissingDimensions);
         }
 
-        $freight = BillableWeight::floor(
-            BillableWeight::cents($billable, $row->per_kg_cents),
-            $row->min_charge_cents,
-        );
-
-        // A pallet's floor binds on a light pallet and does not override real
-        // weight-based freight on a heavy one.
-        if ($row->per_pallet_cents !== null) {
-            $freight = max($freight, $row->per_pallet_cents);
-        }
+        $freight = $unit->isPallet()
+            ? $this->palletPrice($row, $billable)
+            : BillableWeight::floor(
+                BillableWeight::cents($billable, (int) $row->per_kg_cents),
+                $row->min_charge_cents,
+            );
 
         $lines = [['label' => 'Freight to Tema', 'cents' => $freight]];
 
@@ -117,6 +114,26 @@ class FreightQuoteService
         return QuoteResult::quoted(
             FreightQuote::of($lines, $row->currency(), $row->id),
         );
+    }
+
+    /**
+     * A pallet's price.
+     *
+     * Taken from the row outright rather than calculated per kilo. A standard
+     * 120x120x150 pallet is 1,080 kg volumetric at the air divisor, so every
+     * pallet below that weight would price identically and a per-kg figure
+     * would be a number that never changes — worse than not having one.
+     *
+     * The pallet floor still wins over the calculated rate, so a rate row can
+     * express either shape without the service caring which it meant.
+     */
+    private function palletPrice(RateCardRow $row, int $billableGrams): int
+    {
+        $calculated = $row->per_kg_cents === null
+            ? 0
+            : BillableWeight::cents($billableGrams, (int) $row->per_kg_cents);
+
+        return BillableWeight::floor($calculated, (int) $row->per_pallet_cents);
     }
 
     /**

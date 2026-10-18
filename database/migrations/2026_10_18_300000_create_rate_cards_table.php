@@ -40,9 +40,15 @@ return new class extends Migration
             // code so a lane change is a data edit, not a deploy.
             $table->unsignedInteger('divisor');
 
-            $table->integer('per_kg_cents');
-            // NULL for a parcel. A pallet's floor, because a half-empty pallet
-            // costs what a full one costs to handle.
+            // NULL on a pallet row. A standard 120x120x150 pallet is 1,080 kg
+            // volumetric at the air divisor, so every pallet under that weight
+            // would price identically and the per-kg field would do nothing.
+            // A pallet is priced from per_pallet_cents alone.
+            $table->integer('per_kg_cents')->nullable();
+
+            // A pallet's price. Required on a pallet row and NULL on a parcel
+            // row, which is priced per kilo. A half-empty pallet costs what a
+            // full one costs to handle.
             $table->integer('per_pallet_cents')->nullable();
             $table->integer('min_charge_cents')->default(0);
             $table->decimal('max_billable_kg', 8, 2)->nullable();
