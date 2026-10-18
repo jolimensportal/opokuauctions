@@ -730,7 +730,12 @@ return new class extends Migration
             // Matched against the START of the normalised postcode, so "M5V"
             // is one band and "M4B" is another.
             $table->string('prefix');
-            $table->foreignId('zone_id')->constrained('origin_zones')->cascadeOnDelete();
+            // CORRECTED DURING EXECUTION. foreignId() creates a bigint, but
+            // origin_zones uses a string primary key, so the constraint could
+            // never match. Same string/bigint family as the pre-existing
+            // wallet.user_id defect.
+            $table->string('zone_id');
+            $table->foreign('zone_id')->references('id')->on('origin_zones')->cascadeOnDelete();
             $table->boolean('active')->default(true);
 
             // Resolution matches on country + prefix and takes the longest
