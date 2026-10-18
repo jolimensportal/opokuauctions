@@ -35,14 +35,20 @@ without a way to price a shipment.
 | What is priced | **Billable weight, parcel and pallet** | A 2 kg box of screws and a 2 kg box of pillows cost the same to move |
 | Pallet pricing | **Per pallet, with a floor** | A half-empty pallet costs what a full one costs to handle |
 | Rate card structure | **Versioned, immutable rows** | A rate change is an insert, so every historical shipment keeps the rate that applied when it shipped |
+| Origin zones | **Postcode bands**, not named cities | Newark and Houston are not the same lane; a city-level rate is either too cheap or too dear |
+| Unmapped postcode | **No quote, with the reason stated** | The only option that never quotes a rate we have not priced |
+| Currency | **On the card, not the row** | One card per currency per version, so a GHS reprice can never touch a USD card |
+| Pickup surcharge | **Its own rate row** | A courier bills per stop, not per kilo. A row with a high minimum prices a stop exactly |
 
 ## Data model
 
 ```
-origin_zones     id, country, code (US-NJ, US-TX, CA-ON, CA-BC), name, active
+postcode_bands   id, country (us|ca), prefix, zone_id, active
+
+origin_zones     id, country, code, name, active
 
 rate_cards       id, name, currency, created_at
-                 — a named grouping of rows. Deliberately carries no dates.
+                 — a named grouping of rows in one currency. No dates.
 
 rate_card_rows   id, rate_card_id, origin_zone_id, destination,
                  mode (air|sea), unit (parcel|pallet),
@@ -52,6 +58,28 @@ rate_card_rows   id, rate_card_id, origin_zone_id, destination,
                  max_billable_kg,
                  effective_from, effective_to
 ```
+
+Bands and zones are separate on purpose. A band maps a sender's postcode to an
+internal zone; rate rows price zones. Adding a band for a new town is therefore a
+data edit, not a reprice — and the two change for entirely different reasons and
+on entirely different timescales.
+
+### Postcode normalisation
+
+Postcodes arrive in whatever form a customer types them, and the two countries
+format differently:
+
+| Country | Input | Normalised | Rule |
+|---|---|---|---|
+| US | `07030` | `07030` | ZIP, five digits. ZIP+4 `07030-1234` is truncated to the ZIP |
+| US | ` 7030 ` | `07030` | Whitespace stripped, then left-padded to five |
+| CA | `m5v 2t6` | `M5V2T6` | Uppercased, spaces and hyphens removed |
+| CA | `M5V-2T6` | `M5V2T6` | As above |
+
+A prefix band is matched against the start of the normalised value, so `M5V` is
+one band and `M4B` is another. Normalisation is a pure function with its own
+tests; a postcode that cannot be normalised is a no-quote, never a guess at the
+country.
 
 **One change from Section 2.** The effective window moved from `rate_cards` onto
 `rate_card_rows`. Two tables holding "when does this price apply" is two sources
@@ -98,9 +126,18 @@ pallet does not get away with $13.
 
 ### Rate matching
 
-A quote resolves to exactly one row, matched on:
+A quote resolves to exactly one row, in two steps:
 
-1. `origin_zone` — derived from the sender's postcode, never typed freehand
+**First, the postcode becomes a zone.** Normalise the sender's postcode, then
+find the active band for that country whose prefix matches, and take its zone.
+A postcode with no band stops here: no quote, naming the postcode, so the sender
+can tell us and we can add the band. Falling back to a national rate would
+discard the reason for bands; falling back to the nearest band would be a guess
+presented as a price.
+
+**Then the zone becomes a row.** Match on:
+
+1. `origin_zone` — resolved above, never typed freehand
 2. `destination` — `Tema` for now
 3. `mode`, `unit`, `intake_method`, `service_level`
 4. the effective window contains today
@@ -117,6 +154,8 @@ Three, and each is a refusal to invent rather than an error:
 | State | Why there is no quote |
 |---|---|
 | A parcel has no dimensions | Air freight is priced on volume. Without them any figure is invented |
+| The postcode cannot be normalised | We do not know which country it belongs to |
+| The postcode matches no active band | That origin is not priced yet, and we say which postcode stopped us |
 | No row matches the zone, unit, intake and window | That lane is not priced |
 | Every matching row is outside its window | The rate we held has expired, and repricing under it is not ours to do |
 
@@ -148,6 +187,11 @@ worst possible defect.
 
 ## Testing
 
+- `PostcodeNormalisationTest` — one test per normalisation rule, plus the
+  Canadian and US formats side by side and an input that cannot be normalised.
+- `PostcodeBandTest` — a matching prefix resolves, a non-matching one does not,
+  a longer prefix beats a shorter one, and an unmapped postcode returns the
+  reason rather than a fallback.
 - `RateRowResolutionTest` — one test per no-quote state, plus the
   most-specific-wins case and the expired-window case.
 - `BillableWeightTest` — volumetric beats actual, actual beats volumetric, the
@@ -169,13 +213,36 @@ codes (SP-4), consolidation, tracking and payment (SP-5). Also untouched:
 have 37 tests pinning that behaviour. Migrating car freight onto the new rate
 card is its own task, and doing both at once makes neither verifiable.
 
-## Open questions
+## Consequences of postcode bands, stated plainly
 
-1. **Zone granularity.** Four zones (US-NJ, US-TX, CA-ON, CA-BC) to start, or
-   postcode-level bands from day one? Postcode bands price tighter but need a
-   postcode dataset and a rule for unmapped areas.
-2. **Currency.** Rates are per-card. Should a card be single-currency with a
-   separate card per currency, or does a row carry its own currency?
-3. **Pickup surcharge.** Task 4 kept a flat per-lot pickup fee. Should a parcel
-   pickup be a flat fee or a rate row of its own, given the partner courier
-   will bill per stop?
+Bands price tighter, and they cost three things that are easy to forget:
+
+- **Unmapped postcodes are unsellable.** A customer in Ohio gets no price at all
+  until a band exists for them. The bands have to be populated from the lanes we
+  actually serve, and the first thing operations will want is a way to add one.
+- **Postal formats differ.** A US ZIP and a Canadian postal code are not the
+  same shape, and `M5V` must not be read as a number.
+- **Longest-prefix-wins.** Overlapping bands such as `07` and `070` need a
+  defined order or resolution is arbitrary.
+
+## Pickup is priced by the same mechanism
+
+A pickup is not a special case bolted onto a quote. It is another row with
+`service_level = pickup`, carrying its own `per_kg_cents` and `min_charge_cents`.
+
+This matters because a partner courier bills **per stop**, and a stop is not a
+kilo. A rural Ohio stop costs the forwarder about what a Newark one does, so a
+single flat fee must either lose money on rural pickups or overcharge dense
+ones. A row with a high minimum prices a stop correctly without a second pricing
+engine.
+
+The quote therefore returns a **line per service level** — base freight, then
+pickup if requested — rather than a single lump. That also means a customer can
+see exactly which part of the price is the stop.
+
+`freight_rates.pickup_cents` on the car lane is untouched. Car pickups stay flat
+until the car lane itself migrates, which is a separate task.
+
+## Status
+
+No open questions remain. Ready for an implementation plan.
