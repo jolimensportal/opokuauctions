@@ -90,11 +90,15 @@ class ParcelBookingService
             'status' => ParcelPaymentStatus::Pending,
         ]);
 
-        $url = $this->payments->createLink(PaymentLink::forCedis(
+        // USD, because the booking is quoted in USD and the sender is paying
+        // from North America. Charging GHS here charged about one-fifteenth of
+        // the quoted price.
+        $url = $this->payments->createLink(PaymentLink::forDollars(
             amountCents: $payment->amount_cents,
             reference: $payment->reference,
             email: $booking->email ?? 'sender@pending-address.invalid',
             description: 'Opoku parcel to Tema — booking '.$booking->reference,
+            currency: (string) config('opoku.payment_currency', 'USD'),
         ));
 
         $booking->forceFill([

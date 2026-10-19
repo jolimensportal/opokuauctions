@@ -65,15 +65,16 @@ class PaystackGateway implements PaymentGateway
     }
 
     /**
-     * Paystack amounts are in the currency's smallest unit. USD has cents, so
-     * the stored value passes straight through; GHS has no subunit, so pesewas
-     * are whole cedi.
+     * Paystack amounts are always in the currency's smallest unit.
+     *
+     * Both USD and GHS subdivide by 100, so the stored integer passes through
+     * unchanged either way. The currency is what has to be right, and the
+     * conversion that belongs between the two was never a currency conversion —
+     * it was a unit conversion, which is easy to mistake for the real thing.
      */
     private function toSmallestUnit(int $amountCents, string $currency): int
     {
-        return strtoupper($currency) === 'GHS'
-            ? (int) round($amountCents / 100)
-            : $amountCents;
+        return $amountCents;
     }
 
     private function client(): PendingRequest

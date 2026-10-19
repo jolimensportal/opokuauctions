@@ -133,7 +133,7 @@ class ParcelCheckoutTest extends TestCase
 
         $link = $this->gateway->lastLink();
         $this->assertSame(2500, $link->amountCents);
-        $this->assertSame('GHS', $link->currency);
+        $this->assertSame('USD', $link->currency);
         $this->assertSame($booking->reference, $link->reference);
     }
 
@@ -403,5 +403,64 @@ class ParcelCheckoutTest extends TestCase
         $this->assertSame(7500, $booking->weight_grams);
         $this->assertTrue($booking->pickup);
         $this->assertSame('07030', $booking->quote_input['postcode']);
+    }
+
+    // ------------------------------------------------------------ currency
+
+    /**
+     * The charge is in the currency the quote was in.
+     *
+     * This shipped charging GHS 25 for a USD 25.00 quote — about $1.67. Both
+     * currencies subdivide by 100, so the number passed through looking correct
+     * and only the currency was wrong, which is exactly the kind of mistake that
+     * survives a test that asserts an amount.
+     */
+    public function test_the_payment_link_is_in_the_same_currency_as_the_quote(): void
+    {
+        $this->open(email: 'ama@example.com');
+
+        $link = $this->gateway->lastLink();
+
+        $this->assertSame('USD', $link->currency);
+        // 2500 cents is USD 25.00 and must arrive as 2500, not 25.
+        $this->assertSame(2500, $link->amountCents);
+        $this->assertSame(
+            $link->amountCents,
+            \App\Models\ParcelBooking::sole()->quoted_total_cents,
+        );
+    }
+
+    public function test_a_pallet_quote_charges_pallet_amounts_not_kilo_amounts(): void
+    {
+        // A pallet is priced off its own row, so the charge must be the pallet
+        // figure and not anything derived from weight.
+        RateCardRow::create([
+            'id' => 'row_pallet', 'rate_card_id' => 'card_us',
+            'origin_zone_id' => 'zone_ne', 'destination' => 'Tema', 'mode' => 'air',
+            'unit' => ShipmentUnit::Pallet, 'intake_method' => IntakeMethod::Dropoff,
+            'service_level' => 'standard', 'divisor' => 5000,
+            'per_kg_cents' => null, 'per_pallet_cents' => 18000,
+            'min_charge_cents' => 0, 'effective_from' => '2026-01-01',
+            'effective_to' => null,
+        ]);
+
+        $this->open(['unit' => 'pallet', 'weight_kg' => 610], email: 'ama@example.com');
+
+        $link = $this->gateway->lastLink();
+        $this->assertSame('USD', $link->currency);
+        $this->assertSame(18000, $link->amountCents);
+    }
+
+    public function test_the_payment_currency_is_configurable_and_defaults_to_usd(): void
+    {
+        $this->assertSame('USD', config('opoku.payment_currency'));
+
+        config(['opoku.payment_currency' => 'GHS']);
+        $this->open(email: 'ama@example.com');
+
+        // Configurable, but never silently reinterpreted: the amount stays the
+        // stored integer. Converting is a separate, explicit step.
+        $this->assertSame('GHS', $this->gateway->lastLink()->currency);
+        $this->assertSame(2500, $this->gateway->lastLink()->amountCents);
     }
 }

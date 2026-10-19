@@ -22,4 +22,28 @@ return [
 
     'whatsapp' => env('OPOKU_WHATSAPP', ''),
 
+    /*
+    |---------------------------------------------------------------------------
+    | What currency the payment link is raised in
+    |---------------------------------------------------------------------------
+    |
+    | Must match the currency the quote was given in. The quote page prices in
+    | USD and the sender pays from North America, so USD is the default and the
+    | figure on the booking passes through unchanged.
+    |
+    | It has to be a currency the merchant has actually enabled in the Paystack
+    | dashboard. A test account with only GHS enabled rejects USD with a 403
+    | "Currency not supported by merchant" — which is a two-minute dashboard
+    | setting, not something to paper over.
+    |
+    | Raising this to a currency other than the quote's is NOT supported. USD and
+    | GHS both subdivide by 100, so a mismatched currency still produces a
+    | plausible-looking integer and quietly charges the wrong money — GHS 25 for
+    | a USD 25.00 quote is about $1.67. If we ever need to charge in cedi, the
+    | amount has to be converted at a real rate first.
+    |
+    */
+
+    'payment_currency' => env('OPOKU_PAYMENT_CURRENCY', 'USD'),
+
 ];
