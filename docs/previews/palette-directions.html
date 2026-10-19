@@ -88,22 +88,23 @@ canvas{display:block;width:100%;height:auto}
 <div class="chrome"><div class="chrome-in">
   <b>Opoku — direction review</b>
   <nav>
-    <a href="#c1a" class="on">1a · True red</a>
-    <a href="#c1b">1b · Oxblood</a>
-    <a href="#c1c">1c · Marigold</a>
+    <a href="#c1a" class="on">1a · True red ✓ shipped</a>
+    <a href="#c1b">1b · Oxblood (not chosen)</a>
+    <a href="#c1c">1c · Marigold (not chosen)</a>
   </nav>
 </div></div>
 
 <div class="intro">
   <h1>Palette &amp; type</h1>
-  <p>Three complete directions, each a full scale plus the same storefront fragment, so you judge them in use rather than as swatches. The current palette is <code>brick oklch(0.600 0.190 5)</code> — hue 5 is a rose. Real red sits near hue 27, which is why it reads as pink rather than red. <b>1c</b> drops red entirely in case the problem is red itself.</p>
+  <p><b>Outcome: 1a shipped.</b> <code>brick-500</code> is now <code>oklch(0.565 0.205 27)</code> — <code>rgb(212, 42, 41)</code> — a true red, where the old token was hue 5 and read as a rose. Neutrals moved from cool navy to warm stone at hue 60 so the accent is the only saturated thing on the page, and Poppins was replaced with Sora in one variable file.</p>
+  <p style="margin-top:10px">1b and 1c are kept for the record. Measured in the browser after shipping: button label on fill 4.84:1, body copy 7.02:1, accent label 13.88:1, price figure 16.46:1, muted text 4.80:1 — all at or above AA.</p>
 </div>
 
 <div class="wrap">
 
 <!-- ══════════════════════════ 1a ══════════════════════════ -->
 <div class="cand" id="c1a" style="
-  --c-accent:oklch(0.565 0.205 27);
+  --c-accent:oklch(0.565 0.205 27); /* rgb(212,42,41) */
   --c-accent-soft:oklch(0.930 0.042 27);
   --c-on-accent:oklch(0.990 0.004 27);
   --c-paper:oklch(0.985 0.003 60);
@@ -120,7 +121,7 @@ canvas{display:block;width:100%;height:auto}
 ">
   <div class="meta">
     <span class="id">1a</span>
-    <h2>True red · Sora</h2>
+    <h2>True red · Sora &nbsp;<span style="font-size:11px;font-weight:500;color:#7ee787;border:1px solid #7ee78744;border-radius:999px;padding:2px 9px;letter-spacing:.06em">SHIPPED</span></h2>
     <p>What you asked for: an actual red. Hue 27, chroma 0.205 — signal red, not rose. Warm stone neutrals replace the cool navy so nothing competes with it. Sora is a geometric sans with squarer terminals than Poppins, so it reads as equipment rather than friendly.</p>
   </div>
   <div class="t">

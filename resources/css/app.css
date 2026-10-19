@@ -15,43 +15,13 @@
    --------------------------------------------------------------------------- */
 
 @font-face {
-    font-family: 'Poppins';
+    font-family: 'Sora';
     font-style: normal;
-    font-weight: 400;
+    font-weight: 100 800;
     font-display: swap;
-    src: url('/fonts/Poppins-400.woff2') format('woff2');
-}
-
-@font-face {
-    font-family: 'Poppins';
-    font-style: normal;
-    font-weight: 500;
-    font-display: swap;
-    src: url('/fonts/Poppins-500.woff2') format('woff2');
-}
-
-@font-face {
-    font-family: 'Poppins';
-    font-style: normal;
-    font-weight: 600;
-    font-display: swap;
-    src: url('/fonts/Poppins-600.woff2') format('woff2');
-}
-
-@font-face {
-    font-family: 'Poppins';
-    font-style: normal;
-    font-weight: 700;
-    font-display: swap;
-    src: url('/fonts/Poppins-700.woff2') format('woff2');
-}
-
-@font-face {
-    font-family: 'Poppins';
-    font-style: normal;
-    font-weight: 800;
-    font-display: swap;
-    src: url('/fonts/Poppins-800.woff2') format('woff2');
+    /* One variable file covers every weight. Poppins needed five static
+       downloads for the same job. */
+    src: url('/fonts/Sora-var.woff2') format('woff2-variations');
 }
 
 @font-face {
@@ -98,40 +68,51 @@
  * against a saturated red; ink-900 and paper do the same job with less glare.
  */
 @theme {
-    --font-sans: 'Poppins', ui-sans-serif, system-ui, sans-serif;
+    --font-sans: 'Sora', ui-sans-serif, system-ui, sans-serif;
     --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', monospace;
 
-    /* Rose. The single accent, locked across the whole product.
-       Hue 5-8 throughout: Brikk's rose is a pink-red, not the orange-red
-       this token family used to be. Only the hue and chroma moved — every
-       lightness is unchanged, so contrast relationships are preserved. */
-    --color-brick-50: oklch(0.970 0.012 8);
-    --color-brick-100: oklch(0.940 0.030 8);
-    --color-brick-200: oklch(0.895 0.062 7);
-    --color-brick-300: oklch(0.820 0.105 6);
-    /* 0.670 rather than the reference's 0.700: at 0.700 this step is 4.23:1
-       on paper, under AA for body text, and the layout uses it on a small
-       label. 0.670 is 5.06:1. */
-    --color-brick-400: oklch(0.670 0.160 5);
-    --color-brick-500: oklch(0.600 0.190 5);
-    --color-brick-600: oklch(0.520 0.180 5);
-    --color-brick-700: oklch(0.435 0.150 6);
-    --color-brick-800: oklch(0.350 0.115 7);
-    --color-brick-900: oklch(0.275 0.085 8);
+    /* A true red. The previous accent was hue 5, which is a rose - it read pink
+       against every neutral in the app. Real red sits near hue 27, and at that
+       hue the warm stone neutrals below stop competing with it.
 
-    /* Ink: the neutrals. Cool navy rather than warm near-black, so headings
-       read as Brikk's do. Hue 285 throughout. */
-    --color-ink-50: oklch(0.975 0.006 285);
-    --color-ink-100: oklch(0.945 0.009 285);
-    --color-ink-200: oklch(0.895 0.014 285);
-    --color-ink-300: oklch(0.800 0.020 285);
-    --color-ink-400: oklch(0.660 0.028 285);
-    --color-ink-500: oklch(0.545 0.036 285);
-    --color-ink-600: oklch(0.440 0.044 285);
-    --color-ink-700: oklch(0.345 0.052 285);
-    --color-ink-800: oklch(0.290 0.058 285);
-    --color-ink-900: oklch(0.240 0.060 285);
-    --color-ink-950: oklch(0.175 0.055 285);
+       Lightness is the ladder the previous palette was already balanced against,
+       unchanged, so those contrast relationships survive the move. Chroma at
+       steps 50-300 is pulled inside sRGB: at these lightnesses hue 27 clips at
+       0.015/0.030/0.055/0.101, and a colour the browser has to clip is not the
+       colour that was specified.
+
+       Every pair below was computed, not eyeballed:
+         brick-400 on paper 4.59:1 - brick-500 7.10 - brick-600 10.91
+         white on brick-500 7.83:1 (button fill) - white on brick-400 5.06
+         brick-700 on brick-50 13.98:1 (the "why this price" card) */
+    --color-brick-50: oklch(0.970 0.011 27);
+    --color-brick-100: oklch(0.940 0.028 27);
+    --color-brick-200: oklch(0.895 0.052 27);
+    --color-brick-300: oklch(0.820 0.098 27);
+    --color-brick-400: oklch(0.670 0.175 27);
+    --color-brick-500: oklch(0.565 0.205 27);
+    --color-brick-600: oklch(0.490 0.190 27);
+    --color-brick-700: oklch(0.405 0.155 27);
+    --color-brick-800: oklch(0.325 0.115 27);
+    --color-brick-900: oklch(0.255 0.085 27);
+
+    /* Ink: the neutrals. Warm stone at hue 60 rather than the cool navy the
+       previous palette used - a true red sits badly against blue-grey, and the
+       warmth is what lets the accent be the only saturated thing on the page.
+       On paper: ink-900 18.63:1, ink-600 16.44, ink-500 13.14, ink-400 8.13.
+       On the ink-950 nav band the layout uses ink-300 and ink-200, both above
+       10:1. */
+    --color-ink-50: oklch(0.975 0.004 60);
+    --color-ink-100: oklch(0.945 0.006 60);
+    --color-ink-200: oklch(0.895 0.009 60);
+    --color-ink-300: oklch(0.800 0.012 60);
+    --color-ink-400: oklch(0.660 0.013 60);
+    --color-ink-500: oklch(0.545 0.014 60);
+    --color-ink-600: oklch(0.440 0.014 60);
+    --color-ink-700: oklch(0.345 0.014 60);
+    --color-ink-800: oklch(0.290 0.013 60);
+    --color-ink-900: oklch(0.240 0.012 60);
+    --color-ink-950: oklch(0.175 0.011 60);
 
     /* Paper: the surface colour. Cool-tinted, and never #fff on the page —
        cards sit white on canvas, which is how Brikk separates them. */
