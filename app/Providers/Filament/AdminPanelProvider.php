@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use Filament\FontProviders\LocalFontProvider;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -28,6 +29,16 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
+            ->font(
+                'DM Sans',
+                url: fn (): string => asset('fonts/filament/dm-sans/index.css'),
+                provider: LocalFontProvider::class,
+            )
+            ->monoFont(
+                'IBM Plex Mono',
+                url: fn (): string => asset('fonts/filament/ibm-plex-mono/index.css'),
+                provider: LocalFontProvider::class,
+            )
             ->colors([
                 'primary' => Color::Amber,
             ])
