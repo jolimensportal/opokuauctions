@@ -156,3 +156,55 @@ This project has domain-specific skills available in `**/skills/**`. You MUST ac
 - Run `vendor/bin/phpunit` to call the test runner directly. It accepts the same file path and `--filter=testName` arguments.
 
 </laravel-boost-guidelines>
+
+---
+
+## This machine — read before starting any server
+
+Two different Laravel apps run here. **Confirming the docroot is part of starting
+the server, not an afterthought.**
+
+| Port | Project |
+|---|---|
+| **8126** | **Opoku Auctions** — this repo |
+| 8123 | KudiMarket (`~/Desktop/kudimarket`) — a **different product** |
+| 8124 | Python http.server, serves `docs/previews/` |
+| 8377 | Ghanaian Apothecary, unrelated |
+
+```sh
+# Always, before trusting anything a browser shows you:
+lsof -ti:8126 | head -1 | xargs -I{} ps -o command= -p {}
+```
+
+If that path does not contain `Projects/opoku-auctions`, you are looking at
+another application. Cookies are not port-scoped, so an Opoku session will load
+on any port and the page will *look* plausible — the branding is the tell.
+
+```sh
+php artisan serve --port=8126     # never 8123, never 8000
+```
+
+### Do not run `migrate:fresh` casually
+
+It drops and recreates **every** table, `sessions` included, which signs the user
+out of the app in every browser at once. On a machine where the user is working
+in a live browser, that is a visible outage caused by a test-hygiene command.
+
+Prefer:
+
+```sh
+php artisan migrate --step                              # additive
+php artisan db:seed --class=SomeSeeder --force           # one seeder
+```
+
+Reach for `migrate:fresh --seed` only when the user has said the data does not
+matter, or when a test genuinely requires an empty schema. Say which you chose
+and why.
+
+### Dev accounts
+
+All use the password `OpokuAdmin!2026`:
+
+- `buyer@opokuauctions.test` — storefront
+- `ops@opokuauctions.test` — admin
+- `owner@opokuauctions.test` — admin
