@@ -15,13 +15,18 @@
    --------------------------------------------------------------------------- */
 
 @font-face {
-    font-family: 'Sora';
+    font-family: 'DM Sans';
     font-style: normal;
-    font-weight: 100 800;
+    font-weight: 400 700;
     font-display: swap;
     /* One variable file covers every weight. Poppins needed five static
-       downloads for the same job. */
-    src: url('/fonts/Sora-var.woff2') format('woff2-variations');
+       downloads for the same job.
+
+       DM Sans has an optical-size axis as well as weight; the browser picks
+       the right optical size for the rendered text size automatically, which
+       is why it holds up at 31px headlines and 12px metadata without a second
+       family. */
+    src: url('/fonts/DMSans-var.woff2') format('woff2-variations');
 }
 
 @font-face {
@@ -64,11 +69,13 @@
  * "brightness" as any other colour at that lightness, and the neutrals can be
  * tinted toward the brick without drifting into a second palette.
  *
- * No pure black and no pure white. #000 and #fff flatten depth and are harsh
- * against a saturated red; ink-900 and paper do the same job with less glare.
+ * Pure black and pure white. The earlier palette avoided both as a matter of
+ * taste; on white the ink ladder does all the work on its own, and a page that
+ * is nearly-but-not-quite white is what made the red look dirty rather than the
+ * red itself.
  */
 @theme {
-    --font-sans: 'Sora', ui-sans-serif, system-ui, sans-serif;
+    --font-sans: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
     --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', monospace;
 
     /* A true red. The previous accent was hue 5, which is a rose - it read pink
@@ -81,10 +88,10 @@
        0.015/0.030/0.055/0.101, and a colour the browser has to clip is not the
        colour that was specified.
 
-       Every pair below was computed, not eyeballed:
-         brick-400 on paper 4.59:1 - brick-500 7.10 - brick-600 10.91
-         white on brick-500 7.83:1 (button fill) - white on brick-400 5.06
-         brick-700 on brick-50 13.98:1 (the "why this price" card) */
+Every pair below was computed against pure white, not eyeballed:
+          brick-400 on white 5.06:1 - brick-500 7.83 - brick-600 12.04
+          white on brick-500 7.83:1 (button fill) - white on brick-400 5.06
+          ink-950 on brick-50 17.02:1 (the "why this price" card) */
     --color-brick-50: oklch(0.970 0.011 27);
     --color-brick-100: oklch(0.940 0.028 27);
     --color-brick-200: oklch(0.895 0.052 27);
@@ -99,9 +106,8 @@
     /* Ink: the neutrals. Warm stone at hue 60 rather than the cool navy the
        previous palette used - a true red sits badly against blue-grey, and the
        warmth is what lets the accent be the only saturated thing on the page.
-       On paper: ink-900 18.63:1, ink-600 16.44, ink-500 13.14, ink-400 8.13.
-       On the ink-950 nav band the layout uses ink-300 and ink-200, both above
-       10:1. */
+       On pure white: ink-900 20.56:1, ink-600 18.15, ink-500 14.50, ink-400
+       8.97. On the ink-950 nav band the layout uses ink-300 and ink-200. */
     --color-ink-50: oklch(0.975 0.004 60);
     --color-ink-100: oklch(0.945 0.006 60);
     --color-ink-200: oklch(0.895 0.009 60);
@@ -114,14 +120,16 @@
     --color-ink-900: oklch(0.240 0.012 60);
     --color-ink-950: oklch(0.175 0.011 60);
 
-    /* Paper: the surface colour. Cool-tinted, and never #fff on the page —
-       cards sit white on canvas, which is how Brikk separates them. */
-    --color-paper: oklch(0.985 0.004 285);
+    /* Paper and canvas: pure white, as specified. Previously both were tinted
+       off-white so that a white card could be separated from the page by
+       value alone. That is now the job of the card's own 1px ink-200 border,
+       which is what keeps a card reading as a card on a white page.
 
-    /* Canvas: the page behind the cards. Slightly cooler and darker than
-       paper, so a white card reads as a card without needing a shadow. */
-    --color-canvas: oklch(0.965 0.006 285);
-    --color-canvas-dim: oklch(0.940 0.008 285);
+       canvas-dim is the one exception and stays faintly tinted: it carries
+       secondary bands, and a pure-white band on a pure-white page is invisible. */
+    --color-paper: #ffffff;
+    --color-canvas: #ffffff;
+    --color-canvas-dim: oklch(0.975 0.004 285);
 
     /* One radius scale for the whole product. Buttons are pill, surfaces are
        14px, inputs are 8px. Documented here because mixed systems read as

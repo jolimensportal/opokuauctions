@@ -178,7 +178,7 @@
                              explanation could contradict the invoice. --}}
                         @php $why = $quote->explanation; @endphp
                         @if ($why && ($input['unit'] ?? 'parcel') === 'parcel' && $why->isVolumetric())
-                            <p class="mt-4 rounded-[10px] border border-brick-200 bg-brick-50 px-3.5 py-3 text-xs leading-relaxed text-brick-700">
+                            <p class="mt-4 rounded-[10px] border border-brick-200 bg-brick-50 px-3.5 py-3 text-xs leading-relaxed text-ink-950">
                                 <strong>Why ${{ number_format($quote->totalCents / 100, 2) }}?</strong>
                                 Your box bills at
                                 {{ $input['length_cm'] }} &times; {{ $input['width_cm'] }} &times; {{ $input['height_cm'] }} cm,
@@ -266,7 +266,7 @@
                 {{-- A refusal is a routine outcome, not an error. It names what
                      to change and, where relevant, what the customer typed. --}}
                 <div class="rounded-[14px] border border-brick-200 bg-white">
-                    <h2 class="border-b border-brick-200 bg-brick-50 px-5 py-3.5 text-[0.9375rem] font-bold tracking-tight text-brick-700">
+                    <h2 class="border-b border-brick-200 bg-brick-50 px-5 py-3.5 text-[0.9375rem] font-bold tracking-tight text-ink-950">
                         We cannot price this one yet
                     </h2>
                     <div class="p-5">
