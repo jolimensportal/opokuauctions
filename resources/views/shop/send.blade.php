@@ -203,6 +203,49 @@
                             <p class="mt-1.5 text-[11px] text-ink-500">
                                 Booking opens shortly. We will write before anything is charged.
                             </p>
+
+                            {{-- The cheapest demand signal available. `/send`
+                                 already produces a price, so before building a
+                                 booking flow on an unvalidated assumption, find
+                                 out whether anyone will pay the number at all.
+                                 The message is prefilled with the quote so the
+                                 conversation opens with facts instead of a
+                                 re-description.
+
+                                 Rendered only when a number is configured. A link
+                                 to a placeholder sends a real enquiry into a
+                                 void, which is worse than no way to enquire. --}}
+                            @php
+                                $waNumber = preg_replace('/\D+/', '', (string) config('opoku.whatsapp'));
+                            @endphp
+                            @if ($waNumber !== '')
+                                @php
+                                    $why = $quote->explanation;
+                                    $message = collect([
+                                        'Hello, I have a quote from Opoku.',
+                                        '',
+                                        'From: ' . strtoupper($input['country'] ?? 'us') . ' ' . ($input['postcode'] ?? ''),
+                                        'Sending: ' . ($input['unit'] ?? 'parcel'),
+                                        'Weight: ' . ($input['weight_kg'] ?? '?') . ' kg',
+                                        ($input['length_cm'] ?? null) ? 'Size: ' . $input['length_cm'] . ' x ' . ($input['width_cm'] ?? '?') . ' x ' . ($input['height_cm'] ?? '?') . ' cm' : null,
+                                        ($why?->isVolumetric()) ? 'Billed at ' . number_format($why->billableKg(), 1) . ' kg by volume.' : null,
+                                        ($input['pickup'] ?? false) ? 'I need collection.' : null,
+                                        '',
+                                        'Quoted total: USD ' . number_format($quote->totalCents / 100, 2),
+                                    ])->filter()->implode("\n");
+                                    $waLink = 'https://wa.me/' . $waNumber . '?text=' . rawurlencode($message);
+                                @endphp
+                                <a href="{{ $waLink }}" target="_blank" rel="noopener noreferrer"
+                                   class="mt-3 flex items-center justify-center gap-2 rounded-full border border-ink-300 bg-white px-4 py-2.5 text-xs font-bold text-ink-900 transition-colors hover:border-ink-900">
+                                    <svg class="h-3.5 w-3.5 shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                        <path d="M12.04 2c-5.46 0-9.9 4.44-9.9 9.9 0 1.75.46 3.45 1.32 4.95L2 22l5.3-1.38a9.87 9.87 0 0 0 4.74 1.2h.01c5.46 0 9.9-4.44 9.9-9.9 0-2.64-1.03-5.13-2.9-7A9.82 9.82 0 0 0 12.04 2Zm0 18.15h-.01a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.19 8.19 0 0 1-1.26-4.39c0-4.54 3.7-8.23 8.25-8.23 2.2 0 4.27.86 5.82 2.42a8.18 8.18 0 0 1 2.42 5.83c0 4.54-3.7 8.23-8.24 8.23Zm4.52-6.16c-.25-.13-1.47-.72-1.69-.8-.23-.09-.39-.13-.56.12-.16.25-.64.8-.78.97-.15.16-.29.18-.53.06-.25-.13-1.05-.39-2-1.23-.74-.66-1.24-1.47-1.38-1.72-.15-.25-.02-.39.1-.51.11-.11.25-.29.37-.44.13-.15.17-.25.25-.41.09-.17.04-.31-.02-.44-.06-.12-.56-1.34-.76-1.84-.2-.48-.4-.42-.56-.43h-.47c-.16 0-.42.06-.64.31s-.85.83-.85 2.02.87 2.35.99 2.51c.12.16 1.71 2.61 4.14 3.66.58.25 1.03.4 1.38.51.58.19 1.11.16 1.53.1.47-.07 1.47-.6 1.67-1.18.21-.58.21-1.07.15-1.18-.06-.11-.22-.17-.47-.29Z"/>
+                                    </svg>
+                                    Message us on WhatsApp
+                                </a>
+                                <p class="mt-1.5 text-[11px] text-ink-500">
+                                    Opens a chat with your quote already written out. Nothing is charged.
+                                </p>
+                            @endif
                         </form>
                     </div>
                 </div>
