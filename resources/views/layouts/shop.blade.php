@@ -61,7 +61,7 @@
 
                 @auth
                     <a href="{{ route('wallet') }}" class="hidden md:inline-flex btn btn-ghost tnum text-xs">
-                        {{ $currency->format($authWallet = auth()->user()->wallet('usd') ? $authWallet->balance_available : 0) }}
+                        {{ $currency->format(auth()->user()?->wallet('usd')?->balance_available ?? 0) }}
                     </a>
                     <a href="{{ route('dashboard') }}" class="btn btn-ghost text-sm">My account</a>
                 @else
