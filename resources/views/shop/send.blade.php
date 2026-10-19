@@ -16,6 +16,19 @@
     @if (session('status'))
         <div class="mb-6 rounded-[14px] border border-ink-200 bg-white px-5 py-4 text-sm text-ink-700" role="status">
             {{ session('status') }}
+
+            {{-- Shown only when a link was actually minted. A button that goes
+                 nowhere is worse than no button, and on an unpriced lane the
+                 honest outcome is a decline, not a dead checkout. --}}
+            @if (session('booking_link'))
+                <a href="{{ session('booking_link') }}" target="_blank" rel="noopener noreferrer"
+                   class="mt-3 inline-flex items-center rounded-full bg-brick-500 px-4 py-2.5 text-xs font-bold text-paper transition-colors hover:bg-brick-600">
+                    Pay USD {{ number_format(session('booking_amount', 0) / 100, 2) }}
+                </a>
+                <p class="mt-2 text-[11px] text-ink-500">
+                    Pay with MTN MoMo, Telecel Cash, AirtelTigo Money or card. The link is good for 24 hours.
+                </p>
+            @endif
         </div>
     @endif
 

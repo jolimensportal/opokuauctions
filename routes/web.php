@@ -60,3 +60,17 @@ Route::middleware(['guest'])->group(function () {
     Route::get('/register', [BuyerAuthController::class, 'showRegister'])->name('register');
     Route::post('/register', [BuyerAuthController::class, 'register'])->name('register.store');
 });
+
+Route::prefix('webhooks')->name('webhooks.')->group(function (): void {
+    // Both are called by a machine with no session and no CSRF token. Both
+    // verify on the request itself — a webhook route excluded from CSRF
+    // without a signature check is an endpoint anyone can post to.
+    Route::post('paystack', [\App\Http\Controllers\Webhooks\PaystackWebhookController::class, 'handle'])
+        ->name('paystack')
+        ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
+
+    Route::post('whatsapp', [\App\Http\Controllers\Webhooks\WhatsAppInboundController::class, 'handle'])
+        ->name('whatsapp')
+        ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
+});
+

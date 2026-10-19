@@ -6,6 +6,7 @@ use App\Enums\IntakeMethod;
 use App\Http\Controllers\Controller;
 use App\Enums\ShipmentUnit;
 use App\Models\RateReservation;
+use App\Services\ParcelBookingService;
 use App\Services\FreightQuoteService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -86,8 +87,10 @@ class SenderQuoteController extends Controller
      * record — there is no password and no address because at this point we
      * have a question and nothing we have consent to hold.
      */
-    public function reserve(Request $request): RedirectResponse
-    {
+    public function reserve(
+        Request $request,
+        ParcelBookingService $bookings,
+    ): RedirectResponse {
         $data = $request->validate([
             'email' => ['required', 'email:rfc', 'max:254'],
             'country' => ['required', Rule::in(['us', 'ca'])],
@@ -123,10 +126,25 @@ class SenderQuoteController extends Controller
             'quoted_total_cents' => $priced?->isAvailable() ? $priced->quote->totalCents : null,
         ]);
 
+        // No price, no link. Minting a payment link against a lane we cannot
+        // quote produces a button that takes money for something we have no
+        // figure for — and the demand signal is still recorded by the
+        // RateReservation above, so nothing is lost by declining to book.
+        $booking = ($held && $priced?->isAvailable()) ? $bookings->open(
+            quoteInput: $held,
+            quotedTotalCents: (int) ($priced->quote?->totalCents ?? 0),
+            rateCardRowId: (string) ($priced->quote?->rateCardRowId ?? ''),
+            email: $data['email'],
+        ) : null;
+
         $request->session()->forget('send.quote_input');
 
         return redirect()
             ->route('send.create')
-            ->with('status', 'Got it. When booking opens we will write to you at that address before anything is charged.');
+            ->with('status', $booking?->payment_link_url
+                ? 'Payment link ready — open it below to book your parcel.'
+                : 'Got it. We do not have a payable rate on that lane yet, so nothing has been charged and no card is held.')
+            ->with('booking_link', $booking?->payment_link_url)
+            ->with('booking_amount', $booking?->quoted_total_cents);
     }
 }

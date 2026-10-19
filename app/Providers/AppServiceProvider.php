@@ -29,7 +29,22 @@ class AppServiceProvider extends ServiceProvider
             );
         });
 
-        //
+        // The payment rail, resolved the same way. The WhatsApp provider is
+        // still an open decision, so nothing outside this binding and the two
+        // adapters may name a provider.
+        $this->app->singleton(\App\Payments\Paystack\PaymentGateway::class, function () {
+            $key = (string) env('PAYSTACK_SECRET_KEY', '');
+
+            // A missing key must not silently produce a live-charging gateway
+            // holding an empty secret, which would sign nothing and then reject
+            // every genuine webhook - a checkout that takes money and books
+            // nothing, which is the worst possible failure.
+            if ((bool) env('PAYSTACK_FAKE', false) || blank($key)) {
+                return new \App\Payments\Paystack\FakePaymentGateway();
+            }
+
+            return new \App\Payments\Paystack\PaystackGateway($key);
+        });
     }
 
     /**
