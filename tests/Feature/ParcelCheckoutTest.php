@@ -47,7 +47,18 @@ class ParcelCheckoutTest extends TestCase
         $this->app->instance(FakeWhatsAppGateway::class, $whatsapp = new FakeWhatsAppGateway());
         $this->app->instance(\App\Notifications\WhatsApp\WhatsAppGateway::class, $whatsapp);
 
+        // The Paystack account takes cedi only, so that is what the suite
+        // exercises. Configured here rather than read from .env so the tests
+        // describe the real shape of the flow.
+        config(['opoku.payment_currency' => 'GHS']);
+
         $this->seedRates();
+    }
+
+    /** GHS pesewas the link should charge for a USD amount, at the locked rate. */
+    private function expectedPesawas(int $usdCents): int
+    {
+        return (int) round($usdCents * (float) (config('fx.rates')['usd.ghs'] ?? 15.05));
     }
 
     private function seedRates(): void
@@ -132,8 +143,16 @@ class ParcelCheckoutTest extends TestCase
         $this->assertNotNull($booking->expires_at);
 
         $link = $this->gateway->lastLink();
-        $this->assertSame(2500, $link->amountCents);
-        $this->assertSame('USD', $link->currency);
+        $this->assertSame('GHS', $link->currency);
+        // The quote is USD; the charge is cedi. The round trip is the whole
+        // point — GHS back down to USD must land on the quoted figure.
+        $this->assertSame($this->expectedPesawas(2500), $link->amountCents);
+        $this->assertEqualsWithDelta(
+            25.00,
+            $link->amountCents / 100 / (float) (config('fx.rates')['usd.ghs'] ?? 15.05),
+            0.01,
+            'the cedi charged must equal the USD quoted',
+        );
         $this->assertSame($booking->reference, $link->reference);
     }
 
@@ -365,8 +384,12 @@ class ParcelCheckoutTest extends TestCase
         $this->assertSame(2500, $booking->quoted_total_cents);
         $this->assertNotNull($booking->payment_link_url);
 
-        // The link the customer is handed matches the price they were shown.
-        $this->assertSame(2500, $this->gateway->lastLink()->amountCents);
+        // The link is cedi because that is what the account takes, and it is
+        // the USD quote converted — not the USD figure pasted into a cedi field,
+        // which is the bug this whole conversion exists to prevent.
+        $link = $this->gateway->lastLink();
+        $this->assertSame('GHS', $link->currency);
+        $this->assertSame($this->expectedPesawas(2500), $link->amountCents);
 
         // And following the redirect shows them the button.
         $this->get('/send')
@@ -421,13 +444,16 @@ class ParcelCheckoutTest extends TestCase
 
         $link = $this->gateway->lastLink();
 
-        $this->assertSame('USD', $link->currency);
-        // 2500 cents is USD 25.00 and must arrive as 2500, not 25.
-        $this->assertSame(2500, $link->amountCents);
-        $this->assertSame(
-            $link->amountCents,
-            \App\Models\ParcelBooking::sole()->quoted_total_cents,
-        );
+        $this->assertSame('GHS', $link->currency);
+
+        // The booking keeps the USD quote AND the cedi charge, plus the rate
+        // that turned one into the other. A cedi charge with no rate behind it
+        // is a charge nobody can reconcile later.
+        $booking = \App\Models\ParcelBooking::sole();
+        $this->assertSame(2500, $booking->quoted_total_cents);
+        $this->assertSame('GHS', $booking->charge_currency);
+        $this->assertSame($this->expectedPesawas(2500), $booking->charge_cents);
+        $this->assertNotNull($booking->fx_rate);
     }
 
     public function test_a_pallet_quote_charges_pallet_amounts_not_kilo_amounts(): void
@@ -447,20 +473,40 @@ class ParcelCheckoutTest extends TestCase
         $this->open(['unit' => 'pallet', 'weight_kg' => 610], email: 'ama@example.com');
 
         $link = $this->gateway->lastLink();
-        $this->assertSame('USD', $link->currency);
-        $this->assertSame(18000, $link->amountCents);
+        $this->assertSame('GHS', $link->currency);
+        $this->assertSame($this->expectedPesawas(18000), $link->amountCents);
     }
 
-    public function test_the_payment_currency_is_configurable_and_defaults_to_usd(): void
+    public function test_the_booking_records_both_the_quote_and_the_charge(): void
     {
-        $this->assertSame('USD', config('opoku.payment_currency'));
+        $this->assertSame('GHS', config('opoku.payment_currency'));
 
-        config(['opoku.payment_currency' => 'GHS']);
         $this->open(email: 'ama@example.com');
+        $booking = \App\Models\ParcelBooking::sole();
 
-        // Configurable, but never silently reinterpreted: the amount stays the
-        // stored integer. Converting is a separate, explicit step.
-        $this->assertSame('GHS', $this->gateway->lastLink()->currency);
-        $this->assertSame(2500, $this->gateway->lastLink()->amountCents);
+        $this->assertSame(2500, $booking->quoted_total_cents, 'the quote stays in USD');
+        $this->assertSame('GHS', $booking->charge_currency, 'the charge is in cedi');
+        $this->assertGreaterThan(0, $booking->charge_cents);
+        $this->assertNotNull($booking->fx_rate, 'a cedi charge must carry the rate it used');
+    }
+
+    /**
+     * Confirmation still compares in USD.
+     *
+     * The rate locked at link time is what we were paid against, but whether
+     * the RATE CARD moved is a USD question, so the reprice has to compare
+     * like with like rather than comparing 25 dollars to 376 cedi.
+     */
+    public function test_confirmation_compares_in_usd_not_in_the_charge_currency(): void
+    {
+        $booking = $this->open(email: 'ama@example.com');
+
+        $this->postWebhook([
+            'event' => 'charge.success',
+            'data' => ['reference' => $booking->reference],
+        ])->assertJson(['status' => 'booked']);
+
+        $booking->refresh();
+        $this->assertSame(2500, $booking->quoted_total_cents);
     }
 }

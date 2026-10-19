@@ -25,7 +25,7 @@ class ParcelBooking extends Model
     protected $fillable = [
         'reference', 'status', 'email', 'whatsapp_to', 'country', 'postcode', 'unit',
         'weight_grams', 'length_cm', 'width_cm', 'height_cm', 'pickup',
-        'quoted_total_cents', 'rate_card_row_id', 'quote_input', 'payment_link_url',
+        'quoted_total_cents', 'charge_cents', 'charge_currency', 'fx_rate', 'fx_quote_id', 'rate_card_row_id', 'quote_input', 'payment_link_url',
         'expires_at', 'abandoned_at', 'booked_at',
     ];
 
@@ -37,6 +37,7 @@ class ParcelBooking extends Model
         'width_cm' => 'integer',
         'height_cm' => 'integer',
         'quoted_total_cents' => 'integer',
+        'charge_cents' => 'integer',
         'quote_input' => 'array',
         'expires_at' => 'immutable_datetime',
         'abandoned_at' => 'immutable_datetime',

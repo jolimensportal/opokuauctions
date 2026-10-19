@@ -40,6 +40,7 @@ class ParcelBookingService
     public function __construct(
         private readonly FreightQuoteService $quotes,
         private readonly PaymentGateway $payments,
+        private readonly FxService $fx,
     ) {}
 
     /**
@@ -69,6 +70,7 @@ class ParcelBookingService
             'height_cm' => $quoteInput['height_cm'] ?? null,
             'pickup' => (bool) ($quoteInput['pickup'] ?? false),
             'quoted_total_cents' => $quotedTotalCents,
+            'charge_currency' => strtoupper((string) config('opoku.payment_currency', 'USD')),
             'rate_card_row_id' => $rateCardRowId,
             'quote_input' => $quoteInput,
         ]);
@@ -90,20 +92,34 @@ class ParcelBookingService
             'status' => ParcelPaymentStatus::Pending,
         ]);
 
-        // USD, because the booking is quoted in USD and the sender is paying
-        // from North America. Charging GHS here charged about one-fifteenth of
-        // the quoted price.
-        $url = $this->payments->createLink(PaymentLink::forDollars(
-            amountCents: $payment->amount_cents,
+        // The merchant takes cedi, so a USD quote has to be converted before it
+        // becomes a charge. The rate is locked at the moment the link is minted
+        // and recorded, because a Paystack link is a fixed amount and the
+        // number we were later paid has to be traceable back to a rate rather
+        // than to whatever it happens to be today.
+        $currency = strtoupper((string) config('opoku.payment_currency', 'USD'));
+        $amount = $payment->amount_cents;
+        $quote = null;
+
+        if ($currency !== 'USD') {
+            $quote = $this->fx->lock('usd', 'ghs');
+            $amount = $this->fx->convertWithQuote($payment->amount_cents, $quote);
+        }
+
+        $url = $this->payments->createLink(new PaymentLink(
+            amountCents: $amount,
+            currency: $currency,
             reference: $payment->reference,
             email: $booking->email ?? 'sender@pending-address.invalid',
             description: 'Opoku parcel to Tema — booking '.$booking->reference,
-            currency: (string) config('opoku.payment_currency', 'USD'),
         ));
 
         $booking->forceFill([
             'status' => ParcelBookingStatus::PaymentPending,
             'payment_link_url' => $url,
+            'charge_cents' => $amount,
+            'charge_currency' => $currency,
+            'fx_rate' => $quote ? ($quote->rate_numerator.'/'.$quote->rate_denominator) : null,
             'expires_at' => Carbon::now()->addHours(self::LINK_TTL_HOURS),
         ])->save();
 
