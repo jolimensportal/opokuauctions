@@ -19,7 +19,18 @@
 
     <div class="col-span-8 sm:col-span-4 min-w-0">
         <div class="font-semibold text-ink-900 truncate">{{ $lot->title }}</div>
-        <div class="text-xs text-ink-500 tnum truncate">{{ $lot->vehicleDetail?->vin }}</div>
+        {{-- A goods lot has no VIN. Printing one anyway left a blank line
+             under every pallet title, which read as a loading failure. --}}
+        <div class="text-xs text-ink-500 truncate">
+            @if ($lot->isVehicle() && $lot->vehicleDetail?->vin)
+                <span class="tnum">{{ $lot->vehicleDetail->vin }}</span>
+            @elseif ($lot->goodsDetail)
+                <span>{{ $lot->goodsDetail->unit_label }}</span>
+                @if ($lot->goodsDetail->manifest_count > 1)
+                    <span class="tnum">&middot; {{ $lot->goodsDetail->manifest_count }} pieces</span>
+                @endif
+            @endif
+        </div>
     </div>
 
     <div class="hidden sm:block col-span-2 text-sm text-ink-600 truncate">{{ $lot->city }}</div>
@@ -32,8 +43,19 @@
         {{ $lot->timeUntilClose() }}
     </div>
 
-    <div class="col-span-12 sm:col-span-1 text-right">
-        <span class="tnum font-bold text-ink-900">{{ number_format($lot->current_bid / 100) }}</span>
-        <span class="text-xs text-ink-500 ml-1">{{ strtoupper($lot->currency_code) }}</span>
+    <div class="col-span-12 sm:col-span-1 text-right whitespace-nowrap">
+        {{-- An unbid lot showing USD 0 is wrong twice over: the price on the
+             lot is not zero, and a bidder would read it as free. Show what it
+             opens at until someone actually bids. Stacked, because the bid
+             column is one twelfth of the row and inline it wrapped to three
+             lines and made every card a different height. --}}
+        @if ($lot->current_bid > 0)
+            <span class="tnum font-bold text-ink-900">{{ number_format($lot->current_bid / 100) }}</span>
+            <span class="text-xs text-ink-500 ml-1">{{ strtoupper($lot->currency_code) }}</span>
+        @else
+            <div class="text-[10px] uppercase tracking-wide text-ink-400 leading-none">opens at</div>
+            <span class="tnum font-bold text-ink-900">{{ number_format($lot->starting_bid / 100) }}</span>
+            <span class="text-xs text-ink-500 ml-1">{{ strtoupper($lot->currency_code) }}</span>
+        @endif
     </div>
 </a>

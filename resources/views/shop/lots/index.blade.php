@@ -2,12 +2,21 @@
 
 @section('title', 'Live lots — Opoku Auctions')
 
+@php
+    // A goods board is not a car board with different rows. It has no make, and
+    // its conditions are grades, not titles — so the copy, the facets and the
+    // header all follow the kind rather than hardcoding "vehicle".
+    $kind = $filters['kind'] ?? 'vehicle';
+    $noun = $kind === 'goods' ? 'goods lot' : 'vehicle';
+    $conditions = \App\Models\ConditionDefinition::forKind($kind);
+@endphp
+
 @section('content')
 <section class="mx-auto max-w-6xl px-4 sm:px-6 pt-10 pb-20">
 
     <h1 class="text-3xl font-extrabold tracking-tight text-ink-900">Live lots</h1>
     <p class="mt-2 text-ink-600 max-w-[56ch]">
-        {{ $lots->total() }} vehicle{{ $lots->total() === 1 ? '' : 's' }} available.
+        {{ $lots->total() }} {{ $noun }}{{ $lots->total() === 1 ? '' : ($kind === 'goods' ? 's' : 's') }} available.
         Every price shown is the hammer price. The landed total is on each lot.
     </p>
 
@@ -23,21 +32,23 @@
                 @endforeach
             </select>
         </div>
-        <div>
-            <label class="label" for="make">Make</label>
-            <select name="make" id="make" class="field">
-                <option value="">Any make</option>
-                @foreach ($makes as $m)
-                    <option value="{{ $m }}" @selected(($filters['make'] ?? '') === $m)>{{ $m }}</option>
-                @endforeach
-            </select>
-        </div>
+        @if ($kind !== 'goods')
+            <div>
+                <label class="label" for="make">Make</label>
+                <select name="make" id="make" class="field">
+                    <option value="">Any make</option>
+                    @foreach ($makes as $m)
+                        <option value="{{ $m }}" @selected(($filters['make'] ?? '') === $m)>{{ $m }}</option>
+                    @endforeach
+                </select>
+            </div>
+        @endif
         <div>
             <label class="label" for="condition">Condition</label>
             <select name="condition" id="condition" class="field">
                 <option value="">Any condition</option>
-                @foreach (['clean_title', 'salvage', 'project', 'parts_only'] as $c)
-                    <option value="{{ $c }}" @selected(($filters['condition'] ?? '') === $c)>{{ str_replace('_', ' ', $c) }}</option>
+                @foreach ($conditions as $c)
+                    <option value="{{ $c->code }}" @selected(($filters['condition'] ?? '') === $c->code)>{{ $c->label }}</option>
                 @endforeach
             </select>
         </div>
@@ -47,7 +58,7 @@
     </form>
 
     <div class="mt-10">
-    @include('shop.partials.lot-board-header')
+    @include('shop.partials.lot-board-header', ['kindLabel' => $kind === 'goods' ? 'Goods' : 'Vehicle'])
 
         @forelse ($lots as $lot)
             @include('shop.partials.lot-row', ['lot' => $lot])
