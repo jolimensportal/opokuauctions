@@ -118,7 +118,12 @@ Every pair below was computed against pure white, not eyeballed:
     --color-ink-700: oklch(0.345 0.014 60);
     --color-ink-800: oklch(0.290 0.013 60);
     --color-ink-900: oklch(0.240 0.012 60);
-    --color-ink-950: oklch(0.175 0.011 60);
+    /* Pure black, and it is called ink-950 rather than black only so it stays on
+       the same ladder as the rest. Previously oklch(0.175 0.011 60), which
+       resolves to #140F0B - a warm near-black with a brown cast that was
+       visible across the header, the hero and the footer at full-bleed size.
+       Pages are pure white, so a tinted black against them reads as dirt. */
+    --color-ink-950: #000000;
 
     /* Paper and canvas: pure white, as specified. Previously both were tinted
        off-white so that a white card could be separated from the page by
