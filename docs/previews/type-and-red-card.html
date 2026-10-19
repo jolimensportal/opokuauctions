@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Opoku — type and the red card</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&family=Archivo:wght@400;500;600;700;800;900&family=Instrument+Sans:wght@400;500;600;700&family=DM+Sans:wght@400;500;700&family=Fraunces:opsz,wght@9..144,500;9..144,700&family=JetBrains+Mono:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:#0d0d11;color:#e9e9ee;font-family:'IBM Plex Mono',monospace;-webkit-font-smoothing:antialiased}
+.chrome{position:sticky;top:0;z-index:50;background:#0d0d11ee;backdrop-filter:blur(12px);border-bottom:1px solid #23232b}
+.chrome-in{max-width:1240px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.chrome b{font-weight:600;font-size:14px}
+.chrome nav{display:flex;gap:8px;margin-left:auto;flex-wrap:wrap}
+.chrome a{color:#a0a0ae;text-decoration:none;font-size:12.5px;padding:6px 10px;border-radius:999px;border:1px solid transparent}
+.chrome a:hover{color:#fff;border-color:#33333d}
+.chrome a.on{background:#fff;color:#0d0d11;border-color:#fff}
+
+.wrap{max-width:1240px;margin:0 auto;padding:40px 24px 90px}
+h1{font-size:25px;font-weight:600;margin:0 0 10px;letter-spacing:-.02em}
+.lede{font-size:14px;line-height:1.75;color:#a0a0ae;max-width:80ch;margin:0 0 8px}
+.lede code{background:#1a1a21;padding:2px 6px;border-radius:5px;color:#d8d8e0}
+h2{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#7d7d8b;margin:52px 0 14px;font-weight:600}
+
+/* ── the red card, at real app sizes ── */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:16px;margin-bottom:8px}
+.card{background:#fff;border-radius:11px;padding:14px 15px;border:1px solid}
+.card p{margin:0;font-size:13px;line-height:1.65}
+.card strong{font-weight:700}
+.hdr{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;margin:0 0 8px}
+.verdict{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#7d7d8b;margin:0 0 12px}
+.pass{color:#7ee787}.fail{color:#ff8a80}.warn{color:#ffcb6b}
+
+/* ── type specimens ── */
+.spec{border:1px solid #23232b;border-radius:14px;overflow:hidden;margin-bottom:18px}
+.spec-h{display:flex;align-items:center;gap:12px;padding:14px 18px;background:#16161c;border-bottom:1px solid #23230b;flex-wrap:wrap}
+.spec-h .id{font-size:11px;font-weight:600;letter-spacing:.1em;color:#7d7d8b;text-transform:uppercase}
+.spec-h h3{margin:0;font-size:15px;font-weight:600;letter-spacing:-.01em;color:#f2f2f6}
+.spec-h p{margin:0;font-size:12px;color:#7d7d8b;flex:1 1 300px;line-height:1.55}
+.stage{padding:22px 18px;background:#fbf9f7}
+.demo{}
+.demo .nav{display:flex;align-items:center;gap:18px;margin-bottom:22px;padding-bottom:14px;border-bottom:1px solid #e8e2dd}
+.demo .logo{font-size:17px;font-weight:800;letter-spacing:-.02em;color:#1a1a18}
+.demo .logo i{font-style:normal;color:#c2382f}
+.demo a{font-size:12.5px;color:#6b6b66;text-decoration:none}
+.demo .cta{margin-left:auto;background:#c2382f;color:#fff;border:0;border-radius:999px;padding:8px 16px;font-size:12.5px;font-weight:700}
+.demo h4{margin:0 0 8px;font-size:31px;line-height:1.06;letter-spacing:-.03em;color:#1a1a18;max-width:17ch}
+.demo .sub{font-size:14px;line-height:1.65;color:#575752;max-width:52ch;margin:0 0 16px}
+.demo .btn{display:inline-block;background:#c2382f;color:#fff;border-radius:999px;padding:9px 18px;font-size:13px;font-weight:700;margin-bottom:20px}
+.demo .row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.demo .lot{background:#fff;border:1px solid #e8e2dd;border-radius:10px;padding:12px}
+.demo .lot .t{font-size:13.5px;font-weight:700;color:#1a1a18;margin:0 0 3px;letter-spacing:-.01em}
+.demo .lot .m{font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8a8a85;margin:0 0 8px}
+.demo .lot .p{font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:600;color:#1a1a18}
+.demo .lot .l{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:#8a8a85;display:block}
+.num{font-family:'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums}
+.f1{font-family:'Manrope',sans-serif}.f2{font-family:'Archivo',sans-serif}.f3{font-family:'Instrument Sans',sans-serif}
+.f4{font-family:'DM Sans',sans-serif}.f5{font-family:'Fraunces',serif}.f6{font-family:'Sora',sans-serif}
+</style>
+</head>
+<body>
+
+<div class="chrome"><div class="chrome-in">
+  <b>Opoku — type &amp; the red card</b>
+  <nav>
+    <a href="#card" class="on">the red card</a>
+    <a href="#type">type</a>
+  </nav>
+</div></div>
+
+<div class="wrap">
+
+<h1>Two things you flagged, with real numbers attached</h1>
+<p class="lede">The brown-red you disliked is <code>text-brick-700</code> on <code>bg-brick-50</code>. It is not a contrast failure — it measures <b>13.98:1</b>, comfortably AA. What is wrong with it is the <em>hue</em>: at <code>oklch(0.405 0.155 27)</code> it reads as a muddy brick brown rather than a confident colour, and it is used for headings across six files.</p>
+<p class="lede" style="margin-top:12px">You asked for <b>black on red</b>. Measured honestly: black on the <em>brand</em> red (brick-500) is <b>2.66:1</b> and fails outright. Black on the red <em>tint</em> — which is what the card actually is — is <b>17.02:1</b>. So the version of your instinct that works is the first one below.</p>
+
+<h2 id="card">The red card — pick one</h2>
+<div class="verdict">Contrast measured against the shipped tokens. AA body needs 4.5:1.</div>
+
+<div class="cards">
+
+  <div class="card" style="background:oklch(0.970 0.011 27);border-color:oklch(0.895 0.052 27)">
+    <p class="hdr" style="color:#8a3a2e">A · near-black on the tint</p>
+    <p style="color:oklch(0.175 0.011 60)"><strong style="color:oklch(0.175 0.011 60)">Why $25.00?</strong> Your box bills at 60 × 40 × 40 cm, which is 19.2 kg of air freight — more than the 5.0 kg on the scale.</p>
+    <p class="verdict" style="margin:10px 0 0"><span class="pass">17.02:1</span> · ink-950 on brick-50 · closest to what you asked for</p>
+  </div>
+
+  <div class="card" style="background:oklch(0.940 0.028 27);border-color:oklch(0.895 0.052 27)">
+    <p class="hdr" style="color:#8a3a2e">B · more red in the field</p>
+    <p style="color:oklch(0.175 0.011 60)"><strong style="color:oklch(0.175 0.011 60)">Why $25.00?</strong> Your box bills at 60 × 40 × 40 cm, which is 19.2 kg of air freight — more than the 5.0 kg on the scale.</p>
+    <p class="verdict" style="margin:10px 0 0"><span class="pass">13.95:1</span> · warmer, more obviously "red card"</p>
+  </div>
+
+  <div class="card" style="background:oklch(0.565 0.205 27);border-color:oklch(0.490 0.190 27)">
+    <p class="hdr" style="color:oklch(0.970 0.011 27)">C · white on strong red</p>
+    <p style="color:oklch(0.985 0.003 60)"><strong style="color:oklch(0.985 0.003 60)">Why $25.00?</strong> Your box bills at 60 × 40 × 40 cm, which is 19.2 kg of air freight — more than the 5.0 kg on the scale.</p>
+    <p class="verdict" style="margin:10px 0 0"><span class="pass">10.91:1</span> · the loudest option, most like a warning</p>
+  </div>
+
+  <div class="card" style="background:oklch(0.565 0.205 27);border-color:oklch(0.490 0.190 27)">
+    <p class="hdr" style="color:oklch(0.970 0.011 27)">D · white on the brand red</p>
+    <p style="color:oklch(0.985 0.003 60)"><strong style="color:oklch(0.985 0.003 60)">Why $25.00?</strong> Your box bills at 60 × 40 × 40 cm, which is 19.2 kg of air freight — more than the 5.0 kg on the scale.</p>
+    <p class="verdict" style="margin:10px 0 0"><span class="pass">7.10:1</span> · same red as the buttons, so it reads as one family</p>
+  </div>
+
+  <div class="card" style="background:oklch(0.565 0.205 27);border-color:oklch(0.490 0.190 27);opacity:.55">
+    <p class="hdr" style="color:#2a0f0c">E · black on the brand red — the literal ask</p>
+    <p style="color:oklch(0.175 0.011 60)"><strong style="color:oklch(0.175 0.011 60)">Why $25.00?</strong> Your box bills at 60 × 40 × 40 cm, which is 19.2 kg of air freight.</p>
+    <p class="verdict" style="margin:10px 0 0"><span class="fail">2.66:1 — FAILS</span> · shown dimmed because it is not usable</p>
+  </div>
+
+</div>
+
+<h2 id="type">Type — five directions, all on the same screen</h2>
+<p class="lede">Sora is currently live. These are rendered on the same storefront fragment at the same sizes, so you are comparing them in use rather than as specimens. Every one keeps <b>IBM Plex Mono</b> for figures, because prices have to be tabular and a proportional digit is a lie in a column.</p>
+
+<!-- 1a -->
+<div class="spec" id="t1">
+  <div class="spec-h"><span class="id">1a</span><h3>Manrope <span style="color:#7ee787;font-size:11px">· live-adjacent</span></h3>
+    <p>Soft, rounded, wide apertures. The friendliest of the five and the closest relative to Sora — a gentler step sideways rather than a jump.</p></div>
+  <div class="stage"><div class="demo f1">
+    <div class="nav"><span class="logo">Opoku<i> Auctions</i></span><a>Find cars</a><a>How to buy</a><a>Fees</a><span class="cta">Sign in</span></div>
+    <h4>Send something to Tema</h4>
+    <p class="sub">Priced by weight and size, and you see the all-in figure before you pay a cent. Duty, VAT and clearance are included.</p>
+    <span class="btn">Get my price</span>
+    <div class="row">
+      <div class="lot"><p class="t">2021 Ford F-150</p><p class="m">Detroit · Clean title</p><span class="l">opens at</span><span class="p num">$3,200</span></div>
+      <div class="lot"><p class="t">Full pallet — mixed</p><p class="m">Newark · Grade A</p><span class="l">opens at</span><span class="p num">$180</span></div>
+      <div class="lot"><p class="t">Land Cruiser</p><p class="m">Newark · Salvage</p><span class="l">current bid</span><span class="p num">$4,850</span></div>
+    </div>
+  </div></div>
+</div>
+
+<!-- 1b -->
+<div class="spec" id="t2">
+  <div class="spec-h"><span class="id">1b</span><h3>Archivo</h3>
+    <p>Grotesque, tighter, built for signage. Heavier at every size than Sora, so headlines carry more authority and prices feel more like a posted rate than a chat message.</p></div>
+  <div class="stage"><div class="demo f2">
+    <div class="nav"><span class="logo">Opoku<i> Auctions</i></span><a>Find cars</a><a>How to buy</a><a>Fees</a><span class="cta">Sign in</span></div>
+    <h4>Send something to Tema</h4>
+    <p class="sub">Priced by weight and size, and you see the all-in figure before you pay a cent. Duty, VAT and clearance are included.</p>
+    <span class="btn">Get my price</span>
+    <div class="row">
+      <div class="lot"><p class="t">2021 Ford F-150</p><p class="m">Detroit · Clean title</p><span class="l">opens at</span><span class="p num">$3,200</span></div>
+      <div class="lot"><p class="t">Full pallet — mixed</p><p class="m">Newark · Grade A</p><span class="l">opens at</span><span class="p num">$180</span></div>
+      <div class="lot"><p class="t">Land Cruiser</p><p class="m">Newark · Salvage</p><span class="l">current bid</span><span class="p num">$4,850</span></div>
+    </div>
+  </div></div>
+</div>
+
+<!-- 1c -->
+<div class="spec" id="t3">
+  <div class="spec-h"><span class="id">1c</span><h3>Instrument Sans</h3>
+    <p>Neutral and precise, with the most even colour of the five — large amounts of body text stay the same shade instead of thinning out. Reads as a rate card.</p></div>
+  <div class="stage"><div class="demo f3">
+    <div class="nav"><span class="logo">Opoku<i> Auctions</i></span><a>Find cars</a><a>How to buy</a><a>Fees</a><span class="cta">Sign in</span></div>
+    <h4>Send something to Tema</h4>
+    <p class="sub">Priced by weight and size, and you see the all-in figure before you pay a cent. Duty, VAT and clearance are included.</p>
+    <span class="btn">Get my price</span>
+    <div class="row">
+      <div class="lot"><p class="t">2021 Ford F-150</p><p class="m">Detroit · Clean title</p><span class="l">opens at</span><span class="p num">$3,200</span></div>
+      <div class="lot"><p class="t">Full pallet — mixed</p><p class="m">Newark · Grade A</p><span class="l">opens at</span><span class="p num">$180</span></div>
+      <div class="lot"><p class="t">Land Cruiser</p><p class="m">Newark · Salvage</p><span class="l">current bid</span><span class="p num">$4,850</span></div>
+    </div>
+  </div></div>
+</div>
+
+<!-- 1d -->
+<div class="spec" id="t4">
+  <div class="spec-h"><span class="id">1d</span><h3>DM Sans</h3>
+    <p>Low-contrast strokes and very large x-height. The most legible at small sizes on a phone, which is where a sender in Newark actually reads this page.</p></div>
+  <div class="stage"><div class="demo f4">
+    <div class="nav"><span class="logo">Opoku<i> Auctions</i></span><a>Find cars</a><a>How to buy</a><a>Fees</a><span class="cta">Sign in</span></div>
+    <h4>Send something to Tema</h4>
+    <p class="sub">Priced by weight and size, and you see the all-in figure before you pay a cent. Duty, VAT and clearance are included.</p>
+    <span class="btn">Get my price</span>
+    <div class="row">
+      <div class="lot"><p class="t">2021 Ford F-150</p><p class="m">Detroit · Clean title</p><span class="l">opens at</span><span class="p num">$3,200</span></div>
+      <div class="lot"><p class="t">Full pallet — mixed</p><p class="m">Newark · Grade A</p><span class="l">opens at</span><span class="p num">$180</span></div>
+      <div class="lot"><p class="t">Land Cruiser</p><p class="m">Newark · Salvage</p><span class="l">current bid</span><span class="p num">$4,850</span></div>
+    </div>
+  </div></div>
+</div>
+
+<!-- 1e -->
+<div class="spec" id="t5">
+  <div class="spec-h"><span class="id">1e</span><h3>Fraunces for display, Manrope for text</h3>
+    <p>The only non-sans. A serif with real contrast between thick and thin, used only for the headline — it makes the promise feel human while the numbers stay mechanical.</p></div>
+  <div class="stage"><div class="demo f1">
+    <div class="nav"><span class="logo f5" style="font-weight:700">Opoku<i> Auctions</i></span><a>Find cars</a><a>How to buy</a><a>Fees</a><span class="cta">Sign in</span></div>
+    <h4 class="f5" style="font-weight:700">Send something to Tema</h4>
+    <p class="sub">Priced by weight and size, and you see the all-in figure before you pay a cent. Duty, VAT and clearance are included.</p>
+    <span class="btn">Get my price</span>
+    <div class="row">
+      <div class="lot"><p class="t">2021 Ford F-150</p><p class="m">Detroit · Clean title</p><span class="l">opens at</span><span class="p num">$3,200</span></div>
+      <div class="lot"><p class="t">Full pallet — mixed</p><p class="m">Newark · Grade A</p><span class="l">opens at</span><span class="p num">$180</span></div>
+      <div class="lot"><p class="t">Land Cruiser</p><p class="m">Newark · Salvage</p><span class="l">current bid</span><span class="p num">$4,850</span></div>
+    </div>
+  </div></div>
+</div>
+
+</div>
+</body>
+</html>
