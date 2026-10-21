@@ -68,7 +68,7 @@ class AttentionQueuePageTest extends TestCase
     {
         $buyer = User::factory()->create(['role' => Role::Buyer]);
 
-        $this->actingAs($buyer)->get('/admin/attention-queue')->assertForbidden();
+        $this->actingAs($buyer, 'admin')->get('/admin/attention-queue')->assertForbidden();
     }
 
     public function test_a_guest_is_sent_to_login(): void
@@ -80,14 +80,14 @@ class AttentionQueuePageTest extends TestCase
     {
         $ops = User::factory()->create(['role' => Role::Ops]);
 
-        $this->actingAs($ops)->get('/admin/attention-queue')->assertOk();
+        $this->actingAs($ops, 'admin')->get('/admin/attention-queue')->assertOk();
     }
 
     public function test_an_owner_can_open_the_console(): void
     {
         $owner = User::factory()->create(['role' => Role::Owner]);
 
-        $this->actingAs($owner)->get('/admin/attention-queue')->assertOk();
+        $this->actingAs($owner, 'admin')->get('/admin/attention-queue')->assertOk();
     }
 
     public function test_an_unweighed_lot_appears_in_the_queue(): void
@@ -96,7 +96,7 @@ class AttentionQueuePageTest extends TestCase
 
         $ops = User::factory()->create(['role' => Role::Ops]);
 
-        $this->actingAs($ops)
+        $this->actingAs($ops, 'admin')
             ->get('/admin/attention-queue')
             ->assertOk()
             ->assertSee('lot_unweighed');
@@ -108,7 +108,7 @@ class AttentionQueuePageTest extends TestCase
 
         $ops = User::factory()->create(['role' => Role::Ops]);
 
-        $this->actingAs($ops)
+        $this->actingAs($ops, 'admin')
             ->get('/admin/attention-queue')
             ->assertOk()
             ->assertSee('cannot be freighted');
@@ -124,7 +124,7 @@ class AttentionQueuePageTest extends TestCase
 
         $ops = User::factory()->create(['role' => Role::Ops]);
 
-        $this->actingAs($ops)
+        $this->actingAs($ops, 'admin')
             ->get('/admin/attention-queue')
             ->assertOk()
             ->assertSee('Critical');
@@ -137,7 +137,7 @@ class AttentionQueuePageTest extends TestCase
         $ops = User::factory()->create(['role' => Role::Ops]);
 
         // An empty queue must say so plainly rather than rendering a blank box.
-        $this->actingAs($ops)
+        $this->actingAs($ops, 'admin')
             ->get('/admin/attention-queue')
             ->assertOk()
             ->assertSee('Nothing needs attention');
@@ -149,7 +149,7 @@ class AttentionQueuePageTest extends TestCase
 
         $kofi = User::factory()->create(['role' => Role::Ops, 'name' => 'Kofi Mensah']);
 
-        $this->actingAs($kofi)
+        $this->actingAs($kofi, 'admin')
             ->get('/admin/attention-queue')
             ->assertOk()
             ->assertSee('Kofi Mensah');
@@ -161,7 +161,7 @@ class AttentionQueuePageTest extends TestCase
 
         $ops = User::factory()->create(['role' => Role::Ops]);
 
-        $this->actingAs($ops)
+        $this->actingAs($ops, 'admin')
             ->get('/admin/attention-queue')
             ->assertOk()
             ->assertSee('Critical')
@@ -176,7 +176,7 @@ class AttentionQueuePageTest extends TestCase
 
         $ops = User::factory()->create(['role' => Role::Ops]);
 
-        $this->actingAs($ops)
+        $this->actingAs($ops, 'admin')
             ->get('/admin/attention-queue')
             ->assertOk()
             ->assertDontSee('lot_weighed');

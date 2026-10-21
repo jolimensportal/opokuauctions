@@ -4,7 +4,6 @@ namespace Tests\Feature;
 
 use App\Enums\Role;
 use App\Models\User;
-use App\Models\Wallet;
 use App\Services\WalletService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -25,17 +24,17 @@ class RoleAccessTest extends TestCase
 
     public function test_buyer_cannot_access_the_admin_panel(): void
     {
-        $this->actingAs($this->user(Role::Buyer));
+        $this->actingAs($this->user(Role::Buyer), 'admin');
 
         $this->get('/admin')->assertForbidden();
     }
 
     public function test_ops_and_owner_can_access_the_admin_panel(): void
     {
-        $this->actingAs($this->user(Role::Ops));
+        $this->actingAs($this->user(Role::Ops), 'admin');
         $this->get('/admin')->assertOk();
 
-        $this->actingAs($this->user(Role::Owner));
+        $this->actingAs($this->user(Role::Owner), 'admin');
         $this->get('/admin')->assertOk();
     }
 

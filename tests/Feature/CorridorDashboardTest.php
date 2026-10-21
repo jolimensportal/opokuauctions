@@ -3,11 +3,12 @@
 namespace Tests\Feature;
 
 use App\Enums\Role;
-use App\Models\Lot;
-use App\Models\Shipment;
-use App\Models\User;
-use App\Services\WalletService;
 use App\Filament\Pages\CorridorDashboard;
+use App\Models\Lot;
+use App\Models\User;
+use App\Models\Wallet;
+use App\Services\WalletService;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 /**
@@ -17,18 +18,18 @@ use Tests\TestCase;
  */
 class CorridorDashboardTest extends TestCase
 {
-    use \Illuminate\Foundation\Testing\RefreshDatabase;
+    use RefreshDatabase;
 
     public function test_page_renders_for_ops(): void
     {
-        $this->actingAs(User::factory()->create(['role' => Role::Ops]));
+        $this->actingAs(User::factory()->create(['role' => Role::Ops]), 'admin');
 
         $this->get(CorridorDashboard::getUrl(panel: 'admin'))->assertSuccessful();
     }
 
     public function test_it_shows_an_unpaid_lot_in_needs_money(): void
     {
-        $this->actingAs(User::factory()->create(['role' => Role::Ops]));
+        $this->actingAs(User::factory()->create(['role' => Role::Ops]), 'admin');
 
         Lot::create([
             'id' => 'lot_unpaid_1', 'kind' => 'vehicle', 'provenance' => 'salvage_auction',
@@ -50,7 +51,7 @@ class CorridorDashboardTest extends TestCase
 
     public function test_it_shows_a_paid_lot_with_no_container_as_unallocated(): void
     {
-        $this->actingAs(User::factory()->create(['role' => Role::Ops]));
+        $this->actingAs(User::factory()->create(['role' => Role::Ops]), 'admin');
 
         Lot::create([
             'id' => 'lot_paid_1', 'kind' => 'vehicle', 'provenance' => 'salvage_auction',
@@ -72,14 +73,14 @@ class CorridorDashboardTest extends TestCase
 
     public function test_reconciliation_drift_is_surfaced_on_the_dashboard(): void
     {
-        $this->actingAs(User::factory()->create(['role' => Role::Ops]));
+        $this->actingAs(User::factory()->create(['role' => Role::Ops]), 'admin');
 
         $wallet = app(WalletService::class);
         $wallet->ensureWallet('buyer-tampered');
         $wallet->deposit('buyer-tampered', 100000);
 
         // Tamper with the cached balance; the ledger stays authoritative.
-        \App\Models\Wallet::where('user_id', 'buyer-tampered')
+        Wallet::where('user_id', 'buyer-tampered')
             ->update(['balance_available' => 999999]);
 
         $this->get(CorridorDashboard::getUrl(panel: 'admin'))
@@ -90,7 +91,7 @@ class CorridorDashboardTest extends TestCase
 
     public function test_a_healthy_ledger_shows_no_drift_banner(): void
     {
-        $this->actingAs(User::factory()->create(['role' => Role::Ops]));
+        $this->actingAs(User::factory()->create(['role' => Role::Ops]), 'admin');
 
         $wallet = app(WalletService::class);
         $wallet->ensureWallet('buyer-healthy');
@@ -104,7 +105,7 @@ class CorridorDashboardTest extends TestCase
 
     public function test_buyers_never_reach_the_corridor_dashboard(): void
     {
-        $this->actingAs(User::factory()->create(['role' => Role::Buyer]));
+        $this->actingAs(User::factory()->create(['role' => Role::Buyer]), 'admin');
 
         $this->get('/admin/corridor-dashboard')->assertForbidden();
     }

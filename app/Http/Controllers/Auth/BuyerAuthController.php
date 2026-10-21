@@ -107,6 +107,28 @@ class BuyerAuthController extends Controller
     }
 
     /**
+     * Sign the buyer out of the shop.
+     *
+     * There was no storefront sign-out at all, and the session cookie is
+     * HttpOnly, so nothing on the page could clear it either. A buyer who
+     * signed in on a shared machine could not end the session.
+     *
+     * The operator console is a separate guard inside the same session, so
+     * this drops the buyer's key and rotates the session id rather than
+     * invalidating everything: signing out of the shop must not sign the
+     * operator out.
+     */
+    public function logout(Request $request): RedirectResponse
+    {
+        Auth::guard('web')->logout();
+
+        $request->session()->regenerate();
+
+        return redirect()->route('home')
+            ->with('status', 'You are signed out.');
+    }
+
+    /**
      * Ghana numbers arrive as 0244 123 456, 233244123456, +233 244 123 456.
      * Store one shape so WhatsApp messaging and phone lookup both work.
      */

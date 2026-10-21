@@ -1,12 +1,15 @@
 <?php
 
+use App\Http\Controllers\Auth\BuyerAuthController;
 use App\Http\Controllers\Shop\CurrencyController;
+use App\Http\Controllers\Shop\OrderController;
+use App\Http\Controllers\Shop\QuoteController;
 use App\Http\Controllers\Shop\SenderQuoteController;
 use App\Http\Controllers\Shop\ShopController;
 use App\Http\Controllers\Shop\WalletController;
-use App\Http\Controllers\Shop\OrderController;
-use App\Http\Controllers\Shop\QuoteController;
-use App\Http\Controllers\Auth\BuyerAuthController;
+use App\Http\Controllers\Webhooks\PaystackWebhookController;
+use App\Http\Controllers\Webhooks\WhatsAppInboundController;
+use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -41,7 +44,12 @@ Route::view('/how-it-works', 'shop.how-it-works')->name('how-it-works');
 Route::view('/fees', 'shop.fees')->name('fees');
 
 // Everything below needs a signed-in buyer.
-Route::middleware(['auth'])->group(function () {
+//
+// The guard is named on both groups rather than left to the default. The
+// console signs in on its own guard and switches the default guard while it
+// runs; a shop that authenticated with "whichever guard was last set" would
+// answer for the wrong person.
+Route::middleware(['auth:web'])->group(function () {
     Route::get('/wallet', [WalletController::class, 'show'])->name('wallet');
     Route::post('/wallet/deposit', [WalletController::class, 'deposit'])->name('wallet.deposit');
     Route::post('/lots/{lot}/bid', [WalletController::class, 'bid'])->name('lots.bid');
@@ -50,11 +58,15 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/account/purchases', [OrderController::class, 'purchases'])->name('orders.index');
     Route::get('/account/purchases/{shipment}', [OrderController::class, 'show'])
         ->name('orders.show');
+
+    // POST, never GET. A GET logout is a link a crawler, a prefetcher or an
+    // email client can fire without the buyer ever asking for it.
+    Route::post('/logout', [BuyerAuthController::class, 'logout'])->name('logout');
 });
 
 // Guest-only, so a signed-in buyer hitting /login lands on their account rather
 // than on a login form they do not need.
-Route::middleware(['guest'])->group(function () {
+Route::middleware(['guest:web'])->group(function () {
     Route::get('/login', [BuyerAuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [BuyerAuthController::class, 'login'])->name('login.store');
     Route::get('/register', [BuyerAuthController::class, 'showRegister'])->name('register');
@@ -65,12 +77,11 @@ Route::prefix('webhooks')->name('webhooks.')->group(function (): void {
     // Both are called by a machine with no session and no CSRF token. Both
     // verify on the request itself — a webhook route excluded from CSRF
     // without a signature check is an endpoint anyone can post to.
-    Route::post('paystack', [\App\Http\Controllers\Webhooks\PaystackWebhookController::class, 'handle'])
+    Route::post('paystack', [PaystackWebhookController::class, 'handle'])
         ->name('paystack')
-        ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
+        ->withoutMiddleware([VerifyCsrfToken::class]);
 
-    Route::post('whatsapp', [\App\Http\Controllers\Webhooks\WhatsAppInboundController::class, 'handle'])
+    Route::post('whatsapp', [WhatsAppInboundController::class, 'handle'])
         ->name('whatsapp')
-        ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
+        ->withoutMiddleware([VerifyCsrfToken::class]);
 });
-

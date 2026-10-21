@@ -48,7 +48,7 @@ class ClearanceConsoleTest extends TestCase
 
     public function test_the_screen_lists_the_tasks_in_order(): void
     {
-        $this->actingAs(User::factory()->create(['role' => Role::Ops]));
+        $this->actingAs(User::factory()->create(['role' => Role::Ops]), 'admin');
         $shipmentId = $this->shipment();
 
         $this->get(ClearanceTaskResource::getUrl())
@@ -59,7 +59,7 @@ class ClearanceConsoleTest extends TestCase
 
     public function test_a_completed_money_task_without_a_receipt_shows_the_warning(): void
     {
-        $this->actingAs(User::factory()->create(['role' => Role::Ops]));
+        $this->actingAs(User::factory()->create(['role' => Role::Ops]), 'admin');
         $shipmentId = $this->shipment();
         $ops = User::where('role', Role::Ops)->first();
 
@@ -82,7 +82,7 @@ class ClearanceConsoleTest extends TestCase
 
     public function test_buyers_cannot_reach_the_clearance_console(): void
     {
-        $this->actingAs(User::factory()->create(['role' => Role::Buyer]));
+        $this->actingAs(User::factory()->create(['role' => Role::Buyer]), 'admin');
 
         $this->get(ClearanceTaskResource::getUrl())->assertForbidden();
     }

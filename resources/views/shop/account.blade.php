@@ -23,9 +23,21 @@
         </div>
     @endif
 
-    <h1 class="text-3xl font-extrabold tracking-tight text-ink-900">
-        Hello, {{ Str::before(auth()->user()->name, ' ') }}
-    </h1>
+    <div class="flex items-baseline justify-between gap-4">
+        <h1 class="text-3xl font-extrabold tracking-tight text-ink-900">
+            Hello, {{ Str::before(auth()->user()->name, ' ') }}
+        </h1>
+
+        {{-- A buyer has to be able to end their own session. POST, because a
+             GET logout is a link anything can fire. --}}
+        <form method="POST" action="{{ route('logout') }}">
+            @csrf
+            <button type="submit"
+                    class="text-xs font-semibold text-ink-600 underline underline-offset-2 transition-colors hover:text-ink-950">
+                Sign out
+            </button>
+        </form>
+    </div>
 
     {{-- The one thing worth acting on today, stated plainly. --}}
     <div class="mt-6 rounded-[14px] border border-brick-200 bg-brick-50 px-5 py-4">

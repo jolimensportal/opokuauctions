@@ -14,6 +14,9 @@ use Tests\TestCase;
  * The storefront grew a FacetService, an FxService and a balance_due_usd
  * column; each of those is read by something behind /admin, and a screen that
  * 500s takes the whole operating side offline.
+ *
+ * The console authenticates on the `admin` guard, not the shop's `web` guard,
+ * so a buyer and an operator can be signed in at the same time.
  */
 class AdminSmokeTest extends TestCase
 {
@@ -36,7 +39,7 @@ class AdminSmokeTest extends TestCase
     #[DataProvider('screenProvider')]
     public function test_an_owner_can_load_every_screen(string $path): void
     {
-        $this->actingAs(User::factory()->create(['role' => Role::Owner]))
+        $this->actingAs(User::factory()->create(['role' => Role::Owner]), 'admin')
             ->get($path)
             ->assertOk();
     }
@@ -44,7 +47,7 @@ class AdminSmokeTest extends TestCase
     #[DataProvider('screenProvider')]
     public function test_an_ops_user_can_load_every_screen(string $path): void
     {
-        $this->actingAs(User::factory()->create(['role' => Role::Ops]))
+        $this->actingAs(User::factory()->create(['role' => Role::Ops]), 'admin')
             ->get($path)
             ->assertOk();
     }
@@ -54,7 +57,7 @@ class AdminSmokeTest extends TestCase
         $buyer = User::factory()->create(['role' => Role::Buyer]);
 
         foreach (array_column(self::screenProvider(), 0) as $path) {
-            $this->actingAs($buyer)->get($path)->assertForbidden();
+            $this->actingAs($buyer, 'admin')->get($path)->assertForbidden();
         }
     }
 }

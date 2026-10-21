@@ -42,6 +42,19 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+
+        // The operator console signs in separately from the shop.
+        //
+        // One guard for both meant one person per browser: signing in at
+        // /admin threw the buyer out, and signing in as a buyer threw the
+        // operator out. Two guards over one session cookie fix that, because
+        // each guard keeps its own key inside the session — a buyer and an
+        // operator can be signed in at the same time, and signing out of one
+        // leaves the other alone.
+        'admin' => [
+            'driver' => 'session',
+            'provider' => 'users',
+        ],
     ],
 
     /*

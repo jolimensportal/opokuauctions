@@ -3,10 +3,10 @@
 namespace Tests\Feature;
 
 use App\Enums\Role;
-use App\Models\Lot;
-use App\Models\User;
 use App\Filament\Resources\Lots\Pages\CreateLot;
 use App\Filament\Resources\Lots\Pages\EditLot;
+use App\Models\Lot;
+use App\Models\User;
 use App\Models\VehicleDetail;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
@@ -43,7 +43,7 @@ class AdminLotFormTest extends TestCase
             'vin' => '1FTFW1E50NKD00001', 'year' => 2004, 'odometer' => 210_000,
         ]);
 
-        Livewire::actingAs($this->ops())
+        Livewire::actingAs($this->ops(), 'admin')
             ->test(EditLot::class, ['record' => $lot->getRouteKey()])
             ->assertOk()
             // A blank section here means ->relationship() silently failed.
@@ -59,7 +59,7 @@ class AdminLotFormTest extends TestCase
     {
         $lot = Lot::factory()->vehicle('Ford', 'F-150')->create();
 
-        Livewire::actingAs($this->ops())
+        Livewire::actingAs($this->ops(), 'admin')
             ->test(EditLot::class, ['record' => $lot->getRouteKey()])
             ->fillForm(['title' => '2004 Ford F-150 XLT'])
             ->call('save')
@@ -74,7 +74,7 @@ class AdminLotFormTest extends TestCase
 
     public function test_an_operator_can_create_a_goods_lot(): void
     {
-        Livewire::actingAs($this->ops())
+        Livewire::actingAs($this->ops(), 'admin')
             ->test(CreateLot::class)
             ->fillForm([
                 'kind' => 'goods',
@@ -108,7 +108,7 @@ class AdminLotFormTest extends TestCase
 
     public function test_the_goods_section_is_hidden_until_the_kind_is_goods(): void
     {
-        Livewire::actingAs($this->ops())
+        Livewire::actingAs($this->ops(), 'admin')
             ->test(CreateLot::class)
             ->assertFormFieldHidden('goodsDetail.unit_label')
             ->assertFormFieldVisible('vehicleDetail.vin')
@@ -119,7 +119,7 @@ class AdminLotFormTest extends TestCase
 
     public function test_a_buyer_cannot_reach_the_lot_form(): void
     {
-        $this->actingAs(User::factory()->create(['role' => Role::Buyer]))
+        $this->actingAs(User::factory()->create(['role' => Role::Buyer]), 'admin')
             ->get('/admin/lots/create')
             ->assertForbidden();
     }
