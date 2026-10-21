@@ -21,11 +21,18 @@ class AdminThemeTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_the_admin_panel_uses_our_vite_theme(): void
+    public function test_the_admin_panel_loads_filaments_stylesheet_and_ours(): void
     {
-        $panel = Filament::getPanel('admin');
+        $html = Filament::getPanel('admin')->getTheme()->getHtml()->toHtml();
 
-        $this->assertSame('resources/css/filament/theme.css', $panel->getViteTheme());
+        // Filament's own stylesheet must still be there. ->viteTheme()
+        // REPLACES the panel's theme rather than adding to it, and a console
+        // with no Filament CSS renders its icons at natural size and its
+        // layout in pieces — while still returning 200.
+        $this->assertStringContainsString('css/filament', $html);
+
+        // Ours comes after, so it can override Filament rather than replace it.
+        $this->assertStringContainsString('build/assets/theme-', $html);
     }
 
     public function test_the_admin_primary_colour_is_the_shops_brick(): void

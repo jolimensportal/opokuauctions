@@ -16,7 +16,7 @@ use Carbon\Carbon;
 class LogisticsExceptions
 {
     /**
-     * @return array<int, array{kind: string, title: string, detail: string, action: string, reference: ?string}>
+     * @return array<int, array{kind: string, title: string, detail: string, action: string, tag: string, tone: string, reference: ?string}>
      */
     public function all(): array
     {
@@ -30,7 +30,7 @@ class LogisticsExceptions
     /**
      * Containers that claim to be moving and have not moved.
      *
-     * @return array<int, array{kind: string, title: string, detail: string, action: string, reference: ?string}>
+     * @return array<int, array{kind: string, title: string, detail: string, action: string, tag: string, tone: string, reference: ?string}>
      */
     private function silentContainers(): array
     {
@@ -55,6 +55,8 @@ class LogisticsExceptions
                         $shipment->status,
                     ),
                     'action' => 'Record a milestone, or check the tracking feed.',
+                    'tag' => $days === null ? 'never moved' : $days.' days',
+                    'tone' => 'bad',
                     'reference' => $shipment->container_no,
                 ];
             })
@@ -66,7 +68,7 @@ class LogisticsExceptions
      * file. The corridor board calls this "needs booking" and counts a
      * container with no number the same way.
      *
-     * @return array<int, array{kind: string, title: string, detail: string, action: string, reference: ?string}>
+     * @return array<int, array{kind: string, title: string, detail: string, action: string, tag: string, tone: string, reference: ?string}>
      */
     private function missingCarriers(): array
     {
@@ -83,6 +85,8 @@ class LogisticsExceptions
                     'title' => sprintf('%s has %s', $shipment->container_no, $missing),
                     'detail' => 'Nothing can be booked, costed or claimed against a carrier until it is fixed.',
                     'action' => 'Create the forwarder, then assign it to the container.',
+                    'tag' => 'blocking',
+                    'tone' => 'warn',
                     'reference' => $shipment->container_no,
                 ];
             })
@@ -92,7 +96,7 @@ class LogisticsExceptions
     /**
      * Customer parcels whose price hold expired before anyone paid.
      *
-     * @return array<int, array{kind: string, title: string, detail: string, action: string, reference: ?string}>
+     * @return array<int, array{kind: string, title: string, detail: string, action: string, tag: string, tone: string, reference: ?string}>
      */
     private function expiredHolds(): array
     {
@@ -112,6 +116,8 @@ class LogisticsExceptions
                     Carbon::parse($booking->expires_at)->toFormattedDateString(),
                 ),
                 'action' => 'Chase the payment or release the hold.',
+                'tag' => 'expired',
+                'tone' => 'bad',
                 'reference' => $booking->reference,
             ])
             ->all();

@@ -3,6 +3,8 @@
 namespace App\Providers\Filament;
 
 use App\Filament\Logistics\Pages\LogisticsDashboard;
+use App\Providers\Filament\Concerns\HasOpokuTheme;
+use Filament\Enums\ThemeMode;
 use Filament\FontProviders\LocalFontProvider;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -28,6 +30,8 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
  */
 class LogisticsPanelProvider extends PanelProvider
 {
+    use HasOpokuTheme;
+
     public function panel(Panel $panel): Panel
     {
         return $panel
@@ -35,7 +39,16 @@ class LogisticsPanelProvider extends PanelProvider
             ->path('admin/logistics')
             ->login()
             ->authGuard('admin')
-            ->viteTheme('resources/css/filament/theme.css')
+            ->theme($this->opokuTheme())
+            // The console is a light paper system, like the shop, and it
+            // stays light. Filament follows the operating system by default,
+            // which put a dark topbar and white-on-dark headings over our
+            // light canvas. Dark mode is forced off because our cards are
+            // paper — there is no dark variant of them to switch to, and the
+            // switcher is hidden so nobody can reach one.
+            ->defaultThemeMode(ThemeMode::Light)
+            ->darkMode(false, isForced: true)
+            ->themeSwitcher(false)
             ->font(
                 'DM Sans',
                 url: fn (): string => asset('fonts/filament/dm-sans/index.css'),

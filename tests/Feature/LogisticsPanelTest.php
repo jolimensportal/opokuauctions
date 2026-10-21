@@ -30,10 +30,10 @@ class LogisticsPanelTest extends TestCase
 
     public function test_the_logistics_panel_wears_the_same_theme(): void
     {
-        $this->assertSame(
-            'resources/css/filament/theme.css',
-            Filament::getPanel('logistics')->getViteTheme(),
-        );
+        $html = Filament::getPanel('logistics')->getTheme()->getHtml()->toHtml();
+
+        $this->assertStringContainsString('css/filament', $html);
+        $this->assertStringContainsString('build/assets/theme-', $html);
     }
 
     public function test_a_guest_is_sent_to_the_logistics_login(): void

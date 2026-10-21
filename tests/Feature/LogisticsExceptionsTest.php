@@ -46,6 +46,9 @@ class LogisticsExceptionsTest extends TestCase
         $this->assertSame('silent_container', $exceptions[0]['kind']);
         $this->assertStringContainsString('MSCU 0000 001', $exceptions[0]['title']);
         $this->assertNotEmpty($exceptions[0]['action']);
+        // Every item carries a short label as well as a next action, so the
+        // row can be read at a glance and acted on without reading it.
+        $this->assertNotEmpty($exceptions[0]['tag']);
     }
 
     public function test_a_container_that_moved_yesterday_is_not_an_exception(): void

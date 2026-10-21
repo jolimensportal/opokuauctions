@@ -38,8 +38,10 @@
             <p class="sub">
                 @if (count($exceptions) === 0)
                     Nothing is stopped. Everything else is moving.
+                @elseif (count($exceptions) === 1)
+                    One thing is stopped.
                 @else
-                    {{ count($exceptions) }} {{ \Illuminate\Support\Str::plural('thing is', count($exceptions)) }} stopped.
+                    {{ count($exceptions) }} things are stopped.
                 @endif
             </p>
 
@@ -49,8 +51,9 @@
                     <div class="grow">
                         <div class="t">{{ $exception['title'] }}</div>
                         <div class="m">{{ $exception['detail'] }}</div>
+                        <div class="action-link">{{ $exception['action'] }}</div>
                     </div>
-                    <span class="chip">{{ $exception['action'] }}</span>
+                    <span class="chip {{ $exception['tone'] }}">{{ $exception['tag'] }}</span>
                 </div>
             @empty
                 <p class="muted">Nothing needs attention.</p>
