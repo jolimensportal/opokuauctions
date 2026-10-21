@@ -2169,3 +2169,39 @@ names. `LogisticsExceptions::all()` returns items with the keys `kind`, `title`,
 `detail`, `action`, `reference` — the same keys the Task 6 tests assert and the
 Task 7 view reads. `ShipmentMilestoneRecorder::record()` takes `shipment`,
 `type`, `occurredAt`, `notes`, `recordedBy`, `source` in every call site.
+
+---
+
+## What actually happened (21 Oct 2026, after execution)
+
+The plan was executed task by task and all eight landed, 474 tests green. Five
+things in it were wrong, and the browser found the last one:
+
+1. **Filament forms are Livewire, not POST forms.** The plan's create tests
+   posted to the create URL and expected a redirect. A plain POST there is a
+   405 — only GET means "show the form". The tests drive
+   `Livewire::test(CreateShipment::class)->fillForm(...)->call('create')`,
+   which is the house pattern (`AdminLotFormTest`).
+2. **A resource's URLs resolve against the current panel.** Testing a page in
+   the logistics panel without `Filament::setCurrentPanel('logistics')` looks
+   for a route in the operations panel and dies on the breadcrumb.
+3. **`$navigationGroup` is `UnitEnum|string|null`,** not `?string`.
+4. **`->viteTheme()` REPLACES the panel's stylesheet instead of adding to it.**
+   The console rendered with none of Filament's own CSS — every icon at its
+   natural size, the layout in pieces — and no test noticed, because the page
+   still returned 200. The theme is now composed in
+   `App\Providers\Filament\Concerns\HasOpokuTheme`: Filament's stylesheet
+   first, ours second, so ours overrides rather than replaces.
+5. **Filament follows the operating system for dark mode,** and this machine
+   is dark, so a black topbar and white-on-dark headings sat over a light
+   paper canvas. The console is a light system and stays light:
+   `->defaultThemeMode(ThemeMode::Light)->darkMode(false, isForced: true)
+   ->themeSwitcher(false)`. There is no dark variant of our cards, and the
+   switcher is hidden so nobody reaches one.
+
+The console's own defaults also changed while building it: the first plan
+gave the exception queue a whole sentence as a chip. Each item now carries a
+short state chip and a next action that reads as a link.
+
+The plan's Task 3/4/5/7 test counts are the ones written; the totals moved as
+tests were added. 474 pass.
