@@ -32,6 +32,10 @@ class AdminPanelProvider extends PanelProvider
             // The console signs in on its own guard, so a buyer and an
             // operator can be signed in at the same time in one browser.
             ->authGuard('admin')
+            // Our design system, built by Vite. Without this the panel loads
+            // only Filament's stylesheet and every class written in an admin
+            // blade is inert.
+            ->viteTheme('resources/css/filament/theme.css')
             ->font(
                 'DM Sans',
                 url: fn (): string => asset('fonts/filament/dm-sans/index.css'),
@@ -43,7 +47,25 @@ class AdminPanelProvider extends PanelProvider
                 provider: LocalFontProvider::class,
             )
             ->colors([
-                'primary' => Color::Amber,
+                // The shop's own brick ramp, step for step. Filament's amber
+                // made the console look like a different product, and
+                // Color::hex() would have generated a ramp that merely looks
+                // close — one brand means one red, or the two drift.
+                'primary' => [
+                    50 => 'oklch(0.970 0.011 27)',
+                    100 => 'oklch(0.940 0.028 27)',
+                    200 => 'oklch(0.895 0.052 27)',
+                    300 => 'oklch(0.820 0.098 27)',
+                    400 => 'oklch(0.670 0.175 27)',
+                    500 => 'oklch(0.565 0.205 27)',
+                    600 => 'oklch(0.490 0.190 27)',
+                    700 => 'oklch(0.405 0.155 27)',
+                    800 => 'oklch(0.325 0.115 27)',
+                    900 => 'oklch(0.255 0.085 27)',
+                    // The shop's ramp stops at 900; Filament wants a 950, and
+                    // this continues the same steps down.
+                    950 => 'oklch(0.190 0.070 27)',
+                ],
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
