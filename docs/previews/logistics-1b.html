@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>1b · Consignment book — Opoku Logistics</title>
+<link rel="stylesheet" href="logistics-candidate.css">
+</head>
+<body>
+<div class="wrap">
+
+    <header class="masthead">
+        <span class="id">Candidate 1b — Consignment book</span>
+        <h1>One record per movement, with everything attached to it</h1>
+        <p class="meta">
+            Both lanes, one surface. The spine is <strong>the consignment</strong>: a container we carry and a
+            parcel a customer sends are the same kind of record with a different type, so one book holds both.
+            Surface: staff console.
+        </p>
+        <nav>
+            <a href="logistics-candidates.html">All candidates</a>
+            <a href="logistics-1a.html">1a Control tower</a>
+            <a href="logistics-1b.html" aria-current="page">1b Consignment book</a>
+            <a href="logistics-1c.html">1c Freight desk</a>
+        </nav>
+    </header>
+
+    <div class="row" style="gap: 12px; margin-bottom: 18px; flex-wrap: wrap;">
+        <span class="label">Logistics / Consignments</span>
+        <span class="pill dark">All lanes</span>
+        <span class="pill">We carry · container</span>
+        <span class="pill">They send · parcel</span>
+        <span class="pill">State: any</span>
+        <span class="grow"></span>
+        <span class="hint mono">search by ref, lot or customer</span>
+    </div>
+
+    <div class="split">
+
+        <!-- ========================= BOOK ========================= -->
+        <section class="region">
+            <span class="label">The book — every movement, newest first</span>
+            <table>
+                <thead>
+                <tr>
+                    <th>Reference</th>
+                    <th>Lane</th>
+                    <th>What</th>
+                    <th>Route</th>
+                    <th>State</th>
+                    <th>Last movement</th>
+                    <th>Money</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="mono">MSCU 4471 908</td>
+                    <td><span class="pill">We carry</span></td>
+                    <td>3 vehicles</td>
+                    <td>Newark → Tema</td>
+                    <td><span class="pill">Sailing</span></td>
+                    <td class="mono">SAILING 17 Oct</td>
+                    <td class="mono">$3,475.00 cleared</td>
+                </tr>
+                <tr>
+                    <td class="mono">gitcdoiifzrojbe8</td>
+                    <td><span class="pill red">They send</span></td>
+                    <td>20 kg parcel</td>
+                    <td>07030 → Tema</td>
+                    <td><span class="pill red">Payment pending</span></td>
+                    <td class="mono">—</td>
+                    <td class="mono">$25.00 quoted</td>
+                </tr>
+                </tbody>
+            </table>
+            <p class="hint" style="margin-top: 12px;">
+                Two records, because two movements exist. A book is honest about that: the 189 unshipped lots
+                are not consignments, so they do not appear here.
+            </p>
+        </section>
+
+        <!-- ========================= DETAIL ========================= -->
+        <aside class="region">
+            <span class="label">Record — MSCU 4471 908</span>
+
+            <div class="stack tight">
+                <div class="row" style="justify-content: space-between;">
+                    <span class="strong">3 vehicles · Newark → Tema</span>
+                    <span class="pill">Sailing</span>
+                </div>
+                <p class="hint">MV Atlantic Trader · ETA 7 Nov 2026 · departed 8 Oct ·
+                    forwarder <span class="red">none on file</span></p>
+            </div>
+
+            <div style="margin-top: 14px;">
+                <span class="label">Manifest</span>
+                <table style="margin-top: 6px;">
+                    <tbody>
+                    <tr><td>2021 Ford F-150</td><td class="mono">$3,850.00</td><td class="mono">paid</td></tr>
+                    <tr><td>2015 Nissan Armada</td><td class="mono">$1,075.00</td><td class="mono">paid</td></tr>
+                    <tr><td>2019 Ford Expedition</td><td class="mono">$1,525.00</td><td class="mono">paid</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div style="margin-top: 14px;">
+                <span class="label">Cost</span>
+                <table style="margin-top: 6px;">
+                    <tbody>
+                    <tr><td>Duty</td><td class="mono">$940.00</td><td class="hint">receipted</td></tr>
+                    <tr><td>VAT</td><td class="mono">$1,890.00</td><td class="hint">receipted</td></tr>
+                    <tr><td>Port charges</td><td class="mono">$645.00</td><td class="hint">receipted</td></tr>
+                    <tr><td>Freight / insurance</td><td class="mono red">not recorded</td><td class="hint">no forwarder</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div style="margin-top: 14px;">
+                <span class="label">Movement</span>
+                <ul class="timeline" style="margin-top: 8px;">
+                    <li><span class="mono hint">8 Oct</span><span class="dot done"></span><span>Loaded at Newark</span></li>
+                    <li><span class="mono hint">9 Oct</span><span class="dot done"></span><span>Departed Newark</span></li>
+                    <li><span class="mono hint">17 Oct</span><span class="dot now"></span><span>At sea, transatlantic</span></li>
+                    <li><span class="mono hint">7 Nov</span><span class="dot wait"></span><span>Arrives Tema (ETA)</span></li>
+                    <li><span class="mono hint">—</span><span class="dot wait"></span><span>Gate-out and hand-over</span></li>
+                </ul>
+            </div>
+
+            <div style="margin-top: 14px;">
+                <span class="label">Documents</span>
+                <p class="hint" style="margin-top: 6px;">Bill of lading — booking reference —
+                    3 clearance receipts (DUTY, VAT, port charges).</p>
+            </div>
+
+            <div class="row" style="margin-top: 16px; gap: 8px;">
+                <span class="btn dark">Record a milestone</span>
+                <span class="btn">Assign forwarder</span>
+            </div>
+        </aside>
+    </div>
+
+    <div class="footer-note">
+        <strong>First slice:</strong> a Shipments resource in the console (list, create, edit) plus a manifest
+        and a per-leg cost breakdown on the record. The data model is close — freight and insurance are two
+        fields, duty/VAT/port charges already live on clearance tasks.
+        <strong>Risk:</strong> the record is heavy. A container that needs booking work is a blank form with
+        eight fields, and an operator with one exception to clear will not open it.
+    </div>
+
+</div>
+</body>
+</html>

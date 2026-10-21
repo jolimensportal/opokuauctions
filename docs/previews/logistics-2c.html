@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Your freight — Opoku Auctions</title>
+<link rel="stylesheet" href="dashboard-shell.css?v=2">
+</head>
+<body>
+
+<header class="topbar">
+    <span class="brand"><span class="mark">Opoku</span><span class="accent">Auctions</span></span>
+    <nav class="topnav">
+        <a href="#">Find cars</a>
+        <a href="#">How to buy</a>
+        <a href="#">Fees</a>
+        <a href="#" class="on">My freight</a>
+        <a href="#">Support</a>
+    </nav>
+    <div class="topbar-right">
+        <span class="icon-btn" title="USD">$</span>
+        <span class="icon-btn" title="Notifications">◔</span>
+        <span class="who">Kwame A.</span>
+        <span class="avatar" style="background: var(--brick-500);">KA</span>
+    </div>
+</header>
+
+<div class="app rail">
+    <nav class="rail-nav" aria-label="Account">
+        <a href="#" class="on" title="Home">◱</a>
+        <a href="#" title="Your cars">◈</a>
+        <a href="#" title="Your parcels">▦</a>
+        <a href="#" title="Tracking">◎</a>
+        <a href="#" title="Payments">$</a>
+        <a href="#" title="Invoices">▤</a>
+        <a href="#" title="Settings">⚙</a>
+        <a href="#" class="spacer" title="Sign out">⏻</a>
+    </nav>
+
+    <main class="canvas">
+        <div class="page-head">
+            <div>
+                <h1>Your freight</h1>
+                <p>Everything moving to Tema that has your name on it.</p>
+            </div>
+            <div class="crumbs">Account / Freight</div>
+        </div>
+
+        <!-- ============ welcome banner (the reference pattern) ============ -->
+        <section class="banner">
+            <h2>Opoku welcomes you, Kwame.</h2>
+            <p>
+                From your account you can see the <a href="#">cars we are carrying for you</a>,
+                the <a href="#">parcels you have sent us</a>, what each one costs, and
+                <a href="#">anything we still need from you</a> before it can move.
+            </p>
+        </section>
+
+        <!-- ============ three tiles ============ -->
+        <div class="grid tiles-3" style="margin-top: 16px;">
+            <div class="card">
+                <div class="tile">
+                    <span class="disc">◈</span>
+                    <div>
+                        <div class="label">Cars arriving</div>
+                        <div class="fig tnum">1</div>
+                        <div class="delta">3 inside</div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="tile">
+                    <span class="disc">▦</span>
+                    <div>
+                        <div class="label">Parcels you sent</div>
+                        <div class="fig tnum">1</div>
+                        <div class="delta">awaiting payment</div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="tile">
+                    <span class="disc">$</span>
+                    <div>
+                        <div class="label">Your balance</div>
+                        <div class="fig tnum">$0.00</div>
+                        <div class="delta">settled</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid split" style="margin-top: 16px;">
+            <!-- ============ your freight ============ -->
+            <section class="card">
+                <h2>Your freight</h2>
+                <p class="sub">One container, one parcel.</p>
+
+                <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px 0 10px; border-bottom: 1px solid var(--ink-100);">
+                    <div>
+                        <div class="strong" style="font-size: 14.5px;">MSCU 4471 908</div>
+                        <div class="muted" style="font-size: 12.5px;">MV Atlantic Trader · Newark → Tema · arriving 7 Nov</div>
+                    </div>
+                    <span class="chip warn">Sailing</span>
+                </div>
+
+                <table>
+                    <tbody>
+                        <tr><td>2021 Ford F-150</td><td class="mono">$3,850.00</td><td><span class="chip ok">cleared</span></td></tr>
+                        <tr><td>2015 Nissan Armada</td><td class="mono">$1,075.00</td><td><span class="chip ok">cleared</span></td></tr>
+                        <tr><td>2019 Ford Expedition</td><td class="mono">$1,525.00</td><td><span class="chip ok">cleared</span></td></tr>
+                    </tbody>
+                </table>
+
+                <ul class="timeline" style="margin-top: 20px;">
+                    <li>
+                        <span class="rail"><span class="node"></span></span>
+                        <div><div class="what">Loaded at Newark</div><div class="meta">8 Oct</div></div>
+                        <span class="when">8 Oct</span>
+                    </li>
+                    <li>
+                        <span class="rail"><span class="node"></span></span>
+                        <div><div class="what">Left the port</div><div class="meta">9 Oct</div></div>
+                        <span class="when">9 Oct</span>
+                    </li>
+                    <li>
+                        <span class="rail"><span class="node now"></span></span>
+                        <div><div class="what">On the Atlantic</div><div class="meta">We will update you when it moves again.</div></div>
+                        <span class="when">17 Oct</span>
+                    </li>
+                    <li>
+                        <span class="rail"><span class="node wait"></span></span>
+                        <div><div class="what">Arrives Tema</div><div class="meta">Then we call you to collect.</div></div>
+                        <span class="when">7 Nov</span>
+                    </li>
+                </ul>
+            </section>
+
+            <!-- ============ required action ============ -->
+            <section class="card">
+                <h2>Required action</h2>
+                <p class="sub">Two things are waiting on you. Nothing is blocked by us.</p>
+
+                <div class="action-row">
+                    <span class="disc">!</span>
+                    <div class="grow">
+                        <div class="t">ID for clearance</div>
+                        <div class="m">We cannot clear a container in your name without it. One upload, once.</div>
+                    </div>
+                    <span class="btn primary">Upload</span>
+                </div>
+
+                <div class="action-row">
+                    <span class="disc">⌖</span>
+                    <div class="grow">
+                        <div class="t">Collection point for your parcel</div>
+                        <div class="m">We have your postcode, 07030. We need the door.</div>
+                    </div>
+                    <span class="btn">Set</span>
+                </div>
+
+                <div class="action-row">
+                    <span class="disc calm">$</span>
+                    <div class="grow">
+                        <div class="t">Pay the parcel you sent</div>
+                        <div class="m">$25.00, held until 20 Oct. After that the price is re-quoted.</div>
+                    </div>
+                    <span class="btn primary">Pay</span>
+                </div>
+
+                <div style="margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--ink-100);">
+                    <div class="tile big">
+                        <span class="disc">$</span>
+                        <div>
+                            <div class="label">Freight billed to Tema</div>
+                            <div class="fig tnum">$3,475.00</div>
+                            <div class="delta">duty, VAT and port charges — all receipted</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <div class="note">
+            <strong>Surface rules for the customer.</strong> This is a standalone account area with its own chrome —
+            no storefront header, no footer, no marketing nav. It is reached from "My account", it never borrows the
+            shop's layout, and it reads the same consignment records the operations console writes. We Courier, Delix
+            and CargoPro all ship exactly this split: a public site and a separate account/portal application.
+        </div>
+    </main>
+</div>
+
+</body>
+</html>

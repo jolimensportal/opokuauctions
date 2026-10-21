@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Logistics dashboard — Opoku Operations</title>
+<link rel="stylesheet" href="dashboard-shell.css?v=2">
+</head>
+<body>
+
+<header class="topbar">
+    <span class="brand"><span class="mark">Opoku</span><span class="accent">Ops</span></span>
+    <nav class="topnav">
+        <a href="#">Overview</a>
+        <a href="#" class="on">Logistics</a>
+        <a href="#">Operations</a>
+        <a href="#">Finance</a>
+        <a href="#">Customers</a>
+    </nav>
+    <div class="topbar-right">
+        <span class="icon-btn" title="Notifications">◔</span>
+        <span class="icon-btn" title="Search">⌕</span>
+        <span class="who">Ama Operations</span>
+        <span class="avatar">AO</span>
+    </div>
+</header>
+
+<div class="app">
+    <aside class="side">
+        <div class="group">
+            <div class="group-label">Freight we carry</div>
+            <a href="#"><span class="ico">▤</span> Containers</a>
+            <a href="#"><span class="ico">◷</span> Milestones</a>
+            <a href="#"><span class="ico">▣</span> Manifests</a>
+            <a href="#"><span class="ico">◇</span> Forwarders</a>
+            <a href="#"><span class="ico">✓</span> Clearance</a>
+        </div>
+        <div class="group">
+            <div class="group-label">Freight customers send</div>
+            <a href="#"><span class="ico">▦</span> Parcels</a>
+            <a href="#"><span class="ico">⌸</span> Pickups</a>
+            <a href="#"><span class="ico">◈</span> Rate cards</a>
+            <a href="#"><span class="ico">◎</span> Zones</a>
+        </div>
+        <div class="group">
+            <div class="group-label">Watch</div>
+            <a href="#" class="on"><span class="ico">!</span> Attention queue</a>
+            <a href="#"><span class="ico">▦</span> All consignments</a>
+        </div>
+    </aside>
+
+    <main class="canvas">
+        <div class="page-head">
+            <div>
+                <h1>Logistics</h1>
+                <p>Every movement to Tema, in both lanes.</p>
+            </div>
+            <div class="crumbs">Logistics / Overview</div>
+        </div>
+
+        <!-- ============ pipeline counters ============ -->
+        <div class="grid tiles-4">
+            <div class="card">
+                <div class="tile">
+                    <span class="disc">▤</span>
+                    <div>
+                        <div class="label">In transit</div>
+                        <div class="fig tnum">1</div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="tile">
+                    <span class="disc">◷</span>
+                    <div>
+                        <div class="label">At Tema</div>
+                        <div class="fig tnum">0</div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="tile">
+                    <span class="disc">▦</span>
+                    <div>
+                        <div class="label">Parcels booked</div>
+                        <div class="fig tnum">0</div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="tile">
+                    <span class="disc alt">!</span>
+                    <div>
+                        <div class="label">Need attention</div>
+                        <div class="fig tnum">3</div>
+                        <div class="delta bad">1 container · 1 parcel · 1 forwarder</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid split" style="margin-top: 16px;">
+            <!-- ============ required action ============ -->
+            <section class="card">
+                <h2>Required action</h2>
+                <p class="sub">Three things are stopped. Everything else is moving.</p>
+
+                <div class="action-row">
+                    <span class="disc">!</span>
+                    <div class="grow">
+                        <div class="t">MSCU 4471 908 has not moved in 4 days</div>
+                        <div class="m">MV Atlantic Trader · Newark → Tema · last milestone SAILING, recorded by hand on 17 Oct. The tracking feed is set to ShipsGo but nothing is polling it.</div>
+                    </div>
+                    <span class="chip bad">4 days</span>
+                </div>
+
+                <div class="action-row">
+                    <span class="disc">!</span>
+                    <div class="grow">
+                        <div class="t">A parcel hold expired while it was still unpaid</div>
+                        <div class="m">20 kg, 60 × 40 × 40 cm from 07030 · quoted $25.00 · hold expired 20 Oct. The rate-card row is still held against it.</div>
+                    </div>
+                    <span class="chip bad">expired</span>
+                </div>
+
+                <div class="action-row">
+                    <span class="disc calm">◇</span>
+                    <div class="grow">
+                        <div class="t">There is no forwarder on file</div>
+                        <div class="m">Nothing can be booked, costed or claimed against a carrier until one exists. 189 lots are on offer and unshipped.</div>
+                    </div>
+                    <span class="chip warn">blocking</span>
+                </div>
+            </section>
+
+            <!-- ============ lane state ============ -->
+            <section class="card">
+                <h2>Money moving</h2>
+                <p class="sub">Cleared on the container, quoted on the parcel.</p>
+
+                <div class="stack" style="gap: 14px;">
+                    <div>
+                        <div class="row between" style="font-size: 12.5px;">
+                            <span class="muted">Duty paid</span><span class="tnum">$940.00</span>
+                        </div>
+                        <div class="bar" style="margin-top: 6px;"><span style="width: 50%"></span></div>
+                    </div>
+                    <div>
+                        <div class="row between" style="font-size: 12.5px;">
+                            <span class="muted">VAT paid</span><span class="tnum">$1,890.00</span>
+                        </div>
+                        <div class="bar" style="margin-top: 6px;"><span style="width: 100%"></span></div>
+                    </div>
+                    <div>
+                        <div class="row between" style="font-size: 12.5px;">
+                            <span class="muted">Port charges</span><span class="tnum">$645.00</span>
+                        </div>
+                        <div class="bar" style="margin-top: 6px;"><span style="width: 34%"></span></div>
+                    </div>
+                    <div>
+                        <div class="row between" style="font-size: 12.5px;">
+                            <span class="muted">Freight &amp; insurance</span><span class="tnum" style="color: var(--brick-600);">not recorded</span>
+                        </div>
+                        <div class="bar" style="margin-top: 6px;"><span class="brick" style="width: 4%"></span></div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--ink-100);">
+                    <div class="tile">
+                        <span class="disc">$</span>
+                        <div>
+                            <div class="label">Customer balance outstanding</div>
+                            <div class="fig tnum">$0.00</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- ============ consignments ============ -->
+        <section class="card flush" style="margin-top: 16px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 18px 20px 14px;">
+                <div>
+                    <h2 style="margin: 0;">Consignments</h2>
+                    <p class="sub" style="margin: 3px 0 0;">Two movements exist. One container we carry, one parcel a customer sent.</p>
+                </div>
+                <div style="display: flex; gap: 9px;">
+                    <span class="btn">Filter</span>
+                    <span class="btn primary">Book a container</span>
+                </div>
+            </div>
+
+            <div class="filters" style="border-top: 1px solid var(--ink-100); border-bottom: 1px solid var(--ink-100);">
+                <div class="field">
+                    <label>Search reference</label>
+                    <div class="box">Container, parcel, lot</div>
+                </div>
+                <div class="field">
+                    <label>Lane</label>
+                    <div class="box solid">Both lanes</div>
+                </div>
+                <div class="field">
+                    <label>State</label>
+                    <div class="box solid">Any state</div>
+                </div>
+                <div class="field">
+                    <label>Owner</label>
+                    <div class="box">Anyone</div>
+                </div>
+            </div>
+
+            <table>
+                <thead>
+                <tr>
+                    <th>Reference</th>
+                    <th>Lane</th>
+                    <th>Contents</th>
+                    <th>Route</th>
+                    <th>State</th>
+                    <th>Last movement</th>
+                    <th>Money</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="mono strong">MSCU 4471 908<span class="sub2">MV Atlantic Trader · ETA 7 Nov</span></td>
+                    <td><span class="chip brick">We carry</span></td>
+                    <td>3 vehicles<span class="sub2">2021 Ford F-150 · 2015 Nissan Armada · 2019 Ford Expedition</span></td>
+                    <td>Newark → Tema</td>
+                    <td><span class="chip warn">Sailing</span></td>
+                    <td class="mono">SAILING 17 Oct<span class="sub2" style="color: var(--brick-600);">silent 4 days</span></td>
+                    <td class="mono">$3,475.00<span class="sub2">cleared and receipted</span></td>
+                </tr>
+                <tr>
+                    <td class="mono strong">gitcdoiifzrojbe8<span class="sub2">20 kg parcel</span></td>
+                    <td><span class="chip">They send</span></td>
+                    <td>60 × 40 × 40 cm<span class="sub2">from 07030</span></td>
+                    <td>07030 → Tema</td>
+                    <td><span class="chip bad">Payment pending</span></td>
+                    <td class="mono">—</td>
+                    <td class="mono">$25.00<span class="sub2">quoted, hold expired 20 Oct</span></td>
+                </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <div class="note">
+            <strong>What this surface is.</strong> The operations console for freight: pipeline counters, a required-action
+            queue, the money moving, and one consignment table that holds both lanes. It is the same shape as CargoPro's
+            Shipping Management (pipeline counters → filter panel → list) and Delix's Parcels (identity, customer, money,
+            status, actions) — re-skinned in the reference's card system.
+        </div>
+    </main>
+</div>
+
+</body>
+</html>

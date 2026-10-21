@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Opoku — dashboard surfaces</title>
+<link rel="stylesheet" href="dashboard-shell.css?v=2">
+</head>
+<body>
+
+<header class="topbar">
+    <span class="brand"><span class="mark">Opoku</span><span class="accent">Brainstorm</span></span>
+    <nav class="topnav">
+        <a href="#surfaces" class="on">Surfaces</a>
+        <a href="#superseded">Superseded</a>
+        <a href="#research">Research</a>
+    </nav>
+    <div class="topbar-right">
+        <span class="who">21 Oct 2026</span>
+    </div>
+</header>
+
+<main class="canvas">
+
+    <div class="page-head">
+        <div>
+            <h1>Three dashboards, not one page</h1>
+            <p>
+                Logistics, operations and the customer portal are separate applications with their own chrome,
+                exactly like the Filament console — never the storefront header and footer. They share one design
+                system: the reference screenshot's card language, in Opoku's paper, ink and brick.
+            </p>
+        </div>
+    </div>
+
+    <section id="surfaces">
+        <div class="grid tiles-3">
+
+            <a href="logistics-2a.html" style="text-decoration: none; color: inherit;">
+                <div class="card" style="height: 100%;">
+                    <span class="chip brick">2a</span>
+                    <h2 style="margin: 10px 0 6px;">Logistics console</h2>
+                    <p class="sub" style="margin-bottom: 14px;">
+                        The operations console for freight. Both lanes on one screen: pipeline counters, a
+                        required-action queue, the money moving, and one consignment table.
+                    </p>
+                    <div class="grid" style="grid-template-columns: repeat(2, 1fr); gap: 8px;">
+                        <div class="tile" style="gap: 9px;"><span class="disc" style="width: 30px; height: 30px; font-size: 12px;">▤</span><div><div class="label">In transit</div><div class="fig tnum" style="font-size: 18px;">1</div></div></div>
+                        <div class="tile" style="gap: 9px;"><span class="disc alt" style="width: 30px; height: 30px; font-size: 12px;">!</span><div><div class="label">Attention</div><div class="fig tnum" style="font-size: 18px;">3</div></div></div>
+                    </div>
+                </div>
+            </a>
+
+            <a href="logistics-2b.html" style="text-decoration: none; color: inherit;">
+                <div class="card" style="height: 100%;">
+                    <span class="chip brick">2b</span>
+                    <h2 style="margin: 10px 0 6px;">Operations console</h2>
+                    <p class="sub" style="margin-bottom: 14px;">
+                        The auction side: what is live, who owes what, what is waiting on a person. Same shell,
+                        different job — so a different default screen.
+                    </p>
+                    <div class="grid" style="grid-template-columns: repeat(2, 1fr); gap: 8px;">
+                        <div class="tile" style="gap: 9px;"><span class="disc" style="width: 30px; height: 30px; font-size: 12px;">▦</span><div><div class="label">Lots live</div><div class="fig tnum" style="font-size: 18px;">192</div></div></div>
+                        <div class="tile" style="gap: 9px;"><span class="disc" style="width: 30px; height: 30px; font-size: 12px;">$</span><div><div class="label">Owed to us</div><div class="fig tnum" style="font-size: 18px;">$0</div></div></div>
+                    </div>
+                </div>
+            </a>
+
+            <a href="logistics-2c.html" style="text-decoration: none; color: inherit;">
+                <div class="card" style="height: 100%;">
+                    <span class="chip brick">2c</span>
+                    <h2 style="margin: 10px 0 6px;">Customer portal</h2>
+                    <p class="sub" style="margin-bottom: 14px;">
+                        The buyer's own account area, in the reference's own layout: icon rail, welcome banner,
+                        three tiles, the freight you are waiting on, and what we need from you.
+                    </p>
+                    <div class="grid" style="grid-template-columns: repeat(2, 1fr); gap: 8px;">
+                        <div class="tile" style="gap: 9px;"><span class="disc" style="width: 30px; height: 30px; font-size: 12px;">◈</span><div><div class="label">Cars arriving</div><div class="fig tnum" style="font-size: 18px;">1</div></div></div>
+                        <div class="tile" style="gap: 9px;"><span class="disc" style="width: 30px; height: 30px; font-size: 12px;">$</span><div><div class="label">Balance</div><div class="fig tnum" style="font-size: 18px;">$0</div></div></div>
+                    </div>
+                </div>
+            </a>
+
+        </div>
+    </section>
+
+    <section id="research" style="margin-top: 22px;">
+        <div class="card">
+            <h2>What the seven demos actually agree on</h2>
+            <p class="sub">Live demos opened and walked, not just read: Delix, CargoPro, We Courier, Movement, Deprixa.</p>
+
+            <div class="grid tiles-2">
+                <div>
+                    <div class="strong" style="font-size: 13px;">Every one of them is a separate application</div>
+                    <p class="muted" style="font-size: 12.5px; margin: 4px 0 0;">
+                        A side bar, a top bar and a breadcrumb. The public site and the account area never share
+                        chrome. We Courier ships four panels (admin, branch, merchant, plus two mobile apps);
+                        Delix has five (admin, account manager, branch manager, merchant, merchant staff).
+                    </p>
+                </div>
+                <div>
+                    <div class="strong" style="font-size: 13px;">The stat tile is the unit of a logistics dashboard</div>
+                    <p class="muted" style="font-size: 12.5px; margin: 4px 0 0;">
+                        Circular icon, label, figure. We Courier: 8 tiles. CargoPro: 5 pipeline counters above one
+                        list. Delix: tiles with sparklines and delta chips. The reference screenshot: 3 tiles.
+                    </p>
+                </div>
+                <div>
+                    <div class="strong" style="font-size: 13px;">Lists are filter panels over dense rows</div>
+                    <p class="muted" style="font-size: 12.5px; margin: 4px 0 0;">
+                        Search tracking · search customer · status · type, then a result count. The row carries
+                        identity, the customer, the money, a status pill and row actions — all on one line.
+                    </p>
+                </div>
+                <div>
+                    <div class="strong" style="font-size: 13px;">History is an event timeline, not a status field</div>
+                    <p class="muted" style="font-size: 12.5px; margin: 4px 0 0;">
+                        Delix's parcel page: a green node on a rail, the event, who did it, and the timestamp.
+                        CargoPro adds "manual event entry" to the same timeline. Our milestones table already
+                        holds this, but no screen renders it yet.
+                    </p>
+                </div>
+                <div>
+                    <div class="strong" style="font-size: 13px;">Nav is grouped by consignment type</div>
+                    <p class="muted" style="font-size: 12.5px; margin: 4px 0 0;">
+                        CargoPro: Prealerts, Shipments, Pickup, Consolidations — each with its own list, dashboard
+                        and payments, plus a shared Tools &amp; Settings. Ours maps to two lanes, so two groups.
+                    </p>
+                </div>
+                <div>
+                    <div class="strong" style="font-size: 13px;">Money gets its own surface</div>
+                    <p class="muted" style="font-size: 12.5px; margin: 4px 0 0;">
+                        Income and payout statement panels sit beside the counters, with COD, VAT, commission and
+                        merchant payable broken out. Freight billed is never a single number.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="superseded" style="margin-top: 22px;">
+        <div class="card">
+            <h2>Superseded — the first three candidates</h2>
+            <p class="sub">
+                Wrong on two counts: they put the storefront's header and footer on a dashboard, and they used our
+                flat hairline language instead of the reference's card system. The spine questions they raised are
+                still open and are answered inside 2a and 2b.
+            </p>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <a class="btn" href="logistics-1a.html">1a Control tower</a>
+                <a class="btn" href="logistics-1b.html">1b Consignment book</a>
+                <a class="btn" href="logistics-1c.html">1c Freight desk</a>
+            </div>
+        </div>
+    </section>
+
+    <div class="note">
+        Every number on these pages is the real contents of the database: the one container, the three vehicles
+        inside it, the duty, VAT and port charges that are actually receipted, the one parcel booking with the
+        hold that expired on 20 Oct, and the 192 lots. Nothing is mocked up.
+    </div>
+
+</main>
+
+</body>
+</html>

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>1c · Freight desk — Opoku Logistics</title>
+<link rel="stylesheet" href="logistics-candidate.css">
+</head>
+<body>
+<div class="wrap">
+
+    <header class="masthead">
+        <span class="id">Candidate 1c — Freight desk</span>
+        <h1>The customer sees their own freight, in both lanes</h1>
+        <p class="meta">
+            Both lanes, one surface. The spine is <strong>the person</strong>: a buyer opens one page and sees
+            every consignment touching them — the cars we carry for them and the parcels they sent us. The staff
+            view lives behind the same nav, one click away. Surface: storefront, customer-facing.
+        </p>
+        <nav>
+            <a href="logistics-candidates.html">All candidates</a>
+            <a href="logistics-1a.html">1a Control tower</a>
+            <a href="logistics-1b.html">1b Consignment book</a>
+            <a href="logistics-1c.html" aria-current="page">1c Freight desk</a>
+        </nav>
+    </header>
+
+    <!-- storefront chrome, drawn lightly so the page reads as the shop -->
+    <div class="row" style="gap: 20px; padding-bottom: 14px; border-bottom: 1px solid var(--ink-200); margin-bottom: 22px;">
+        <span class="strong" style="font-size: 17px;">Opoku <span class="red">Auctions</span></span>
+        <span class="hint">Find cars</span>
+        <span class="hint">How to buy</span>
+        <span class="hint">Fees</span>
+        <span class="hint strong" style="color: var(--ink-950);">Logistics</span>
+        <span class="hint">Track my car</span>
+        <span class="grow"></span>
+        <span class="pill">USD</span>
+        <span class="hint">Kwame A.</span>
+    </div>
+
+    <div class="row" style="justify-content: space-between; align-items: flex-end; margin-bottom: 20px;">
+        <div>
+            <h1 style="margin: 0; font-size: 28px; letter-spacing: -0.02em;">Your freight</h1>
+            <p class="hint" style="margin-top: 4px;">Everything moving to Tema that has your name on it.</p>
+        </div>
+        <span class="btn primary">Get a price</span>
+    </div>
+
+    <div class="grid-2">
+
+        <!-- ========================= LANE A ========================= -->
+        <section class="region">
+            <span class="label">Freight we carry for you</span>
+
+            <div class="box">
+                <div class="row" style="justify-content: space-between;">
+                    <span class="strong">MSCU 4471 908</span>
+                    <span class="pill">Sailing</span>
+                </div>
+                <p class="hint" style="margin: 4px 0 0;">MV Atlantic Trader · Newark → Tema ·
+                    arriving <span class="mono">7 Nov</span></p>
+
+                <ul class="timeline" style="margin-top: 14px;">
+                    <li><span class="mono hint">8 Oct</span><span class="dot done"></span><span>Loaded at Newark</span></li>
+                    <li><span class="mono hint">9 Oct</span><span class="dot done"></span><span>Left the port</span></li>
+                    <li><span class="mono hint">17 Oct</span><span class="dot now"></span><span>On the Atlantic</span></li>
+                    <li><span class="mono hint">7 Nov</span><span class="dot wait"></span><span>Arrives Tema</span></li>
+                    <li><span class="mono hint">—</span><span class="dot wait"></span><span>Ready for collection</span></li>
+                </ul>
+
+                <div style="margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--ink-100);">
+                    <span class="label">Your cars in this container</span>
+                    <table style="margin-top: 6px;">
+                        <tbody>
+                        <tr><td>2021 Ford F-150</td><td class="mono">$3,850.00</td><td class="hint">cleared</td></tr>
+                        <tr><td>2015 Nissan Armada</td><td class="mono">$1,075.00</td><td class="hint">cleared</td></tr>
+                        <tr><td>2019 Ford Expedition</td><td class="mono">$1,525.00</td><td class="hint">cleared</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <p class="hint" style="margin-top: 10px;">Nothing else is on the water for you right now.</p>
+        </section>
+
+        <!-- ========================= LANE B ========================= -->
+        <section class="region">
+            <span class="label">Freight you sent us</span>
+
+            <div class="box tint">
+                <div class="row" style="justify-content: space-between;">
+                    <span class="strong">20 kg parcel · 07030</span>
+                    <span class="pill red">Payment pending</span>
+                </div>
+                <p class="hint" style="margin: 4px 0 0;">60 × 40 × 40 cm · quoted
+                    <span class="mono">$25.00</span> · hold expired 20 Oct</p>
+
+                <ul class="timeline" style="margin-top: 14px;">
+                    <li><span class="mono hint">19 Oct</span><span class="dot done"></span><span>Quote taken</span></li>
+                    <li><span class="mono hint">20 Oct</span><span class="dot now"></span><span>Waiting for your payment</span></li>
+                    <li><span class="mono hint">—</span><span class="dot wait"></span><span>We collect it</span></li>
+                    <li><span class="mono hint">—</span><span class="dot wait"></span><span>In flight</span></li>
+                    <li><span class="mono hint">—</span><span class="dot wait"></span><span>Cleared at Tema</span></li>
+                </ul>
+
+                <div class="row" style="margin-top: 14px; gap: 8px;">
+                    <span class="btn primary">Pay and book</span>
+                    <span class="btn">Get a new price</span>
+                </div>
+            </div>
+
+            <p class="hint" style="margin-top: 10px;">Send another parcel and it joins the same page —
+                no separate account, no separate login.</p>
+        </section>
+    </div>
+
+    <!-- ========================= WHAT WE NEED ========================= -->
+    <section class="region" style="margin-top: 20px;">
+        <span class="label">What we need from you</span>
+        <div class="row" style="gap: 12px; flex-wrap: wrap; align-items: stretch;">
+            <div class="box grow">
+                <p class="strong">ID for clearance</p>
+                <p class="hint">Required before a container can be cleared in your name. One upload, once.</p>
+            </div>
+            <div class="box grow">
+                <p class="strong">Collection point</p>
+                <p class="hint">Where we should pick up your parcel. We have your postcode; we need the door.</p>
+            </div>
+            <div class="box grow">
+                <p class="strong">Nobody waiting on you</p>
+                <p class="hint">Nothing is blocked on you right now. This block disappears when it is empty.</p>
+            </div>
+        </div>
+    </section>
+
+    <div class="row" style="margin-top: 20px; gap: 10px; align-items: center;">
+        <span class="label">Staff</span>
+        <span class="hint">This page is for customers. The operational view lives at
+            <span class="mono">/admin/logistics</span> — a different surface, same data.</span>
+    </div>
+
+    <div class="footer-note">
+        <strong>First slice:</strong> a customer-facing freight page that reads the two consignment tables, plus
+        a booking action that turns a held quote into a real parcel booking with a visible timeline.
+        <strong>Risk:</strong> it does not fix the operational gap. The console still has no way to book a
+        container or record a milestone, so a customer's timeline would be a picture of a system nobody drives.
+    </div>
+
+</div>
+</body>
+</html>

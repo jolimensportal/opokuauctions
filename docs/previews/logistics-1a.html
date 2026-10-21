@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>1a · Control tower — Opoku Logistics</title>
+<link rel="stylesheet" href="logistics-candidate.css">
+</head>
+<body>
+<div class="wrap">
+
+    <header class="masthead">
+        <span class="id">Candidate 1a — Control tower</span>
+        <h1>One screen for everything that needs a human</h1>
+        <p class="meta">
+            Both lanes, one surface. The spine is <strong>the exception</strong>: the screen opens on the
+            things that are stuck, late or unowned, and the healthy freight is a quiet count in the corner.
+            Surface: staff console.
+        </p>
+        <nav>
+            <a href="logistics-candidates.html">All candidates</a>
+            <a href="logistics-1a.html" aria-current="page">1a Control tower</a>
+            <a href="logistics-1b.html">1b Consignment book</a>
+            <a href="logistics-1c.html">1c Freight desk</a>
+        </nav>
+    </header>
+
+    <div class="row" style="gap: 18px; margin-bottom: 18px;">
+        <span class="label">Logistics</span>
+        <span class="pill">Both lanes</span>
+        <span class="pill">Freight we carry</span>
+        <span class="pill">Freight customers send</span>
+        <span class="grow"></span>
+        <span class="hint mono">Tue 21 Oct 2026 · 09:20 GMT</span>
+    </div>
+
+    <div class="split">
+
+        <!-- ========================= EXCEPTIONS ========================= -->
+        <section class="region">
+            <span class="label">Exceptions — everything that is stuck, late or unowned</span>
+
+            <div class="stack">
+
+                <div class="box tint">
+                    <div class="row" style="justify-content: space-between;">
+                        <span class="pill red">4 days silent</span>
+                        <span class="hint mono">raised 17 Oct</span>
+                    </div>
+                    <p class="strong" style="margin: 8px 0 2px;">MSCU 4471 908 has not moved in 4 days</p>
+                    <p class="hint">MV Atlantic Trader · Newark → Tema · last milestone SAILING, recorded by hand
+                        17 Oct. Tracking is set to ShipsGo but nothing is polling it.</p>
+                    <div class="row" style="margin-top: 10px; gap: 8px;">
+                        <span class="btn dark">Record a milestone</span>
+                        <span class="btn">Check the feed</span>
+                        <span class="grow"></span>
+                        <span class="hint">next action · ops</span>
+                    </div>
+                </div>
+
+                <div class="box tint">
+                    <div class="row" style="justify-content: space-between;">
+                        <span class="pill red">expired 20 Oct</span>
+                        <span class="hint mono">ref gitcdoiifzrojbe8</span>
+                    </div>
+                    <p class="strong" style="margin: 8px 0 2px;">A customer parcel booking is still awaiting payment</p>
+                    <p class="hint">20 kg, 60 × 40 × 40 cm, 07030 → Tema · quoted $25.00 · hold expired 20 Oct.
+                        The hold is still consuming a rate-card row.</p>
+                    <div class="row" style="margin-top: 10px; gap: 8px;">
+                        <span class="btn dark">Chase or release</span>
+                        <span class="grow"></span>
+                        <span class="hint">next action · ops</span>
+                    </div>
+                </div>
+
+                <div class="box">
+                    <div class="row" style="justify-content: space-between;">
+                        <span class="pill">no forwarder</span>
+                        <span class="hint mono">MSCU 4471 908</span>
+                    </div>
+                    <p class="strong" style="margin: 8px 0 2px;">A container in transit has no forwarder on file</p>
+                    <p class="hint">There are no forwarder records at all, so nothing can be booked, costed
+                        or claimed against a carrier.</p>
+                    <div class="row" style="margin-top: 10px; gap: 8px;">
+                        <span class="btn">Create the forwarder</span>
+                        <span class="grow"></span>
+                        <span class="hint">next action · ops</span>
+                    </div>
+                </div>
+
+                <div class="box">
+                    <div class="row" style="justify-content: space-between;">
+                        <span class="pill">no tracking</span>
+                        <span class="hint mono">3 lots waiting</span>
+                    </div>
+                    <p class="strong" style="margin: 8px 0 2px;">192 lots are on offer and none is on a shipment</p>
+                    <p class="hint">Three vehicles are booked into MSCU 4471 908. The other 189 are unshipped
+                        and unallocated, so no customer can be told where their car is.</p>
+                    <div class="row" style="margin-top: 10px; gap: 8px;">
+                        <span class="btn">Book a container</span>
+                        <span class="grow"></span>
+                        <span class="hint">next action · ops</span>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ========================= SIDE ========================= -->
+        <aside class="stack">
+
+            <section class="region">
+                <span class="label">Lane — freight we carry</span>
+                <div class="grid-2" style="gap: 8px;">
+                    <div class="box flat"><span class="label">Sailing</span><p class="big tnum">1</p></div>
+                    <div class="box flat"><span class="label">Booked</span><p class="big tnum">0</p></div>
+                    <div class="box flat"><span class="label">At Tema</span><p class="big tnum">0</p></div>
+                    <div class="box flat"><span class="label">Delayed</span><p class="big tnum">0</p></div>
+                </div>
+                <p class="hint" style="margin-top: 10px;">1 container · 3 vehicles inside · 0 forwarders on file</p>
+            </section>
+
+            <section class="region">
+                <span class="label">Lane — freight customers send</span>
+                <div class="grid-2" style="gap: 8px;">
+                    <div class="box flat"><span class="label">Awaiting payment</span><p class="big tnum">1</p></div>
+                    <div class="box flat"><span class="label">Booked</span><p class="big tnum">0</p></div>
+                    <div class="box flat"><span class="label">In flight</span><p class="big tnum">0</p></div>
+                    <div class="box flat"><span class="label">Delivered</span><p class="big tnum">0</p></div>
+                </div>
+                <p class="hint" style="margin-top: 10px;">1 rate card · 6 origin zones · 10 postcode bands ·
+                    0 quotes taken through to a booking</p>
+            </section>
+
+            <section class="region">
+                <span class="label">Money at risk</span>
+                <p class="big tnum">$0.00</p>
+                <p class="hint">Duty $940.00, VAT $1,890.00 and port charges $645.00 are paid and receipted
+                    on MSCU 4471 908. No customer balance is outstanding.</p>
+            </section>
+
+            <section class="region">
+                <span class="label">Does not do</span>
+                <p class="hint">Manifests, documents, per-leg cost breakdown, customer-facing tracking,
+                    hand-over at Tema, or history. This screen answers "what is stuck", nothing else.</p>
+            </section>
+
+        </aside>
+    </div>
+
+    <div class="footer-note">
+        <strong>First slice:</strong> give the console a real Shipments list and a booking action, and derive
+        exceptions from the data that already exists (milestone age, missing forwarder, expired holds).
+        <strong>Risk:</strong> a control tower answers "what is stuck" and goes quiet on "what did we ship
+        last month" — finance and audit questions need a different screen.
+    </div>
+
+</div>
+</body>
+</html>
