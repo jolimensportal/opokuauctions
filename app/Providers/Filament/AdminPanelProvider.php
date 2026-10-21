@@ -2,7 +2,6 @@
 
 namespace App\Providers\Filament;
 
-use App\Http\Controllers\Admin\ConsoleLogoutController;
 use Filament\FontProviders\LocalFontProvider;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -19,7 +18,6 @@ use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
-use Illuminate\Support\Facades\Route;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class AdminPanelProvider extends PanelProvider
@@ -70,12 +68,6 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
-            ])
-            // Registered before Filament's own logout route, so this one is
-            // matched first. Filament's invalidates the whole session, which
-            // would sign the buyer out of the shop as well.
-            ->authenticatedRoutes(function (Panel $panel): void {
-                Route::post('/logout', ConsoleLogoutController::class);
-            });
+            ]);
     }
 }

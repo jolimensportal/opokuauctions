@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\ConsoleLogoutController;
 use App\Http\Controllers\Auth\BuyerAuthController;
 use App\Http\Controllers\Shop\CurrencyController;
 use App\Http\Controllers\Shop\OrderController;
@@ -72,6 +73,21 @@ Route::middleware(['guest:web'])->group(function () {
     Route::get('/register', [BuyerAuthController::class, 'showRegister'])->name('register');
     Route::post('/register', [BuyerAuthController::class, 'register'])->name('register.store');
 });
+
+/*
+| Signing out of the operator console.
+|
+| This deliberately replaces Filament's own logout route. Laravel keeps one
+| route per method and URI, and the app's routes are loaded after the
+| package's, so this one is the route that answers. Filament's invalidates
+| the whole session, which would sign the buyer out of the shop on the same
+| browser; this one drops only the operator's session key.
+|
+| It keeps Filament's route name so the console's own sign-out link still
+| resolves to it.
+*/
+Route::post('/admin/logout', ConsoleLogoutController::class)
+    ->name('filament.admin.auth.logout');
 
 Route::prefix('webhooks')->name('webhooks.')->group(function (): void {
     // Both are called by a machine with no session and no CSRF token. Both

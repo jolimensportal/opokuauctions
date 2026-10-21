@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Enums\Role;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Auth;
 use Tests\TestCase;
 
 /**
@@ -19,24 +20,36 @@ class StorefrontSignOutTest extends TestCase
 {
     use RefreshDatabase;
 
-    private function buyer(): User
+    /** Sign in the way a buyer does, so the session really carries the login. */
+    private function signIn(): User
     {
-        return User::factory()->create(['role' => Role::Buyer]);
+        $buyer = User::factory()->create(['role' => Role::Buyer]);
+
+        $this->post('/login', [
+            'email' => $buyer->email,
+            'password' => 'password',
+        ])->assertRedirect(route('dashboard'));
+
+        // Re-read the session on the next request instead of reusing the
+        // guard instance this request left in memory.
+        Auth::forgetGuards();
+
+        return $buyer;
     }
 
     public function test_a_signed_in_buyer_can_sign_out(): void
     {
-        $this->actingAs($this->buyer(), 'web');
+        $this->signIn();
 
         $this->post('/logout')->assertRedirect(route('home'));
+        Auth::forgetGuards();
 
         $this->get('/account')->assertRedirect(route('login'));
     }
 
     public function test_signing_out_is_a_post_not_a_get(): void
     {
-        $buyer = $this->buyer();
-        $this->actingAs($buyer, 'web');
+        $this->signIn();
 
         // A GET logout is a link a crawler, a prefetcher or an email client
         // can fire without the buyer ever asking for it.
@@ -47,7 +60,7 @@ class StorefrontSignOutTest extends TestCase
 
     public function test_the_account_page_offers_a_sign_out_control(): void
     {
-        $this->actingAs($this->buyer(), 'web');
+        $this->signIn();
 
         $this->get('/account')
             ->assertOk()
