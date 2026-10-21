@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Models\Lot;
 use App\Models\Shipment;
-use App\Models\ShipmentLot;
 use App\Models\ShipmentMilestone;
 use App\Models\Wallet;
 use Illuminate\Support\Facades\DB;
@@ -106,7 +105,10 @@ class CorridorQueries
                 ? (int) $last->occurred_at->diffInDays(now())
                 : null;
 
-            if ($last === null || $shipment->days_stale >= 3) {
+            // The same rule the logistics console uses, so the two dashboards
+            // cannot disagree about whether a container is late. The milestone
+            // is passed in because this loop already loaded it.
+            if (ShipmentStaleness::isSilentSince($last, $shipment->status)) {
                 $stale++;
             }
         }
