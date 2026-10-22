@@ -1,0 +1,90 @@
+/* Opoku — the customer portal.
+
+   Its own application, its own chrome, our design system. The fonts are
+   declared here because the portal does not load the storefront's
+   stylesheet: the account area is a separate application that happens to
+   share the brand. */
+
+@import "tailwindcss/theme.css";
+@import "tailwindcss/utilities.css";
+@import "./opoku-ui.css";
+
+@font-face {
+    font-family: 'DM Sans';
+    font-style: normal;
+    font-weight: 400 700;
+    font-display: swap;
+    src: url('/fonts/DMSans-var.woff2') format('woff2-variations');
+}
+
+@font-face {
+    font-family: 'IBM Plex Mono';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url('/fonts/IBMPlexMono-400.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'IBM Plex Mono';
+    font-style: normal;
+    font-weight: 500;
+    font-display: swap;
+    src: url('/fonts/IBMPlexMono-500.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'IBM Plex Mono';
+    font-style: normal;
+    font-weight: 600;
+    font-display: swap;
+    src: url('/fonts/IBMPlexMono-600.woff2') format('woff2');
+}
+
+/* The portal's own chrome: the top bar and the icon rail, in the reference
+   screenshot's arrangement. The console has its own (a labelled sidebar), so
+   these are the portal's alone. */
+
+.portal-shell {
+    display: grid;
+    grid-template-columns: 68px 1fr;
+    min-height: 100vh;
+    background: var(--canvas);
+}
+
+.portal-rail {
+    background: var(--paper);
+    border-right: 1px solid var(--ink-100);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 20px 0;
+}
+
+.portal-rail a {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    text-decoration: none;
+    color: var(--ink-500);
+    font-size: 15px;
+}
+
+.portal-rail a:hover { background: var(--ink-50); }
+.portal-rail a.on { background: var(--ink-950); color: var(--paper); }
+.portal-rail a.spacer { margin-top: 10px; }
+
+.portal-topbar {
+    height: 68px;
+    display: flex;
+    align-items: center;
+    gap: 26px;
+    padding: 0 26px;
+    background: var(--paper);
+    border-bottom: 1px solid var(--ink-100);
+}
+
+.portal-main { padding: 26px 30px 56px; }
