@@ -173,7 +173,19 @@ class LotsService
                 throw new RuntimeException('Lot has not expired yet');
             }
 
-            $sold = $lot->bid_count > 0 && $lot->current_bid >= $lot->reserve_price;
+            $reserveMet = $lot->bid_count > 0 && $lot->current_bid >= $lot->reserve_price;
+
+            // A sale needs a buyer. A lot can carry a bid count and a current
+            // bid with no bid row behind it - the demo data used to, and a
+            // figure is a number, not a record. Selling that would record a
+            // sale to nobody, and the money panels would then chase a
+            // customer who does not exist. It stays open instead, and the
+            // close command reports it for a human to look at.
+            if ($reserveMet && blank($lot->highest_bidder_id)) {
+                throw new RuntimeException("Lot {$lotId} has a reserve-met bid but no recorded bidder");
+            }
+
+            $sold = $reserveMet;
             $status = $sold ? 'SOLD' : 'RESERVE_NOT_MET';
 
             $lot->status = $status;
