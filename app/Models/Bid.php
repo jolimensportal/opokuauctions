@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * A single bid placed on a lot. Bids are immutable once written: corrections
@@ -26,4 +27,10 @@ class Bid extends Model
         'amount' => 'integer',
         'caused_extension' => 'boolean',
     ];
+
+    /** The lot this bid was placed on. */
+    public function lot(): BelongsTo
+    {
+        return $this->belongsTo(Lot::class);
+    }
 }
