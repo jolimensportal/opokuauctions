@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\ConsoleLogoutController;
 use App\Http\Controllers\Auth\BuyerAuthController;
 use App\Http\Controllers\Shop\CurrencyController;
+use App\Http\Controllers\Shop\CustomerFreightController;
 use App\Http\Controllers\Shop\OrderController;
 use App\Http\Controllers\Shop\QuoteController;
 use App\Http\Controllers\Shop\SenderQuoteController;
@@ -59,6 +60,10 @@ Route::middleware(['auth:web'])->group(function () {
     Route::get('/account/purchases', [OrderController::class, 'purchases'])->name('orders.index');
     Route::get('/account/purchases/{shipment}', [OrderController::class, 'show'])
         ->name('orders.show');
+
+    // The customer portal: a separate application with its own chrome, not a
+    // page of the shop wearing the shop's header and footer.
+    Route::get('/account/freight', CustomerFreightController::class)->name('freight');
 
     // POST, never GET. A GET logout is a link a crawler, a prefetcher or an
     // email client can fire without the buyer ever asking for it.
