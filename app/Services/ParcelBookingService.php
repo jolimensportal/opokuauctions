@@ -54,10 +54,12 @@ class ParcelBookingService
         string $rateCardRowId,
         ?string $email = null,
         ?string $whatsappTo = null,
+        ?int $userId = null,
     ): ParcelBooking {
         $booking = ParcelBooking::create([
             'status' => ParcelBookingStatus::Quoted,
             'email' => $email,
+            'user_id' => $userId,
             'whatsapp_to' => $whatsappTo,
             'country' => $quoteInput['country'],
             'postcode' => $quoteInput['postcode'],

@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\Shop;
 
 use App\Enums\IntakeMethod;
-use App\Http\Controllers\Controller;
 use App\Enums\ShipmentUnit;
+use App\Http\Controllers\Controller;
 use App\Models\RateReservation;
-use App\Services\ParcelBookingService;
 use App\Services\FreightQuoteService;
+use App\Services\ParcelBookingService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -135,6 +135,9 @@ class SenderQuoteController extends Controller
             quotedTotalCents: (int) ($priced->quote?->totalCents ?? 0),
             rateCardRowId: (string) ($priced->quote?->rateCardRowId ?? ''),
             email: $data['email'],
+            // Signed in, the parcel belongs to them and the portal can find
+            // it. A guest's booking is reachable by its email only.
+            userId: auth('web')->id(),
         ) : null;
 
         $request->session()->forget('send.quote_input');

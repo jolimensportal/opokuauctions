@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\ParcelBookingStatus;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 
@@ -23,7 +24,7 @@ class ParcelBooking extends Model
     protected $keyType = 'string';
 
     protected $fillable = [
-        'reference', 'status', 'email', 'whatsapp_to', 'country', 'postcode', 'unit',
+        'reference', 'status', 'email', 'user_id', 'whatsapp_to', 'country', 'postcode', 'unit',
         'weight_grams', 'length_cm', 'width_cm', 'height_cm', 'pickup',
         'quoted_total_cents', 'charge_cents', 'charge_currency', 'fx_rate', 'fx_quote_id', 'rate_card_row_id', 'quote_input', 'payment_link_url',
         'expires_at', 'abandoned_at', 'booked_at',
@@ -57,6 +58,15 @@ class ParcelBooking extends Model
                 $booking->setAttribute('reference', Str::lower(Str::random(16)));
             }
         });
+    }
+
+    /**
+     * The buyer who sent this parcel, when they were signed in when they sent
+     * it. Null for a guest, whose booking is only reachable by its email.
+     */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 
     public function payments(): HasMany
