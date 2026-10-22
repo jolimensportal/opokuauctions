@@ -6,12 +6,15 @@ use App\Services\CorridorQueries;
 use BackedEnum;
 use Filament\Pages\Page;
 use Filament\Support\Icons\Heroicon;
+use UnitEnum;
 
 class CorridorDashboard extends Page
 {
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedSquares2x2;
 
     protected static ?string $navigationLabel = 'Corridor';
+
+    protected static string|UnitEnum|null $navigationGroup = 'Watch';
 
     protected static ?int $navigationSort = 1;
 

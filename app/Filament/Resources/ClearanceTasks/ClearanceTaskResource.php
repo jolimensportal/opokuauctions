@@ -8,6 +8,7 @@ use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use UnitEnum;
 
 /**
  * The clearance checklist is generated from a template and completed in order.
@@ -24,6 +25,8 @@ class ClearanceTaskResource extends Resource
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedClipboardDocumentCheck;
 
     protected static ?string $navigationLabel = 'Customs clearance';
+
+    protected static string|UnitEnum|null $navigationGroup = 'Freight we carry';
 
     protected static ?string $modelLabel = 'clearance task';
 

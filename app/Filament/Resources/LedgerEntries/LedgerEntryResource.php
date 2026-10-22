@@ -7,9 +7,9 @@ use App\Filament\Resources\LedgerEntries\Tables\LedgerEntriesTable;
 use App\Models\LedgerEntry;
 use BackedEnum;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use UnitEnum;
 
 class LedgerEntryResource extends Resource
 {
@@ -18,6 +18,8 @@ class LedgerEntryResource extends Resource
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBookOpen;
 
     protected static ?string $navigationLabel = 'Ledger';
+
+    protected static string|UnitEnum|null $navigationGroup = 'Money';
 
     protected static ?string $modelLabel = 'ledger entry';
 

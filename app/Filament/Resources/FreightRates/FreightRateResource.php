@@ -13,6 +13,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use UnitEnum;
 
 /**
  * What the corridor costs to run, editable.
@@ -33,6 +34,8 @@ class FreightRateResource extends Resource
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedTruck;
 
     protected static ?string $navigationLabel = 'Freight rates';
+
+    protected static string|UnitEnum|null $navigationGroup = 'Freight we carry';
 
     protected static ?string $modelLabel = 'freight rate';
 
