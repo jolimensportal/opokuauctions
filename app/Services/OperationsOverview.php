@@ -82,6 +82,29 @@ class OperationsOverview
     }
 
     /**
+     * Money that is not behaving: sales that were won and not paid for, and
+     * wallets whose cached balance disagrees with their own ledger.
+     *
+     * @return array{needsMoney: array{count: int, cents: int}, drift: array{count: int}}
+     */
+    public function moneyAtRisk(): array
+    {
+        $corridor = app(CorridorQueries::class);
+
+        $needsMoney = $corridor->needsMoney();
+
+        return [
+            'needsMoney' => [
+                'count' => $needsMoney['count'],
+                'cents' => (int) $needsMoney['rows']->sum('current_bid'),
+            ],
+            'drift' => [
+                'count' => $corridor->reconciliationDrift()['count'],
+            ],
+        ];
+    }
+
+    /**
      * What only an operator can move, derived.
      *
      * @return array<int, array{kind: string, title: string, detail: string, action: string, tag: string, tone: string}>

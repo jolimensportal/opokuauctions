@@ -27,7 +27,7 @@
         @endforeach
     </div>
 
-    <div class="grid split" style="margin-top: 1rem;">
+    <div class="grid panels-3" style="margin-top: 1rem;">
         <section class="card">
             <h2>Recent activity</h2>
             <p class="sub">Everything that happened, newest first.</p>
@@ -48,6 +48,28 @@
                     <p class="muted">Nothing has happened yet.</p>
                 @endforelse
             </ul>
+        </section>
+
+        <section class="card">
+            <h2>Money at risk</h2>
+            <p class="sub">Taken, unpaid, or not what the books say.</p>
+
+            <div class="stack" style="gap: 14px;">
+                <div class="row between" style="font-size: 12.5px;">
+                    <span class="muted">Sales won and not paid for</span>
+                    <span class="tnum">{{ $moneyAtRisk['needsMoney']['count'] }} · {{ $money($moneyAtRisk['needsMoney']['cents']) }}</span>
+                </div>
+                <div class="row between" style="font-size: 12.5px;">
+                    <span class="muted">Wallets that disagree with their own ledger</span>
+                    <span class="tnum">{{ $moneyAtRisk['drift']['count'] }}</span>
+                </div>
+            </div>
+
+            @if ($moneyAtRisk['drift']['count'] > 0)
+                <p class="hint" style="margin-top: 14px;">
+                    The numbers above cannot be trusted while a wallet disagrees with its own ledger.
+                </p>
+            @endif
         </section>
 
         <section class="card">

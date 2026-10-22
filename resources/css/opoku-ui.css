@@ -162,6 +162,7 @@ body {
 .grid.tiles-2 { grid-template-columns: repeat(2, 1fr); }
 .grid.split { grid-template-columns: 1.5fr 1fr; }
 .grid.split-even { grid-template-columns: 1fr 1fr; }
+.grid.panels-3 { grid-template-columns: 1.35fr 1fr 1fr; }
 .stack { display: flex; flex-direction: column; gap: 16px; }
 
 /* stat tile: circular icon + label + figure (the reference pattern) */

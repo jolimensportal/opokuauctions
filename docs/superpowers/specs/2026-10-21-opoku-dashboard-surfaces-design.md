@@ -58,10 +58,21 @@ the same records the console writes, in the same design system, with the
 reference's own layout: a narrow icon rail, a standalone top bar, a welcome
 banner, three stat tiles, and a "Required action" panel.
 
-**Why two Filament panels and not one.** The two consoles have different
-sidebars and different default screens, and Filament's navigation is per panel.
-Two panels sharing the `admin` guard gives each its own nav, one login, and no
-custom layout work. A small console switch in the top bar links between them.
+**One Filament panel, not two.** The spec originally called for two panels,
+one per console. That was wrong, and it cost the freight console its
+discoverability: Filament's navigation belongs to the panel, so a second
+panel meant a second sidebar, and the freight console was only reachable by
+typing its URL. Nobody found it. The freight resources now live in the
+operations panel and the navigation groups carry the separation instead:
+
+| Group | Screens |
+|---|---|
+| Marketplace | Dashboard (operations), Lots, Bids |
+| Money | Ledger, Wallets |
+| Freight we carry | Logistics (the freight console), Containers, Forwarders, Customs clearance, Freight rates |
+| Watch | Attention queue |
+
+One console, one login, one navigation, nothing hidden.
 
 **Evidence.** Seven logistics SaaS demos were opened and walked (Delix,
 CargoPro, We Courier, Movement, Deprixa; the two Olivette previews are 410 Gone
@@ -133,10 +144,17 @@ data changes, and the previous one was wrong before it was written.
 
 ## 5. Logistics console — `/admin/logistics`
 
-**Nav, grouped by lane, as CargoPro groups by consignment type:**
-*Freight we carry* (Containers, Milestones, Manifests, Forwarders, Clearance) ·
-*Freight customers send* (Parcels, Pickups, Rate cards, Zones) · *Watch*
-(Attention queue, All consignments).
+**Nav:** the freight screens sit in the console's *Freight we carry* group,
+beside Containers, Forwarders, Customs clearance and Freight rates.
+
+**The old corridor board is gone.** It was a page of its own, next to this
+one, saying much the same thing — two freight screens, and the one with the
+money in it was the harder to find. Its buckets were split by what they are
+about: freight on this console, money on the operations console.
+*Unallocated* (a paid lot on no container) and *disputed* (a container in
+dispute) are exceptions here; *needs money* (sales won and not paid for) and
+*reconciliation drift* (wallets that disagree with their own ledger) are a
+**Money at risk** panel on the operations console.
 
 **Tiles (pipeline counters):** in transit · at Tema · parcels booked · need
 attention.

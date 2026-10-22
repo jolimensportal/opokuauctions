@@ -40,6 +40,7 @@ class OperationsDashboard extends Page
             'summary' => $overview->summary(),
             'activity' => $overview->activity(),
             'actions' => $overview->actions(),
+            'moneyAtRisk' => $overview->moneyAtRisk(),
         ];
     }
 }

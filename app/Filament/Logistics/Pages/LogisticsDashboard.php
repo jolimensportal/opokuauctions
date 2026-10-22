@@ -57,8 +57,10 @@ class LogisticsDashboard extends Page
                 'inTransit' => $shipments->filter(
                     fn (Shipment $shipment): bool => in_array($shipment->status, ['LOADED', 'DEPARTED', 'SAILING'], true)
                 )->count(),
+                // ARRIVED, DISCHARGED, GATE_OUT and CLEARED all mean berthed:
+                // the old corridor board counted only some of them.
                 'atTema' => $shipments->filter(
-                    fn (Shipment $shipment): bool => in_array($shipment->status, ['ARRIVED', 'CLEARED'], true)
+                    fn (Shipment $shipment): bool => in_array($shipment->status, ['ARRIVED', 'DISCHARGED', 'GATE_OUT', 'CLEARED'], true)
                 )->count(),
                 'parcelsBooked' => ParcelBooking::query()
                     ->where('status', 'not', 'payment_pending')

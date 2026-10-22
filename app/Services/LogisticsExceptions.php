@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Lot;
 use App\Models\ParcelBooking;
 use App\Models\Shipment;
 use Carbon\Carbon;
@@ -23,6 +24,8 @@ class LogisticsExceptions
         return [
             ...$this->silentContainers(),
             ...$this->missingCarriers(),
+            ...$this->unallocatedLots(),
+            ...$this->disputedContainers(),
             ...$this->expiredHolds(),
         ];
     }
@@ -90,6 +93,56 @@ class LogisticsExceptions
                     'reference' => $shipment->container_no,
                 ];
             })
+            ->all();
+    }
+
+    /**
+     * A lot that has been paid for and is on no container. Money taken, car
+     * not moving — the most expensive state in the platform to sit in.
+     *
+     * @return array<int, array{kind: string, title: string, detail: string, action: string, reference: ?string}>
+     */
+    private function unallocatedLots(): array
+    {
+        return Lot::query()
+            ->where('status', 'SOLD')
+            ->whereNotNull('balance_settled_at')
+            ->whereDoesntHave('shipmentLot')
+            ->get()
+            ->map(fn (Lot $lot): array => [
+                'kind' => 'unallocated_lot',
+                'title' => sprintf('%s is paid for and on no container', $lot->title),
+                'detail' => sprintf(
+                    'We have the money and the car is not moving. $%s sits in a lot that has no voyage.',
+                    number_format(((int) $lot->current_bid) / 100, 2),
+                ),
+                'action' => 'Put it on the next container, or say why it waits.',
+                'tag' => 'paid, not moving',
+                'tone' => 'bad',
+                'reference' => $lot->id,
+            ])
+            ->all();
+    }
+
+    /**
+     * A container in dispute: funds stay held and nothing here auto-resolves.
+     *
+     * @return array<int, array{kind: string, title: string, detail: string, action: string, reference: ?string}>
+     */
+    private function disputedContainers(): array
+    {
+        return Shipment::query()
+            ->where('status', 'DISPUTED')
+            ->get()
+            ->map(fn (Shipment $shipment): array => [
+                'kind' => 'disputed_container',
+                'title' => sprintf('%s is in dispute', $shipment->container_no),
+                'detail' => 'Funds stay held. Nothing here auto-resolves — only an Owner may release.',
+                'action' => 'Assign the dispute, then settle it.',
+                'tag' => 'disputed',
+                'tone' => 'bad',
+                'reference' => $shipment->container_no,
+            ])
             ->all();
     }
 

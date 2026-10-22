@@ -26,12 +26,12 @@ class AdminSmokeTest extends TestCase
     {
         return [
             'dashboard' => ['/admin'],
-            'corridor dashboard' => ['/admin/corridor-dashboard'],
             'lots' => ['/admin/lots'],
             'bids' => ['/admin/bids'],
             'wallets' => ['/admin/wallets'],
             'ledger' => ['/admin/ledger-entries'],
             'clearance tasks' => ['/admin/clearance-tasks'],
+            'freight console' => ['/admin/logistics'],
             'freight rates' => ['/admin/freight-rates'],
         ];
     }
