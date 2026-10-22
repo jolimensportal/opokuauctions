@@ -50,7 +50,9 @@ class OperationsOverview
             ];
         }
 
-        foreach (Lot::query()->where('status', 'LIVE')->where('ends_at', '<', now())->latest('ends_at')->limit($limit)->get() as $lot) {
+        // Three closed lots, not twelve: a timeline of twelve identical lines
+        // is a list, not a history.
+        foreach (Lot::query()->where('status', 'LIVE')->where('ends_at', '<', now())->latest('ends_at')->limit(3)->get() as $lot) {
             $events[] = [
                 'at' => $lot->ends_at->toIso8601String(),
                 'title' => sprintf('%s closed', $lot->title),
@@ -155,8 +157,8 @@ class OperationsOverview
             'kind' => 'pickup_without_freight',
             'title' => 'A pickup is quoted as a flat fee, so no freight is charged on top',
             'detail' => sprintf(
-                'The pickup row charges %d c as a collection and nothing per kilo, while the forwarder charges the collection and the freight.',
-                (int) $row->min_charge_cents,
+                'The pickup row charges %s as a collection and nothing per kilo, while the forwarder charges the collection and the freight.',
+                '$'.number_format(((int) $row->min_charge_cents) / 100, 2),
             ),
             'action' => 'Add the per-kilo charge to the pickup row.',
             'tag' => 'under-priced',

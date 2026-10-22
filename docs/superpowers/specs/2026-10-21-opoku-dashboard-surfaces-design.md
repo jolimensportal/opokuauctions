@@ -125,8 +125,11 @@ Disputes, Roles & permissions).
 `shipment_milestones`, `clearance_tasks` and the ledger) and *Required action*
 (the items only Ops and Owner can move).
 
-**Required action, on real data, from day one:** the tariff markup (D-1 — the
-rate card bills at cost), the missing pickup charge, and the second forwarder.
+**Required action, derived from the data, not written by hand:** the rate
+card's per-kilo charge against the forwarder's cost, a pickup row that prices
+the collection but not the freight on top of it, and auctions that closed and
+are still open for bids. A hand-written action list goes stale the moment the
+data changes, and the previous one was wrong before it was written.
 
 ## 5. Logistics console — `/admin/logistics`
 
