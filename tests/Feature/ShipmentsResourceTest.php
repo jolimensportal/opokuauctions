@@ -45,14 +45,14 @@ class ShipmentsResourceTest extends TestCase
     public function test_an_operator_can_open_the_shipments_list(): void
     {
         $this->actingAs($this->operator(), 'admin')
-            ->get('/admin/logistics/shipments')
+            ->get('/admin/shipments')
             ->assertOk();
     }
 
     public function test_a_buyer_cannot_open_the_shipments_list(): void
     {
         $this->actingAs(User::factory()->create(['role' => Role::Buyer]), 'admin')
-            ->get('/admin/logistics/shipments')
+            ->get('/admin/shipments')
             ->assertForbidden();
     }
 

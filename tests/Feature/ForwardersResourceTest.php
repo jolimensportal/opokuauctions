@@ -32,14 +32,14 @@ class ForwardersResourceTest extends TestCase
     public function test_an_operator_can_open_the_forwarders_list(): void
     {
         $this->actingAs($this->operator(), 'admin')
-            ->get('/admin/logistics/forwarders')
+            ->get('/admin/forwarders')
             ->assertOk();
     }
 
     public function test_a_buyer_cannot_open_the_forwarders_list(): void
     {
         $this->actingAs(User::factory()->create(['role' => Role::Buyer]), 'admin')
-            ->get('/admin/logistics/forwarders')
+            ->get('/admin/forwarders')
             ->assertForbidden();
     }
 
@@ -80,7 +80,7 @@ class ForwardersResourceTest extends TestCase
         Forwarder::create(['id' => 'fwd_one', 'name' => 'Atlantic Freight']);
 
         $this->actingAs($this->operator(), 'admin')
-            ->get('/admin/logistics/forwarders')
+            ->get('/admin/forwarders')
             ->assertOk()
             ->assertSee('Atlantic Freight');
     }

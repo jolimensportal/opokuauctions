@@ -16,18 +16,23 @@ class LogisticsDashboard extends Page
 
     protected static ?string $navigationLabel = 'Logistics';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Watch';
+    protected static string|UnitEnum|null $navigationGroup = 'Freight we carry';
 
-    protected static ?int $navigationSort = 1;
+    protected static ?int $navigationSort = 0;
 
     protected static ?string $title = 'Logistics';
 
     /**
-     * The console's front door is the console's own URL. Filament's panel
-     * root otherwise redirects to the first page's slug, which would put the
-     * home screen at /admin/logistics/logistics-dashboard.
+     * Its own URL, inside the operations panel.
+     *
+     * This was a second panel, which gave each console its own navigation and
+     * left an operator with no way from one to the other: the freight console
+     * was only reachable by typing its URL, because Filament's navigation
+     * belongs to the panel. One panel with grouped navigation gives the same
+     * separation — the freight groups sit beside the marketplace ones — and
+     * nothing is hidden.
      */
-    protected static ?string $slug = '/';
+    protected static ?string $slug = 'logistics';
 
     protected string $view = 'filament.logistics.pages.logistics-dashboard';
 

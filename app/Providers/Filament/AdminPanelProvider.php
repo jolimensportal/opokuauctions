@@ -79,7 +79,11 @@ class AdminPanelProvider extends PanelProvider
                 ],
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
+            // The freight resources live in their own directory but belong to
+            // this panel: one console, one navigation, no islands.
+            ->discoverResources(in: app_path('Filament/Logistics/Resources'), for: 'App\Filament\Logistics\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
+            ->discoverPages(in: app_path('Filament/Logistics/Pages'), for: 'App\Filament\Logistics\Pages')
             ->pages([
                 OperationsDashboard::class,
             ])
