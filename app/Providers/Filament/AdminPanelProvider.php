@@ -49,12 +49,15 @@ class AdminPanelProvider extends PanelProvider
             ->themeSwitcher(false)
             ->font(
                 'DM Sans',
-                url: fn (): string => asset('fonts/filament/dm-sans/index.css'),
+                url: fn (): string => asset('fonts/dm-sans/index.css'),
                 provider: LocalFontProvider::class,
             )
+            // One family across the product. Filament's mono is used for
+            // table headers, ids and figures, and it is the same sans as
+            // everything else now.
             ->monoFont(
-                'IBM Plex Mono',
-                url: fn (): string => asset('fonts/filament/ibm-plex-mono/index.css'),
+                'DM Sans',
+                url: fn (): string => asset('fonts/dm-sans/index.css'),
                 provider: LocalFontProvider::class,
             )
             ->colors([

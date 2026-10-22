@@ -29,30 +29,6 @@
     src: url('/fonts/DMSans-var.woff2') format('woff2-variations');
 }
 
-@font-face {
-    font-family: 'IBM Plex Mono';
-    font-style: normal;
-    font-weight: 400;
-    font-display: swap;
-    src: url('/fonts/IBMPlexMono-400.woff2') format('woff2');
-}
-
-@font-face {
-    font-family: 'IBM Plex Mono';
-    font-style: normal;
-    font-weight: 500;
-    font-display: swap;
-    src: url('/fonts/IBMPlexMono-500.woff2') format('woff2');
-}
-
-@font-face {
-    font-family: 'IBM Plex Mono';
-    font-style: normal;
-    font-weight: 600;
-    font-display: swap;
-    src: url('/fonts/IBMPlexMono-600.woff2') format('woff2');
-}
-
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
@@ -76,7 +52,13 @@
  */
 @theme {
     --font-sans: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
-    --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', monospace;
+
+    /* One family, everywhere. Tailwind's default for this token is the
+       operating system's monospace stack, so any `font-mono` in a view fell
+       back to Menlo - a second typeface the product did not even ship. The
+       name survives because the intent survives: these are figures, ids and
+       labels, and they are set with tabular figures so columns still line up. */
+    --font-mono: var(--font-sans);
 
     /* A true red. The previous accent was hue 5, which is a rose - it read pink
        against every neutral in the app. Real red sits near hue 27, and at that
@@ -158,10 +140,10 @@ Every pair below was computed against pure white, not eyeballed:
         -webkit-font-smoothing: antialiased;
     }
 
-    /* Money, container numbers, lot references, VINs, timestamps. Identifiers
-       should read as identifiers. */
+    /* Money, container numbers, lot references, VINs, timestamps.
+       One family, but the figures still line up in a column. */
     .tnum {
-        font-family: var(--font-mono);
+        font-family: var(--font-sans);
         font-variant-numeric: tabular-nums;
         letter-spacing: -0.01em;
     }
@@ -344,7 +326,7 @@ Every pair below was computed against pure white, not eyeballed:
 /* A rubber stamp. Tilted, ink-coloured, never perfectly opaque. */
 .stamp {
     display: inline-block;
-    font-family: var(--font-mono);
+    font-family: var(--font-sans);
     font-size: 0.6875rem;
     font-weight: 600;
     letter-spacing: 0.16em;
@@ -366,7 +348,7 @@ Every pair below was computed against pure white, not eyeballed:
 
 /* Field label above field value, the way a form is laid out on a manifest. */
 .field-key {
-    font-family: var(--font-mono);
+    font-family: var(--font-sans);
     font-size: 0.6875rem;
     letter-spacing: 0.1em;
     text-transform: uppercase;
@@ -374,7 +356,7 @@ Every pair below was computed against pure white, not eyeballed:
 }
 
 .field-val {
-    font-family: var(--font-mono);
+    font-family: var(--font-sans);
     font-variant-numeric: tabular-nums;
     color: var(--color-ink-900);
 }

@@ -11,33 +11,8 @@
     src: url('fonts/DMSans-var.woff2') format('woff2-variations');
 }
 
-@font-face {
-    font-family: 'IBM Plex Mono';
-    font-style: normal;
-    font-weight: 400;
-    font-display: swap;
-    src: url('fonts/IBMPlexMono-400.woff2') format('woff2');
-}
-
-@font-face {
-    font-family: 'IBM Plex Mono';
-    font-style: normal;
-    font-weight: 500;
-    font-display: swap;
-    src: url('fonts/IBMPlexMono-500.woff2') format('woff2');
-}
-
-@font-face {
-    font-family: 'IBM Plex Mono';
-    font-style: normal;
-    font-weight: 600;
-    font-display: swap;
-    src: url('fonts/IBMPlexMono-600.woff2') format('woff2');
-}
-
 :root {
     --font-sans: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
-    --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, monospace;
 
     --brick-50: oklch(0.970 0.011 27);
     --brick-100: oklch(0.940 0.028 27);
@@ -75,7 +50,7 @@ body {
     text-wrap: pretty;
 }
 
-.mono, .tnum { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.mono, .tnum { font-family: var(--font-sans); font-variant-numeric: tabular-nums; }
 
 .wrap { max-width: 1320px; margin: 0 auto; padding: 0 24px 72px; }
 
@@ -87,7 +62,7 @@ body {
 }
 
 .masthead .id {
-    font-family: var(--font-mono);
+    font-family: var(--font-sans);
     font-size: 12px;
     font-weight: 600;
     letter-spacing: 0.08em;
@@ -114,7 +89,7 @@ body {
 
 /* --- generic wireframe primitives ------------------------------------- */
 .label {
-    font-family: var(--font-mono);
+    font-family: var(--font-sans);
     font-size: 10px;
     font-weight: 600;
     letter-spacing: 0.14em;
@@ -157,7 +132,7 @@ body {
 table { width: 100%; border-collapse: collapse; font-size: 13px; }
 th {
     text-align: left;
-    font-family: var(--font-mono);
+    font-family: var(--font-sans);
     font-size: 10px;
     font-weight: 600;
     letter-spacing: 0.12em;
@@ -171,7 +146,7 @@ tr:last-child td { border-bottom: 0; }
 
 .pill {
     display: inline-block;
-    font-family: var(--font-mono);
+    font-family: var(--font-sans);
     font-size: 10px;
     font-weight: 600;
     letter-spacing: 0.06em;

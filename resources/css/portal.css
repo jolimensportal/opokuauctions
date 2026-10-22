@@ -17,30 +17,6 @@
     src: url('/fonts/DMSans-var.woff2') format('woff2-variations');
 }
 
-@font-face {
-    font-family: 'IBM Plex Mono';
-    font-style: normal;
-    font-weight: 400;
-    font-display: swap;
-    src: url('/fonts/IBMPlexMono-400.woff2') format('woff2');
-}
-
-@font-face {
-    font-family: 'IBM Plex Mono';
-    font-style: normal;
-    font-weight: 500;
-    font-display: swap;
-    src: url('/fonts/IBMPlexMono-500.woff2') format('woff2');
-}
-
-@font-face {
-    font-family: 'IBM Plex Mono';
-    font-style: normal;
-    font-weight: 600;
-    font-display: swap;
-    src: url('/fonts/IBMPlexMono-600.woff2') format('woff2');
-}
-
 /* The portal's own chrome: the top bar and the icon rail, in the reference
    screenshot's arrangement. The console has its own (a labelled sidebar), so
    these are the portal's alone. */

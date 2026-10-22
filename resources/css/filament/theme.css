@@ -4,8 +4,8 @@
    portal loads too. This file adds what only the console needs: Filament's
    utilities and our fonts.
 
-   The fonts are not declared here. The panel loads DM Sans and IBM Plex Mono
-   through its own font providers, and a second @font-face for the same
+   The fonts are not declared here. The panel loads DM Sans
+   through its own font provider, and a second @font-face for the same
    family would fight with them.
 
    Tailwind's utilities are available in the admin, but its preflight is not
