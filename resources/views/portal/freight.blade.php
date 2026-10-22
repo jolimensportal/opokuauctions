@@ -73,7 +73,7 @@
                         <li>
                             <span class="rail"><span class="node {{ $milestone->type === 'SAILING' ? 'now' : '' }}"></span></span>
                             <div>
-                                <div class="what">{{ \Illuminate\Support\Str::headline($milestone->type) }}</div>
+                                <div class="what">{{ \Illuminate\Support\Str::headline(\Illuminate\Support\Str::lower($milestone->type)) }}</div>
                                 <div class="meta">{{ $milestone->notes ?? 'Recorded movement' }}</div>
                             </div>
                             <span class="when">{{ $milestone->occurred_at->toFormattedDateString() }}</span>

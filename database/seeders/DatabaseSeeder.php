@@ -37,6 +37,9 @@ class DatabaseSeeder extends Seeder
             DemoGoodsSeeder::class,
             DemoInventorySeeder::class,
             DemoShipmentSeeder::class,
+            // Last: it awards one of the container's cars to the buyer, so it
+            // needs the container and the buyer to exist first.
+            DemoBuyerFreightSeeder::class,
         ]);
 
         // This seeder mutes model events, so the Lot creating hook that weighs a
