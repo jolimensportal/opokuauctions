@@ -1,12 +1,10 @@
-# Opoku — Four Operations, One Platform
+# Opoku Operations — Four Operations, One Platform
 
 *What has been built for you. Everything described as live runs today.*
 
 ---
 
-## The short version
-
-This system runs four operations:
+OUR system runs four operations:
 
 1. **Car sales and auctions.**
 2. **Garage and goods sales and auctions.**
