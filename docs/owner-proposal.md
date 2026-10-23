@@ -1,4 +1,4 @@
-# Opoku — One Platform, Two Businesses
+# Opoku — Four Operations, One Platform
 
 *What has been built for you. Everything described as live runs today.*
 
@@ -6,50 +6,107 @@
 
 ## The short version
 
-This system runs two businesses on one set of records:
+This system runs four operations:
 
-**The auction house** — cars and goods from salvage auctions, garage cleanouts,
-estates, foreclosures, liquidators, overstock and trade-ins.
+1. **Car sales and auctions.**
+2. **Garage and goods sales and auctions.**
+3. **Pallet, bale and bulk-lot sales and auctions.**
+4. **3PL logistics** — general shipments from the US and Canada to Tema, for
+   anyone.
 
-**A full third-party logistics (3PL) company** — general shipments from the United
-States and Canada to Tema, for anyone: a private individual sending a parcel or
-a pallet home, a family shipping a barrel, a business moving stock, or a buyer
-moving a car they won.
-
-They are not two products bolted together. They share the same customers, the
-same money, the same containers and the same books.
-
----
-
-## Two businesses, one platform
-
-Most software in this trade picks one side. An auction site. Or a courier's
-booking page. Your business is both, and the handover between them — the moment
-a sold car has to start moving — is where the money and the confusion live.
-
-This platform owns that handover. A lot is filed, bid on, closed and paid for.
-The same system then quotes its freight, books it, puts it in a container,
-clears it at Tema and hands it over. And because the logistics side stands on
-its own, it also sells to people who will never bid on anything: the sender with
-one box is as much a customer as the buyer of a car.
+They are not four products bolted together. They run on one set of records:
+one customer account, one wallet, one container, one set of books. A car sold in
+operation one and a bale sold in operation three travel in the same shipment and
+settle through the same ledger.
 
 ---
 
-## The auction floor takes anything you can sell
+## The four operations
 
-Auction software usually assumes everything is a car. Your business is not that
-narrow, and the system is not either.
+### 1. Car sales and auctions
 
-- **Vehicles and goods are both first-class lots.** A lot is either a vehicle or
-  goods — a pallet, a bundle, or a single item. The operator's form swaps to the
-  right fields automatically.
-- **Bulk lots carry their manifest.** A pallet lot records what is inside it,
-  how many cartons, the grade and its dimensions. The same table holds a single
-  headlamp, with the bulk fields simply left empty.
+Salvage write-offs, insurance write-offs, repossessions, estate cars, trade-ins
+and garage finds. Each car is filed as a vehicle lot with its own details —
+make, model, year, VIN, condition grade, photographs — and weighed against the
+curb-weight table so its shipping cost is real, not estimated.
+
+The buyer sees the landed cost before they bid: the car, the freight to Tema,
+insurance, and the pickup surcharge if they want it collected. They bid. The
+auction closes, the reserve is checked, and the winner is recorded.
+
+### 2. Garage and goods sales and auctions
+
+Individual items out of whole-garage cleanouts and estates: a bed frame, a
+headlamp, a bundle of tools. One item, one lot, one price. These are the lots
+that most auction software cannot even file, because it assumes every lot has a
+VIN.
+
+Here the lot is goods, and the system asks for what a goods lot actually has:
+what it is, its grade, its dimensions, and — when it is a bundle — how many
+pieces are inside it. Provenance is recorded: garage sale, estate, liquidation,
+overstock and returns.
+
+### 3. Pallet, bale and bulk-lot sales and auctions
+
+The wholesale side. A whole pallet, a bale, a half pallet, a mixed container
+lot — goods bought by volume and resold by the piece. These are filed as bulk
+lots with a **unit label** (pallet, half pallet, bale, bundle) and a
+**manifest**: what is inside, how many pieces or cartons, and the grade.
+
+That manifest is the point. A buyer bidding on a 480-carton pallet needs to know
+what they are buying before they commit, and the record has to survive the
+argument afterwards. The same table holds a single headlamp with the bulk fields
+left empty — one item and one pallet are the same kind of record at different
+scales, not two different systems.
+
+### 4. 3PL logistics
+
+A complete third-party logistics operation, sold to anyone — not only to people
+who bought something:
+
+- A private individual sending a parcel or a pallet home.
+- A family shipping a barrel.
+- A business moving stock.
+- An auction buyer moving a car they won.
+
+From the United States and Canada to Tema: quote, collect, consolidate, ship,
+clear, deliver, and account for every step. The section further down covers what
+that means in practice.
+
+---
+
+## Why one platform, and not four
+
+Most operators in this trade end up with a folder of unrelated systems: a
+spreadsheet for cars, a WhatsApp group for bales, a courier's website for
+parcels, and a notebook for who owes what.
+
+The four operations share more than they separate:
+
+- **The same buyer** can buy a car in one operation and a bale in another.
+- **The same container** carries cars, pallets and parcels.
+- **The same money** settles all of it — one wallet, one ledger.
+- **The same handover** — sold, paid, shipped, cleared, delivered — is where the
+  money and the confusion live in this business.
+
+That handover is what this platform owns. It is also the reason the operations
+belong on one system rather than four.
+
+---
+
+## The auction engine serves all three auction operations
+
+Three operations, one engine. What changes between them is the stock and the
+fields; what stays the same is how a lot is bid on, closed and paid for.
+
+- **Vehicles and goods are both first-class lots.** The operator's form swaps to
+  the right fields automatically.
+- **Bulk lots carry their manifest.** Unit label, piece or carton count, grade,
+  dimensions.
 - **Provenance is recorded on every lot.** Garage sale. Foreclosure.
   Liquidation. Overstock and returns. Estate. Salvage auction. Trade-in.
-- **Buyers filter by it.** The storefront boards are real: Vehicles, Garage
-  goods, Salvage write-offs, Garage-sale lots. Buyers narrow by kind,
+- **Buyers filter by it.** Vehicles, Garage goods, Salvage write-offs and
+  Garage-sale lots are real storefront boards. Buyers narrow by kind,
   provenance, city, condition and make.
 
 When a new kind of stock arrives — an estate clearance next month, a container
@@ -68,7 +125,7 @@ Every bid is a record: who, how much, and the exact second it arrived.
 - **A leading bid is demoted, never deleted.** When someone outbids the leader,
   the old bid stays in the history marked as outbid. The full story is there.
 - **The clock defends itself.** A bid in the closing window extends the auction,
-  so no one steals a car by waiting until everyone is asleep.
+  so no one steals a car or a pallet by waiting until everyone is asleep.
 - **A bidder cannot bid against themselves.** The system refuses it.
 
 When a customer says "I bid more than that," you open the record. The
@@ -84,10 +141,10 @@ reserve, sells to the recorded winner if the reserve is met, and marks the lot
 
 Two safeguards matter here.
 
-- **A car is never sold to nobody.** If the figures say a lot met its reserve
-  but no real bidder is recorded against it, the system refuses to invent a sale
-  and flags the lot for a human instead. One real defect was found and fixed
-  this way.
+- **Nothing is sold to nobody.** If the figures say a lot met its reserve but no
+  real bidder is recorded against it, the system refuses to invent a sale and
+  flags the lot for a human instead. One real defect was found and fixed this
+  way.
 - **Closing twice changes nothing.** Running the close again on a closed lot is
   safe.
 
@@ -98,7 +155,7 @@ the hard part, the decision logic, is done and tested.
 
 ## The 3PL — a logistics business, not a shipping page
 
-This is the part that became core. It covers what a third-party logistics (3PL)
+This is the operation that became core. It covers what a third-party logistics
 company has to do for general shipments: quote, collect, consolidate, ship,
 clear, deliver, and account for every step — from the US and Canada to Tema,
 for parcels, pallets and vehicles alike.
@@ -194,9 +251,9 @@ A checklist that matters, not a decorative one.
 - **Money tasks post their cost.** Duty, VAT and port charges go to the ledger,
   because they are the difference between what a buyer paid and what the
   business actually spent. Without them, a landed-cost promise is a guess.
-- **A tick without a receipt is unevidenced, not complete.** Customs disputes
-  are settled with documents, so a money task marked done with no receipt
-  attached is surfaced as a problem rather than quietly passing.
+- **A tick without a receipt is unevidenced, not complete.** Customs disputes are
+  settled with documents, so a money task marked done with no receipt attached
+  is surfaced as a problem rather than quietly passing.
 - **Duty is estimated before the goods leave**, so the buyer knows what they owe
   before they commit, not at the port.
 
@@ -226,16 +283,16 @@ and already balance.
 
 ## Four screens, each for the person who needs it
 
-- **Storefront.** The auction, the lot pages, and the sender quote page — the
-  two front doors of the business.
+- **Storefront.** All three auction operations and the sender quote page — the
+  front doors of the business.
 - **Operations console.** Everything needing action today: lots, bids,
   shipments, clearance, exceptions, money at risk.
 - **Freight console.** The logistics workspace: shipments and containers,
   forwarders, rate cards, clearance tasks, logistics exceptions.
 - **Customer portal.** The buyer or sender signs in and sees their cars, their
-  parcels, their payments and their documents. A guest's booking is found by
-  their email, so someone who sent a parcel before registering does not look at
-  an empty page and think it was lost.
+  goods, their parcels, their payments and their documents. A guest's booking is
+  found by their email, so someone who sent a parcel before registering does not
+  look at an empty page and think it was lost.
 
 Behind them, three roles. A buyer sees only their own business. An operator runs
 the day but cannot move money out of a disputed state. The owner sees everything
@@ -253,8 +310,8 @@ This is not a set of screens mocked up for a meeting.
   that cannot be re-priced.
 - **Every surface was checked in a real browser**, screen by screen — the
   storefront, the operations console, the freight console, the customer portal.
-- **The data is real.** Over 160 lots in the catalog today, with bid histories
-  written as records rather than painted numbers.
+- **The data is real.** Over 160 lots in the catalog today, across vehicles and
+  goods, with bid histories written as records rather than painted numbers.
 
 The usual failure in software is not a missing feature. It is a system that
 looks finished and quietly does the wrong thing with your money. A system that
@@ -271,14 +328,17 @@ checks itself is worth more than one that merely looks complete.
    release the loser, capture the winner. The accounts and operations are built;
    this is the wiring.
 3. **The scheduled closer.** Run the tested closing logic every minute.
-4. **Auto-assignment to a container.** When a car is won and paid, place it on
+4. **Auto-assignment to a container.** When a lot is won and paid, place it on
    the next shipment without a human doing it by hand.
-5. **Direct payments.** Let customers pay into their account by mobile money or
+5. **A bulk-lot board.** Bulk lots are already filed and sold as goods lots with
+   a manifest; a dedicated storefront board for pallets and bales is a filter
+   away.
+6. **Direct payments.** Let customers pay into their account by mobile money or
    card instead of an operator recording it.
-6. **Collection by us.** The third intake method is modelled; it launches when
+7. **Collection by us.** The third intake method is modelled; it launches when
    the route is priced.
-7. **Reports.** What sold, at what margin, over what period. The data is already
-   there.
+8. **Reports.** What sold, in which operation, at what margin, over what period.
+   The data is already there.
 
 Each is a connection to something already built, not a rebuild.
 
@@ -286,12 +346,11 @@ Each is a connection to something already built, not a rebuild.
 
 ## What you are actually getting
 
-Not an auction website. Not a shipping booking page.
-
-Two businesses — the auction house and the logistics company — running on one
-set of records that never forgets, never guesses, and can be handed to someone
-else to run. The lots, the bids, the money, the parcels, the pallets, the
-containers, the clearance, the customers: all of it in one place.
+Four operations — cars, garage and goods, pallet and bale bulk lots, and 3PL
+logistics — running on one set of records that never forgets, never guesses, and
+can be handed to someone else to run. The lots, the bids, the money, the
+parcels, the pallets, the containers, the clearance, the customers: all of it in
+one place.
 
 It is built. It runs. You can walk through it today.
 
