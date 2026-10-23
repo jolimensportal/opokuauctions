@@ -9,7 +9,7 @@ OUR system runs four operations:
 1. **Car sales and auctions.**
 2. **Garage and goods sales and auctions.**
 3. **Pallet, bale and bulk-lot sales and auctions.**
-4. **3PL logistics** — general shipments from the US and Canada to Tema, for
+3. **3PL logistics** — general shipments from the US and Canada to Tema, for
    anyone.
 
 They are not four products bolted together. They run on one set of records:
@@ -146,8 +146,9 @@ Two safeguards matter here.
 - **Closing twice changes nothing.** Running the close again on a closed lot is
   safe.
 
-The schedule that runs the closer every minute is the next switch to turn on —
-the hard part, the decision logic, is done and tested.
+The closer runs on the scheduler every minute. An auction whose time is up
+closes itself: nothing waits for a person to press a button, and nothing depends
+on someone remembering.
 
 ---
 
@@ -302,7 +303,7 @@ and holds the money authority.
 
 This is not a set of screens mocked up for a meeting.
 
-- **525 automated checks** run over the system every time it changes. They catch
+- **530 automated checks** run over the system every time it changes. They catch
   the things that cost money: a bid that goes missing, a wallet that stops
   balancing, a lot sold twice, a container loaded with an unpaid car, a booking
   that cannot be re-priced.
@@ -325,17 +326,16 @@ checks itself is worth more than one that merely looks complete.
 2. **Money held at the bid.** Hold the leader's funds the moment they lead,
    release the loser, capture the winner. The accounts and operations are built;
    this is the wiring.
-3. **The scheduled closer.** Run the tested closing logic every minute.
-4. **Auto-assignment to a container.** When a lot is won and paid, place it on
+3. **Auto-assignment to a container.** When a lot is won and paid, place it on
    the next shipment without a human doing it by hand.
-5. **A bulk-lot board.** Bulk lots are already filed and sold as goods lots with
+4. **A bulk-lot board.** Bulk lots are already filed and sold as goods lots with
    a manifest; a dedicated storefront board for pallets and bales is a filter
    away.
-6. **Direct payments.** Let customers pay into their account by mobile money or
+5. **Direct payments.** Let customers pay into their account by mobile money or
    card instead of an operator recording it.
-7. **Collection by us.** The third intake method is modelled; it launches when
+6. **Collection by us.** The third intake method is modelled; it launches when
    the route is priced.
-8. **Reports.** What sold, in which operation, at what margin, over what period.
+7. **Reports.** What sold, in which operation, at what margin, over what period.
    The data is already there.
 
 Each is a connection to something already built, not a rebuild.
@@ -355,6 +355,6 @@ It is built. It runs. You can walk through it today.
 ---
 
 *Everything described as live is live in the system as it stands. The figures —
-the lot count, the 525 checks, the ledger reconciling to the cent — are
+the lot count, the 530 checks, the ledger reconciling to the cent — are
 measured, not estimated. Anything described as next has not been switched on
 yet, and this document says so.*
