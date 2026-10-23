@@ -108,6 +108,26 @@ class DemoBidSeederTest extends TestCase
         $this->assertSame(165_000, $standing->amount);
     }
 
+    public function test_a_painted_count_the_increment_cannot_reach_is_capped(): void
+    {
+        $lot = $this->paintedLot([
+            'starting_bid' => 320_000,
+            'reserve_price' => 410_000,
+            'bid_increment' => 10_000,
+        ]);
+        $lot->update(['current_bid' => 385_000, 'bid_count' => 14]);
+
+        $this->seed(DemoBidSeeder::class);
+
+        $fresh = $lot->fresh();
+
+        // Seven bids of $10,000 steps fit between $320,000 and $385,000.
+        // Fourteen would have had to land far above the painted price.
+        $this->assertSame(7, Bid::where('lot_id', $lot->id)->count());
+        $this->assertSame(7, $fresh->bid_count);
+        $this->assertSame(385_000, $fresh->current_bid);
+    }
+
     public function test_a_lot_with_no_painted_bids_is_left_alone(): void
     {
         $lot = $this->paintedLot();

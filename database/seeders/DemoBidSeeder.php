@@ -159,18 +159,23 @@ class DemoBidSeeder extends Seeder
      * The amounts of the history: a rising series that lands exactly on the
      * painted current bid.
      *
+     * The painted count is capped at what the increment can actually produce.
+     * A lot painted with 14 bids, a $100 increment and a spread of $650 cannot
+     * have both: fourteen bids rising by the increment land far above the
+     * painted price. Writing fewer real bids is honest; writing bids
+     * placeBid() would refuse is not.
+     *
      * @return array<int, int>
      */
     private function amounts(int $starting, int $target, int $count, int $increment): array
     {
+        $maximum = intdiv(max(0, $target - $starting), $increment) + 1;
+        $count = min($count, $maximum);
+
         $amounts = [];
-        $amount = $starting;
 
         for ($index = 0; $index < $count; $index++) {
-            $remaining = $count - $index - 1;
-
-            $amount = max($amount, $target - ($remaining * $increment));
-            $amounts[] = $amount;
+            $amounts[] = $target - (($count - 1 - $index) * $increment);
         }
 
         return $amounts;
